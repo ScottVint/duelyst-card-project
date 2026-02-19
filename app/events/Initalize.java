@@ -23,6 +23,7 @@ public class Initalize implements EventProcessor{
 	@Override
 	public void processEvent(ActorRef out, GameState gameState, JsonNode message) {
 		// hello this is a change
+		//test
 		
 		gameState.gameInitalised = true;
 		

@@ -31,6 +31,7 @@ sbt.bat
 
 
 # Skip Eclipse Files
+.idea
 *.pydevproject
 .project
 .metadata
