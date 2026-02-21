@@ -1,7 +1,9 @@
 package structures.basic;
 
+import akka.actor.ActorRef;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import commands.BasicCommands;
 
 /**
  * This is a representation of a Unit on the game board.
@@ -25,6 +27,9 @@ public class Unit {
 	Position position;
 	UnitAnimationSet animations;
 	ImageCorrection correction;
+	int maxHealth;
+	int health;
+	int attack;
 	
 	public Unit() {}
 	
@@ -58,6 +63,27 @@ public class Unit {
 		this.position = position;
 		this.animations = animations;
 		this.correction = correction;
+	}
+
+	/**
+	 * Constructs a unit from a card. Sure hope this works!
+	 * @param id
+	 * @param animations
+	 * @param correction
+	 * @param unitDetails
+	 * @author Scott
+	 */
+	public Unit(int id, UnitAnimationSet animations, ImageCorrection correction, BigCard unitDetails) {
+		super();
+		this.id = id;
+		this.animation = UnitAnimationType.idle;
+
+		position = new Position(0,0,0,0);
+		this.correction = correction;
+		this.animations = animations;
+
+		this.maxHealth = unitDetails.getHealth();
+		this.attack = unitDetails.getAttack();
 	}
 
 	public int getId() {
@@ -96,7 +122,28 @@ public class Unit {
 	public void setAnimations(UnitAnimationSet animations) {
 		this.animations = animations;
 	}
-	
+
+	// Extended getter/setters
+
+	public int getHealth() {
+		return health;
+	}
+
+	/** Sets health. Ensures health does not go above maximum.
+	 * @param value
+	 * @author Scott
+	 */
+	public void setHealth (int value) {
+		if(value < 0) {
+			health = 0;
+		} else if (value > maxHealth) {
+			health = maxHealth;
+		} else {
+			health = value;
+		}
+	}
+
+
 	/**
 	 * This command sets the position of the Unit to a specified
 	 * tile.
@@ -106,6 +153,18 @@ public class Unit {
 	public void setPositionByTile(Tile tile) {
 		position = new Position(tile.getXpos(),tile.getYpos(),tile.getTilex(),tile.getTiley());
 	}
-	
-	
+
+	/**
+	 * This command automatically calls setUnitHealth to the
+	 * new health value based on the damage taken, and
+	 * displays it to the UI.
+	 * @param out
+	 * @param damage
+	 * @author Scott
+	 */
+	@JsonIgnore
+	public void takeDamage(ActorRef out, int damage) {
+		setHealth(health-damage);
+		BasicCommands.setUnitHealth(out, this, health);
+	}
 }
