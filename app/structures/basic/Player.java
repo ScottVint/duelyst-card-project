@@ -9,9 +9,10 @@ package structures.basic;
  */
 public class Player {
 
-	int health;
-	int mana;
-	
+	// For use in subclasses, these are now protected instead of private
+	protected int health;
+	protected int mana;
+
 	public Player() {
 		super();
 		this.health = 20;
