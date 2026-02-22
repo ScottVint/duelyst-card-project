@@ -35,14 +35,14 @@ public class BetterUnit extends Unit {
 	/**
 	 * Avatar damage taking method.
 	 * Sets the health of the unit and displays it, then sets the corresponding
-	 * player's health to the same value.
-	 * @param out
+	 * player's health to the same value. <br />
+	 * The display is currently unimplemented.
 	 * @param player
 	 * @param damage
 	 * @author Scott
 	 */
-	public void takeDamage(ActorRef out, Player player, int damage) {
-		super.takeDamage(out, damage);
+	public void takeDamage(Player player, int damage) {
+		super.takeDamage(damage);
 		player.setHealth(this.health);
 	}
 	

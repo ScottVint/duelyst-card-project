@@ -65,26 +65,6 @@ public class Unit {
 		this.correction = correction;
 	}
 
-	/**
-	 * Constructs a unit from a card. Sure hope this works!
-	 * @param id
-	 * @param animations
-	 * @param correction
-	 * @param unitDetails
-	 * @author Scott
-	 */
-	public Unit(int id, UnitAnimationSet animations, ImageCorrection correction, BigCard unitDetails) {
-		super();
-		this.id = id;
-		this.animation = UnitAnimationType.idle;
-
-		position = new Position(0,0,0,0);
-		this.correction = correction;
-		this.animations = animations;
-
-		this.maxHealth = unitDetails.getHealth();
-		this.attack = unitDetails.getAttack();
-	}
 
 	public int getId() {
 		return id;
@@ -158,13 +138,13 @@ public class Unit {
 	 * This command automatically calls setUnitHealth to the
 	 * new health value based on the damage taken, and
 	 * displays it to the UI.
-	 * @param out
+	 * <br /> Unimplemented.
 	 * @param damage
 	 * @author Scott
 	 */
 	@JsonIgnore
-	public void takeDamage(ActorRef out, int damage) {
+	public void takeDamage(int damage) {
 		setHealth(health-damage);
-		BasicCommands.setUnitHealth(out, this, health);
+		//BasicCommands.setUnitHealth(out, this, health);
 	}
 }
