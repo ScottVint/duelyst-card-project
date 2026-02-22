@@ -1,5 +1,7 @@
 package structures;
 
+import structures.basic.players.*;
+
 /**
  * This class can be used to hold information about the on-going game.
  * Its created with the GameActor.
@@ -16,8 +18,10 @@ public class GameState {
 
 	public boolean player1Turn = true; // Tracks current active turn
 
-	public void advanceTurn() {
+	public void advanceTurn(HumanPlayer player1, AIPlayer player2) {
 		player1Turn = !player1Turn;
+		player1.setMana(0);
+		player2.setMana(0);
 	}
 	
 }
