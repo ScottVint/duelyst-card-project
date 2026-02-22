@@ -20,6 +20,12 @@ public class EndTurnClicked implements EventProcessor{
 
 	@Override
 	public void processEvent(ActorRef out, GameState gameState, JsonNode message) {
+
+
+		// Only run if it is the player's turn
+		if(gameState.player1Turn) {
+			gameState.advanceTurn();
+		}
 		
 	}
 

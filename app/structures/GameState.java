@@ -13,5 +13,11 @@ public class GameState {
 	public boolean gameInitalised = false;
 	
 	public boolean something = false;
+
+	public boolean player1Turn = true; // Tracks current active turn
+
+	public void advanceTurn() {
+		player1Turn = !player1Turn;
+	}
 	
 }
