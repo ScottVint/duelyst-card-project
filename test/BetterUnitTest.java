@@ -1,10 +1,5 @@
-import akka.actor.ActorPath;
 import org.junit.Test;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
-import commands.BasicCommands;
-import akka.actor.ActorRef;
 import structures.basic.BetterUnit;
 import structures.basic.players.*;
 import utils.BasicObjectBuilders;
@@ -14,7 +9,7 @@ import static org.junit.Assert.*;
 
 public class BetterUnitTest {
     @Test
-    public void checkPlayerHPLink() {
+    public void testPlayerHPLink() {
 
         HumanPlayer player1 = new HumanPlayer();
         AIPlayer player2 = new AIPlayer();
@@ -42,5 +37,24 @@ public class BetterUnitTest {
 
         assertEquals(player1.getHealth(), playerAvatar.getHealth());
         assertEquals(player2.getHealth(), aiAvatar.getHealth());
+    }
+
+    @Test
+    public void testBottomOut() {
+        HumanPlayer player1 = new HumanPlayer();
+        AIPlayer player2 = new AIPlayer();
+        BetterUnit playerAvatar = (BetterUnit) BasicObjectBuilders.loadUnit(StaticConfFiles.humanAvatar, 0, BetterUnit.class);
+        BetterUnit aiAvatar = (BetterUnit) BasicObjectBuilders.loadUnit(StaticConfFiles.aiAvatar, 0, BetterUnit.class);
+
+        playerAvatar.setHealth(player1, 20);
+        aiAvatar.setHealth(player2, 20);
+
+        playerAvatar.takeDamage(50);
+        aiAvatar.takeDamage(5);
+        aiAvatar.takeDamage(16);
+
+        assertEquals( 0, playerAvatar.getHealth());
+        assertEquals(0, aiAvatar.getHealth());
+
     }
 }
