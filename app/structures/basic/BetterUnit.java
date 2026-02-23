@@ -41,8 +41,8 @@ public class BetterUnit extends Unit {
 	 * @param damage
 	 * @author Scott
 	 */
-	public void takeDamage(Player player, int damage) {
-		super.takeDamage(damage);
+	public void takeDamage(ActorRef out, Player player, int damage) {
+		super.takeDamage(out, damage);
 		player.setHealth(this.health);
 	}
 	
