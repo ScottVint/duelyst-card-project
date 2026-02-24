@@ -27,9 +27,10 @@ public class BetterUnit extends Unit {
 		this.keywords = keywords;
 	};
 
-	public void setHealth(Player player, int health) {
+	public void setHealth(ActorRef out, Player player, int health) {
 		super.setHealth(health);
 		player.setHealth(this.health);
+		BasicCommands.setPlayer1Health(out, this.health);
 	}
 
 	/**

@@ -1,5 +1,7 @@
 import org.junit.Test;
 
+import commands.BasicCommands;
+import commands.DummyTell;
 import structures.basic.BetterUnit;
 import structures.basic.players.*;
 import utils.BasicObjectBuilders;
@@ -7,7 +9,12 @@ import utils.StaticConfFiles;
 
 import static org.junit.Assert.*;
 
-public class BetterUnitTest {
+public class BetterUnitTest implements DummyTell{
+    @Override
+    public void tell(ObjectNode message) {
+        
+    }
+
     @Test
     public void testPlayerHPLink() {
 
