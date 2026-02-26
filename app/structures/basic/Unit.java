@@ -123,7 +123,6 @@ public class Unit {
 		}
 	}
 
-
 	/**
 	 * This command sets the position of the Unit to a specified
 	 * tile.
