@@ -10,12 +10,12 @@ public class AIPlayer extends structures.basic.Player{
 
     public void setHealth(ActorRef out, int health) {
         this.health = health;
-        BasicCommands.setPlayer1Health(out, this);
+        BasicCommands.setPlayer2Health(out, this);
     }
 
     public void setMana(ActorRef out, int mana) {
         this.mana = mana;
-        BasicCommands.setPlayer1Mana(out, this);
+        BasicCommands.setPlayer2Mana(out, this);
     }
 }
 

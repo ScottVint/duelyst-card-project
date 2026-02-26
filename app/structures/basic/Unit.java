@@ -139,12 +139,13 @@ public class Unit {
 	 * new health value based on the damage taken, and
 	 * displays it to the UI.
 	 * <br /> Unimplemented.
+	 * @param out
 	 * @param damage
 	 * @author Scott
 	 */
 	@JsonIgnore
-	public void takeDamage(int damage) {
+	public void takeDamage(ActorRef out, int damage) {
 		setHealth(health-damage);
-		//BasicCommands.setUnitHealth(out, this, health);
+		BasicCommands.setUnitHealth(out, this, health);
 	}
 }
