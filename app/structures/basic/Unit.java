@@ -123,7 +123,6 @@ public class Unit {
 		}
 	}
 
-
 	/**
 	 * This command sets the position of the Unit to a specified
 	 * tile.
@@ -143,8 +142,8 @@ public class Unit {
 	 * @author Scott
 	 */
 	@JsonIgnore
-	public void takeDamage(int damage) {
+	public void takeDamage(ActorRef out, int damage) {
 		setHealth(health-damage);
-		//BasicCommands.setUnitHealth(out, this, health);
+		BasicCommands.setUnitHealth(out, this, health);
 	}
 }

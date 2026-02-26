@@ -29,6 +29,10 @@ public class TileClicked implements EventProcessor{
 		int tiley = message.get("tiley").asInt();
 		
 		if (gameState.something == true) {
+			// Only run if it is the player's turn
+			if(gameState.player1Turn) {
+				;
+			}
 			// do some logic
 		}
 		
