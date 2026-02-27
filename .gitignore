@@ -2,6 +2,13 @@
 # Main Exclusions
 # ---------------------------------------
 
+# macOS system files
+.DS_Store
+
+# Project reference material (PDFs) — not part of the codebase
+Game Information/
+Project Assignment/
+
 # Java Build Target
 target/**
 
@@ -68,3 +75,4 @@ local.properties
 .scala_dependencies
 .worksheet
 /bin/
+.DS_Store

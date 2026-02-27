@@ -10,9 +10,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * or attack. The position is the physical position on the
  * board. UnitAnimationSet contains the underlying information
  * about the animation frames, while ImageCorrection has
- * information for centering the unit on the tile. 
- * 
+ * information for centering the unit on the tile.
+ * <p>
+ * Extended to include combat stats (health, maxHealth, attack).
+ *
  * @author Dr. Richard McCreadie
+ * @author Minghao
  *
  */
 public class Unit {
@@ -25,6 +28,15 @@ public class Unit {
 	Position position;
 	UnitAnimationSet animations;
 	ImageCorrection correction;
+	/** The player who owns this unit. Not serialised to JSON. @author Minghao */
+	@JsonIgnore
+	Player owner;
+	/** Current hit points of this unit. @author Minghao */
+	int health;
+	/** Maximum hit points of this unit. @author Minghao */
+	int maxHealth;
+	/** Attack damage this unit deals per strike. @author Minghao */
+	int attack;
 	
 	public Unit() {}
 	
@@ -98,6 +110,68 @@ public class Unit {
 	}
 	
 	/**
+	 * Returns the player who owns this unit.
+	 * @author Minghao
+	 */
+	public Player getOwner() {
+		return owner;
+	}
+	/**
+	 * Sets the owning player of this unit.
+	 * @param owner the player to assign as owner
+	 * @author Minghao
+	 */
+	public void setOwner(Player owner) {
+		this.owner = owner;
+	}
+
+	/**
+	 * Returns the current health of the unit.
+	 * @author Minghao
+	 */
+	public int getHealth() {
+		return health;
+	}
+	/**
+	 * Sets the current health of the unit.
+	 * @param health new health value
+	 * @author Minghao
+	 */
+	public void setHealth(int health) {
+		this.health = health;
+	}
+	/**
+	 * Returns the maximum health of the unit.
+	 * @author Minghao
+	 */
+	public int getMaxHealth() {
+		return maxHealth;
+	}
+	/**
+	 * Sets the maximum health of the unit.
+	 * @param maxHealth new maximum health value
+	 * @author Minghao
+	 */
+	public void setMaxHealth(int maxHealth) {
+		this.maxHealth = maxHealth;
+	}
+	/**
+	 * Returns the attack damage of the unit.
+	 * @author Minghao
+	 */
+	public int getAttack() {
+		return attack;
+	}
+	/**
+	 * Sets the attack damage of the unit.
+	 * @param attack new attack value
+	 * @author Minghao
+	 */
+	public void setAttack(int attack) {
+		this.attack = attack;
+	}
+
+	/**
 	 * This command sets the position of the Unit to a specified
 	 * tile.
 	 * @param tile
@@ -106,6 +180,6 @@ public class Unit {
 	public void setPositionByTile(Tile tile) {
 		position = new Position(tile.getXpos(),tile.getYpos(),tile.getTilex(),tile.getTiley());
 	}
-	
-	
+
+
 }

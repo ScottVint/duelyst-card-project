@@ -11,8 +11,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * A basic representation of a tile on the game board. Tiles have both a pixel position
  * and a grid position. Tiles also have a width and height in pixels and a series of urls
  * that point to the different renderable textures that a tile might have.
- * 
+ * <p>
+ * Extended to track the Unit currently occupying this tile.
+ *
  * @author Dr. Richard McCreadie
+ * @author Minghao
  *
  */
 public class Tile {
@@ -27,6 +30,9 @@ public class Tile {
 	int height;
 	int tilex;
 	int tiley;
+	/** The unit currently standing on this tile, or null if unoccupied. @author Minghao */
+	@JsonIgnore
+	Unit unit;
 	
 	public Tile() {}
 	
@@ -94,7 +100,22 @@ public class Tile {
 	public void setTiley(int tiley) {
 		this.tiley = tiley;
 	}
-	
+	/**
+	 * Returns the unit currently on this tile, or null if unoccupied.
+	 * @author Minghao
+	 */
+	public Unit getUnit() {
+		return unit;
+	}
+	/**
+	 * Places a unit on this tile. Pass null to mark the tile as empty.
+	 * @param unit the unit to place, or null
+	 * @author Minghao
+	 */
+	public void setUnit(Unit unit) {
+		this.unit = unit;
+	}
+
 	/**
 	 * Loads a tile from a configuration file
 	 * parameters.

@@ -8,18 +8,27 @@ import demo.Loaders_2024_Check;
 import structures.GameState;
 
 // Import the necessary structural classes
+import structures.basic.Card;
 import structures.basic.Player;
 import structures.basic.Unit;
 import structures.basic.Tile;
 import commands.BasicCommands;
+import java.util.List;
 
 /**
  * Indicates that both the core game loop in the browser is starting, meaning
  * that it is ready to recieve commands from the back-end.
- * * {
- * messageType = "initalize"
+ * <p>
+ * Handles Story Card #18: initialises avatars (HP, position, ownership) and
+ * deals 3 starting cards to each player.
+ * <pre>
+ * {
+ *   messageType = "initalize"
  * }
- * * @author Dr. Richard McCreadie
+ * </pre>
+ *
+ * @author Dr. Richard McCreadie
+ * @author Minghao
  */
 public class Initalize implements EventProcessor {
 
@@ -35,6 +44,12 @@ public class Initalize implements EventProcessor {
         // Retrieve the Avatar units for both players
         Unit avatar1 = player1.getAvatar();
         Unit avatar2 = player2.getAvatar();
+
+        // Set avatar ownership so that unit-selection logic (Story Card #3) can
+        // correctly identify which units belong to the human player.
+        // Without this, getOwner() returns null and avatar clicks are ignored.
+        avatar1.setOwner(player1); // @author Minghao
+        avatar2.setOwner(player2); // @author Minghao
 
         // ==========================================
         // Story Card #18 Acceptance Test: Both players and their avatars have initial HP set to 20 [cite: 160]
@@ -80,8 +95,14 @@ public class Initalize implements EventProcessor {
             player2.drawCard();
         }
         
-        // Notify front-end to render Player 1's initial hand (Assuming Player 1 is the local human player)
-        // BasicCommands.drawHand(out, player1.getHand());
+        // Render Player 1's initial hand on the front-end.
+        // BasicCommands.drawCard takes a hand position (1-indexed, 1-6) and mode (0 = normal).
+        // Only Player 1's hand is shown; Player 2 is the AI and has no visible hand.
+        // @author Minghao
+        List<Card> p1Hand = player1.getHand();
+        for (int i = 0; i < p1Hand.size(); i++) {
+            BasicCommands.drawCard(out, p1Hand.get(i), i + 1, 0);
+        }
 
         // Note: As per the template's instructions, comment out the demo execution when implementing your own solution
         // CommandDemo.executeDemo(out); 
