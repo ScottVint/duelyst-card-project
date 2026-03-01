@@ -171,7 +171,7 @@ public class BasicCommands {
 	 * playing in the browser. Ignore this if it is a looping animation.
 	 * @param out
 	 * @param unit
-	 * @param animation
+	 * @param animationToPlay
 	 */
 	@SuppressWarnings({"deprecation"})
 	public static int playUnitAnimation(ActorRef out, Unit unit, UnitAnimationType animationToPlay) {
@@ -396,7 +396,7 @@ public class BasicCommands {
 	 * Plays a projectile fire animation between two tiles
 	 * @param out
 	 * @param effect
-	 * @param tile
+	 * @param startTile
 	 */
 	@SuppressWarnings({"deprecation"})
 	public static void playProjectileAnimation(ActorRef out, EffectAnimation effect, int mode, Tile startTile, Tile targetTile) {
