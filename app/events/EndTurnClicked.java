@@ -23,7 +23,7 @@ public class EndTurnClicked implements EventProcessor{
 
 		// Only run if it is the player's turn
 		if(gameState.player1Turn) {
-			gameState.advanceTurn(gameState.player, gameState.ai);
+			gameState.advanceTurn(out, gameState.player, gameState.ai);
 			System.out.println("Button Clicked");
 		}
 		

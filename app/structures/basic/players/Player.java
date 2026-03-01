@@ -1,4 +1,4 @@
-package structures.basic;
+package structures.basic.players;
 import akka.actor.ActorRef;
 
 /**
@@ -33,7 +33,7 @@ public class Player {
 	public int getMana() {
 		return mana;
 	}
-	public void setMana(int mana) {
+	public void setMana(ActorRef out, int mana) {
 		this.mana = mana;
 	}
 	

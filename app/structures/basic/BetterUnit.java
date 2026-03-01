@@ -4,7 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import akka.actor.ActorRef;
-import commands.BasicCommands;
+import structures.basic.players.Player;
 import utils.BasicObjectBuilders;
 import utils.StaticConfFiles;
 

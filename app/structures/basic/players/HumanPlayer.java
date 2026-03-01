@@ -8,7 +8,7 @@ import commands.BasicCommands;
  * 2 different classes are required to be able to use the frontend commands.
  * @author Scott
  */
-public class HumanPlayer extends structures.basic.Player{
+public class HumanPlayer extends Player {
     public HumanPlayer() {
         super();
     }
