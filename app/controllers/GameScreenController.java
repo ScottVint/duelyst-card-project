@@ -55,6 +55,8 @@ public class GameScreenController extends Controller {
 	}
 	
 	public Props createGameActor(ActorRef out) {
+		System.out.println(out);
 		return Props.create(GameActor.class, out); // calls the constructor for Game Actor
 	}
 }
+
