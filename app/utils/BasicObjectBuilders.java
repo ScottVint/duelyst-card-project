@@ -61,15 +61,14 @@ public class BasicObjectBuilders {
 	 * @param configurationFile
 	 * @return
 	 */
-	public static EffectAnimation loadEffect(String configurationFile) {
-		try {
-			EffectAnimation effect = mapper.readValue(new File(configurationFile), EffectAnimation.class);
-			return effect;
-		} catch (Exception e) {
-			e.printStackTrace();
-
-		}
-		return null;
+		public static EffectAnimation loadEffect(String configurationFile) {
+	try {
+		EffectAnimation effect = mapper.readValue(new File(configurationFile), EffectAnimation.class);
+		return effect;
+	} catch (Exception e) {
+		e.printStackTrace();
+	}
+	return null;
 	}
 
 	/**

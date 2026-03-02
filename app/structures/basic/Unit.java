@@ -1,9 +1,7 @@
 package structures.basic;
 
-import akka.actor.ActorRef;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import commands.BasicCommands;
 
 /**
  * This is a representation of a Unit on the game board.
@@ -27,9 +25,6 @@ public class Unit {
 	Position position;
 	UnitAnimationSet animations;
 	ImageCorrection correction;
-	int maxHealth;
-	int health;
-	int attack;
 	
 	public Unit() {}
 	
@@ -64,7 +59,6 @@ public class Unit {
 		this.animations = animations;
 		this.correction = correction;
 	}
-
 
 	public int getId() {
 		return id;
@@ -102,27 +96,7 @@ public class Unit {
 	public void setAnimations(UnitAnimationSet animations) {
 		this.animations = animations;
 	}
-
-	// Extended getter/setters
-
-	public int getHealth() {
-		return health;
-	}
-
-	/** Sets health. Ensures health does not go above maximum.
-	 * @param value
-	 * @author Scott
-	 */
-	public void setHealth (int value) {
-		if(value < 0) {
-			health = 0;
-		} else if (value > maxHealth) {
-			health = maxHealth;
-		} else {
-			health = value;
-		}
-	}
-
+	
 	/**
 	 * This command sets the position of the Unit to a specified
 	 * tile.
@@ -132,18 +106,6 @@ public class Unit {
 	public void setPositionByTile(Tile tile) {
 		position = new Position(tile.getXpos(),tile.getYpos(),tile.getTilex(),tile.getTiley());
 	}
-
-	/**
-	 * This command automatically calls setUnitHealth to the
-	 * new health value based on the damage taken, and
-	 * displays it to the UI.
-	 * <br /> Unimplemented.
-	 * @param damage
-	 * @author Scott
-	 */
-	@JsonIgnore
-	public void takeDamage(ActorRef out, int damage) {
-		setHealth(health-damage);
-		BasicCommands.setUnitHealth(out, this, health);
-	}
+	
+	
 }

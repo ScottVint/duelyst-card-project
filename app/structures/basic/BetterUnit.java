@@ -3,8 +3,6 @@ package structures.basic;
 import java.util.HashSet;
 import java.util.Set;
 
-import akka.actor.ActorRef;
-import commands.BasicCommands;
 import utils.BasicObjectBuilders;
 import utils.StaticConfFiles;
 
@@ -26,25 +24,6 @@ public class BetterUnit extends Unit {
 	public void setKeywords(Set<String> keywords) {
 		this.keywords = keywords;
 	};
-
-	public void setHealth(Player player, int health) {
-		super.setHealth(health);
-		player.setHealth(this.health);
-	}
-
-	/**
-	 * Avatar damage taking method.
-	 * Sets the health of the unit and displays it, then sets the corresponding
-	 * player's health to the same value. <br />
-	 * The display is currently unimplemented.
-	 * @param player
-	 * @param damage
-	 * @author Scott
-	 */
-	public void takeDamage(ActorRef out, Player player, int damage) {
-		super.takeDamage(out, damage);
-		player.setHealth(this.health);
-	}
 	
 	
 	public static void main(String[] args) {

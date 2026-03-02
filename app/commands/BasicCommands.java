@@ -32,9 +32,9 @@ public class BasicCommands {
 	
 	/**
 	 * You can consider the contents of the user’s browser window a canvas that can be drawn upon. drawTile will draw 
-	 * the image of a board tile on the board. This command takes as input a Tile object and a visualisation mode (an 
-	 * integer) that specifies which version of the tile to render (each tile has multiple versions, e.g. normal vs. 
-	 * highlighted). This command can be used multiple times to change the visualisation mode for a tile.
+at specifies which version of the tile to render (each tile has multiple versions, e.g. normal vs.
+	 * highlighted). This command can be used mu	 * the image of a board tile on the board. This command takes as input a Tile object and a visualisation mode (an
+	 * 	 * integer) thltiple times to change the visualisation mode for a tile.
 	 * @param out
 	 * @param tile
 	 * @param mode
