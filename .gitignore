@@ -20,12 +20,14 @@ null/**
 
 # SBT Components
 logs/**
-project/**
+project/target/**
+project/project/**
 public/**
 sbt-dist/**
 scripts/**
 sbt
 sbt.bat
+.bsp/
 
 # ---------------------------------------
 # Additional Files from IDE's
@@ -76,3 +78,4 @@ local.properties
 .worksheet
 /bin/
 .DS_Store
+.claude/**
