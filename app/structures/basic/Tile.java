@@ -27,6 +27,9 @@ public class Tile {
 	int height;
 	int tilex;
 	int tiley;
+
+	// added
+	private Unit unitOnTile = null;
 	
 	public Tile() {}
 	
@@ -113,6 +116,7 @@ public class Tile {
 		return null;
 		
 	}
+
 	
 	
 	

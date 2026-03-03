@@ -7,6 +7,7 @@ import commands.BasicCommands;
 import demo.CommandDemo;
 import demo.Loaders_2024_Check;
 import structures.GameState;
+import structures.basic.Board;
 import structures.basic.players.AIPlayer;
 import structures.basic.players.HumanPlayer;
 import utils.BasicObjectBuilders;
@@ -30,6 +31,11 @@ public class Initalize implements EventProcessor{
 		gameState.gameInitalised = true;
 		
 		gameState.something = true;
+
+		gameState.board = new Board();
+		gameState.board.clearSelection(out);
+
+
 		
 		// User 1 makes a change
 //		CommandDemo.executeDemo(out); // this executes the command demo, comment out this when implementing your solution

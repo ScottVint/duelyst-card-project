@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
+import structures.basic.Board;
 import structures.basic.Tile;
 import structures.basic.Unit;
 
@@ -25,9 +27,13 @@ public class GameState {
 
 	public boolean player1Turn = true; // Tracks current active turn
 
+    public Board board;
+
 	// Player classes
 	public HumanPlayer player = new HumanPlayer();
 	public AIPlayer ai = new AIPlayer();
+
+
 
 	public void advanceTurn(HumanPlayer player1, AIPlayer player2) {
 		player1Turn = !player1Turn;
