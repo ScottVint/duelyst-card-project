@@ -30,6 +30,14 @@ public class GameState {
 	private Board board;
 	/** The unit currently selected by the player, or null if none. @author Minghao */
 	private Unit selectedUnit;
+	/** True when it is Player 1's turn to act. @author Minghao */
+	private boolean player1Turn = true;
+	/** How many turns Player 1 has had (starts at 1 since the game opens on P1's first turn). @author Minghao */
+	private int player1TurnCount = 1;
+	/** How many turns Player 2 has had (0 until P1 first ends their turn). @author Minghao */
+	private int player2TurnCount = 0;
+	/** Hand position (1-indexed) of the card selected by the player, or -1 if none. @author Minghao */
+	private int selectedHandPosition = -1;
 
 	/**
 	 * Initialises the board, loads both avatars from config, and prepares
@@ -92,5 +100,29 @@ public class GameState {
 	public void setSelectedUnit(Unit unit) {
 		this.selectedUnit = unit;
 	}
+
+	/** Returns true when it is Player 1's turn. @author Minghao */
+	public boolean isPlayer1Turn() { return player1Turn; }
+
+	/** Sets whose turn it is. @author Minghao */
+	public void setPlayer1Turn(boolean player1Turn) { this.player1Turn = player1Turn; }
+
+	/** Returns how many turns Player 1 has had so far. @author Minghao */
+	public int getPlayer1TurnCount() { return player1TurnCount; }
+
+	/** Returns how many turns Player 2 has had so far. @author Minghao */
+	public int getPlayer2TurnCount() { return player2TurnCount; }
+
+	/** Increments Player 1's turn counter (called when P1's new turn begins). @author Minghao */
+	public void incrementPlayer1TurnCount() { player1TurnCount++; }
+
+	/** Increments Player 2's turn counter (called when P2's new turn begins). @author Minghao */
+	public void incrementPlayer2TurnCount() { player2TurnCount++; }
+
+	/** Returns the 1-indexed hand position of the selected card, or -1 if none. @author Minghao */
+	public int getSelectedHandPosition() { return selectedHandPosition; }
+
+	/** Sets the selected hand position. Pass -1 to deselect. @author Minghao */
+	public void setSelectedHandPosition(int pos) { this.selectedHandPosition = pos; }
 
 }

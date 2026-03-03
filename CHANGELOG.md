@@ -4,6 +4,79 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [Unreleased] — 2026-03-03
+
+### Added
+
+#### `app/events/EndTurnClicked.java` — Story Card #6 (Mana Replenishment)
+- Implemented turn-end mana logic: when a player ends their turn, the opposing player's mana is replenished to `min(N + 1, 9)`, where N is that player's turn count (capped at 9 to match standard Duelyst rules).
+- Clears any active unit/card selection (`selectedUnit`, `selectedHandPosition`) at the start of each new turn.
+- Clears all board highlights (mode 0) left over from the previous turn.
+- Front-end mana display updated immediately via `BasicCommands.setPlayer1Mana` / `setPlayer2Mana`.
+- Author: Minghao
+
+#### `app/events/CardClicked.java` — Story Card #22 (Summon Tile Highlighting)
+- Fully implemented: selecting a creature card from Player 1's hand highlights all empty board tiles adjacent (8-directional, 1 step) to any friendly unit already on the board in green (mode 2).
+- Occupied adjacent tiles are never highlighted as valid summon destinations.
+- Clears all previous highlights before applying new ones, preventing stale green tiles from prior selections.
+- Spell (non-creature) cards do not trigger any summon highlights.
+- Author: Minghao
+
+#### `test/EndTurnClickedTest.java` *(new file)* — 5 tests for Story Card #6
+- `endingPlayer1TurnReplenishesPlayer2Mana` — P2 receives mana = 2 on their first turn.
+- `endingPlayer2TurnReplenishesPlayer1Mana` — P1 receives mana = 3 on their second turn.
+- `manaIsNeverMoreThanNine` — mana is capped at 9 regardless of turn count.
+- `endTurnClearsSelectedUnit` — `selectedUnit` is null after end turn.
+- `endTurnClearsSelectedHandPosition` — `selectedHandPosition` is −1 after end turn.
+- Author: Minghao
+
+#### `test/CardClickedTest.java` *(new file)* — 5 tests for Story Card #22
+- `selectingCreatureCardStoresHandPosition` — GameState records the selected hand position.
+- `selectingCreatureCardHighlightsAllAdjacentEmptyTiles` — all 8 neighbours of the P1 avatar at [2,3] are highlighted in green.
+- `occupiedAdjacentTileIsNotHighlighted` — a tile occupied by any unit is excluded from highlights.
+- `spellCardDoesNotHighlightSummonTiles` — spell cards produce no green (mode 2) highlights.
+- `clickingNewCardClearsPreviousHighlights` — switching card selection sends mode-0 resets before new highlights.
+- Author: Minghao
+
+---
+
+### Changed
+
+#### `app/structures/GameState.java`
+- Added `boolean player1Turn = true` to track whose turn it is.
+- Added `int player1TurnCount = 1` and `int player2TurnCount = 0` to calculate per-turn mana.
+- Added `int selectedHandPosition = -1` to track the card currently selected in the hand (−1 = none).
+- Added matching getters (`isPlayer1Turn`, `getPlayer1TurnCount`, `getPlayer2TurnCount`, `getSelectedHandPosition`), setters, and `incrementPlayer1TurnCount` / `incrementPlayer2TurnCount` helpers.
+- Author: Minghao
+
+#### `app/events/Initalize.java`
+- Added `player1.setMana(2)` and `BasicCommands.setPlayer1Mana(out, player1)` to set Player 1's starting mana for turn 1 (Story Card #6).
+- Author: Minghao
+
+#### `build.sbt`
+- Added `javaOptions` with four `--add-opens` flags and `fork := true` so the forked test JVM can run Guice/CGLIB under Java 21 without `InaccessibleObjectException`.
+
+#### `.gitignore`
+- Changed `public/**` to `public/images/**` so that `public/js/` and `public/css/` can be tracked by git.
+
+---
+
+### Build / Infrastructure
+
+#### `.sbtopts` *(new file)*
+- Passes four `-J--add-opens` flags directly to the sbt launcher JVM, fixing the `CodeGenerationException: InaccessibleObjectException` (`ClassLoader.defineClass`) crash that occurred when running `sbt run` under Java 21 with Play 2.8's bundled Guice/CGLIB.
+
+---
+
+### Story Cards Addressed
+
+| # | Title | Changes |
+|---|-------|---------|
+| #6 | Mana Display & Replenishment | Full implementation in `EndTurnClicked`; initial mana set in `Initalize` |
+| #22 | Summon Tile Highlighting | Full implementation in `CardClicked`; green highlights for adjacent empty tiles |
+
+---
+
 ## [Unreleased] — 2026-02-27
 
 ### Added

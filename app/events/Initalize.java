@@ -68,6 +68,12 @@ public class Initalize implements EventProcessor {
         BasicCommands.setPlayer2Health(out, player2);
 
         // ==========================================
+        // Story Card #6 Acceptance Test: Player 1 starts their first turn with 2 mana [cite: SC6]
+        // ==========================================
+        player1.setMana(2);
+        BasicCommands.setPlayer1Mana(out, player1);
+
+        // ==========================================
         // Story Card #18 Acceptance Test: Set initial avatar positions
         // ==========================================
         

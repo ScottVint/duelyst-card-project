@@ -30,5 +30,13 @@ lazy val root = (project in file("."))
       "-Xlint:unchecked",
       "-Xlint:deprecation",
       "-Werror"
-    )
+    ),
+    // Allow Guice/CGLIB to use reflection on java.lang internals (required for Java 16+)
+    javaOptions ++= Seq(
+      "--add-opens", "java.base/java.lang=ALL-UNNAMED",
+      "--add-opens", "java.base/java.lang.reflect=ALL-UNNAMED",
+      "--add-opens", "java.base/java.util=ALL-UNNAMED",
+      "--add-opens", "java.base/java.util.concurrent=ALL-UNNAMED"
+    ),
+    fork := true
   )

@@ -22,7 +22,7 @@ null/**
 logs/**
 project/target/**
 project/project/**
-public/**
+public/images/**
 sbt-dist/**
 scripts/**
 sbt
