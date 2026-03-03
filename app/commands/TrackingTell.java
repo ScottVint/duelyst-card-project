@@ -13,7 +13,7 @@ import structures.basic.Unit;
  * Intercepts BasicCommands messages while still forwarding them to the UI.
  * Used to capture Tile/Unit objects created by CommandDemo into GameState.
  */
-public class TrackingTell extends DummyTell {
+public class TrackingTell implements DummyTell {
 
     private final ActorRef out;
     private final GameState gameState;
@@ -37,9 +37,9 @@ public class TrackingTell extends DummyTell {
                 Tile tile = mapper.treeToValue(tileNode, Tile.class);
                 int x = tile.getTilex();
                 int y = tile.getTiley();
-                if (gameState.inBounds(x, y)) {
-                    gameState.board[x][y] = tile;
-                }
+//                if (gameState.inBounds(x, y)) {
+//                    gameState.board[x][y] = tile;
+//                }
             }
 
             if ("drawUnit".equals(type)) {
