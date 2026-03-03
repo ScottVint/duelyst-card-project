@@ -1,11 +1,18 @@
 package structures;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import structures.basic.Tile;
+import structures.basic.Unit;
+
 import structures.basic.players.*;
 
 /**
  * This class can be used to hold information about the on-going game.
- * Its created with the GameActor.
- * 
+ * It's created with the GameActor.
+ *
  * @author Dr. Richard McCreadie
  *
  */
@@ -32,5 +39,36 @@ public class GameState {
 			System.out.println("Player 2 turn");
 		}
 	}
-	
+
+
+ // Selected unit
+    public Unit selectedUnit = null;
+
+    //TODO Check wtf is going on here
+    public Map<Integer, Unit> unitsById = new HashMap<>();
+    public Map<String, Integer> occupiedByUnitId = new HashMap<>(); // "x,y" -> unitId
+
+    // For demo: identify player avatars by spawn tiles
+    //TODO I don't think this is needed?
+    public Integer p1AvatarId = null; // unit on (2,3)
+    public Integer p2AvatarId = null; // unit on (8,3)
+
+    // Highlight caches
+    public Set<String> validMoveTiles = new HashSet<>();
+    public Set<String> validAttackTiles = new HashSet<>();
+
+    // Animation lock
+    public boolean isAnimating = false;
+
+    //TODO These shouldn't be here
+    public static String key(int x, int y) { return x + "," + y; }
+
+    public void clearHighlights() {
+        validMoveTiles.clear();
+        validAttackTiles.clear();
+    }
+
+    public void clearSelection() {
+        selectedUnit = null;
+    }
 }
