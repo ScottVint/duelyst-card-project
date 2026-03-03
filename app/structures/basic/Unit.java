@@ -138,6 +138,7 @@ public class Unit {
 	 * new health value based on the damage taken, and
 	 * displays it to the UI.
 	 * <br /> Unimplemented.
+	 * @param out
 	 * @param damage
 	 * @author Scott
 	 */

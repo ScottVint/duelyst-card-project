@@ -4,7 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import akka.actor.ActorRef;
-import commands.BasicCommands;
+import structures.basic.players.Player;
 import utils.BasicObjectBuilders;
 import utils.StaticConfFiles;
 
@@ -27,9 +27,9 @@ public class BetterUnit extends Unit {
 		this.keywords = keywords;
 	};
 
-	public void setHealth(Player player, int health) {
+	public void setHealth(ActorRef out, Player player, int health) {
 		super.setHealth(health);
-		player.setHealth(this.health);
+		player.setHealth(out, this.health);
 	}
 
 	/**
@@ -43,7 +43,7 @@ public class BetterUnit extends Unit {
 	 */
 	public void takeDamage(ActorRef out, Player player, int damage) {
 		super.takeDamage(out, damage);
-		player.setHealth(this.health);
+		player.setHealth(out, this.health);
 	}
 	
 	

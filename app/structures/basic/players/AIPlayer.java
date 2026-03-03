@@ -3,19 +3,26 @@ package structures.basic.players;
 import akka.actor.ActorRef;
 import commands.BasicCommands;
 
-public class AIPlayer extends structures.basic.Player{
+// Called AIPlayer for our purposes, but more realistically
+// can be used as a player 2.
+//                                      --Scott
+public class AIPlayer extends Player {
+
+
     public AIPlayer() {
         super();
     }
 
+    @Override
     public void setHealth(ActorRef out, int health) {
         this.health = health;
-        BasicCommands.setPlayer1Health(out, this);
+        BasicCommands.setPlayer2Health(out, this);
     }
 
+    @Override
     public void setMana(ActorRef out, int mana) {
         this.mana = mana;
-        BasicCommands.setPlayer1Mana(out, this);
+        BasicCommands.setPlayer2Mana(out, this);
     }
 }
 
