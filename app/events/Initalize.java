@@ -3,9 +3,13 @@ package events;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import akka.actor.ActorRef;
+import commands.BasicCommands;
 import demo.CommandDemo;
 import demo.Loaders_2024_Check;
 import structures.GameState;
+import structures.basic.players.AIPlayer;
+import structures.basic.players.HumanPlayer;
+import utils.BasicObjectBuilders;
 
 /**
  * Indicates that both the core game loop in the browser is starting, meaning
@@ -22,15 +26,13 @@ public class Initalize implements EventProcessor{
 
 	@Override
 	public void processEvent(ActorRef out, GameState gameState, JsonNode message) {
-		// hello this is a change
-		//test
-		
+
 		gameState.gameInitalised = true;
 		
 		gameState.something = true;
 		
 		// User 1 makes a change
-		CommandDemo.executeDemo(out); // this executes the command demo, comment out this when implementing your solution
+//		CommandDemo.executeDemo(out); // this executes the command demo, comment out this when implementing your solution
 		//Loaders_2024_Check.test(out);
 	}
 
