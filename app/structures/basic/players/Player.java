@@ -3,6 +3,10 @@ package structures.basic.players;
 import structures.basic.Card;
 import structures.basic.Deck;
 import structures.basic.Hand;
+import structures.basic.Unit;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * A basic representation of the Player. A player
@@ -18,6 +22,7 @@ public class Player {
 	protected int mana;
 	protected Deck deck = new Deck(this);
 	protected Hand hand = new Hand();
+	protected Map<Integer, Unit> units = new HashMap<>();
 
 	public Player() {
 		super();
@@ -42,9 +47,18 @@ public class Player {
 		this.mana = mana;
 	}
 
-	// Shared methods
+	// Shared getters
 	public Deck getDeck() { return deck; }
 	public Hand getHand() { return hand; }
+	public Map<Integer, Unit> getUnits() { return units; }
+
+	public void addUnit(Integer id, Unit unit) {
+		this.units.put(id, unit);
+	}
+
+	public void removeUnit(Integer id) {
+		this.units.remove(id);
+	}
 
 	public void drawToHand() {
 		Card card = this.deck.drawFromDeck();

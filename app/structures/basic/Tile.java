@@ -100,6 +100,7 @@ public class Tile {
 
 	// More accessors
 	public Unit getUnitOnTile() { return unitOnTile; }
+	public void setUnitOnTile(Unit unit) { this.unitOnTile = unit; }
 	
 	/**
 	 * Loads a tile from a configuration file
