@@ -4,6 +4,45 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [Unreleased] — 2026-03-04
+
+### Added
+
+#### `app/events/OtherClicked.java` — Story Card #12 (Cancel Selection)
+- Fully implemented from empty stub: clicking a non-interactive area clears `selectedUnit`, `selectedHandPosition`, and sends mode-0 resets for every board tile.
+- Author: Minghao
+
+#### `app/events/CardClicked.java` — Story Card #12 (Card Toggle Deselect)
+- Added toggle behaviour: if the player clicks a card that is already selected, it is immediately deselected (`selectedHandPosition` → −1) and all highlights are cleared — without re-applying new ones.
+- Author: Minghao
+
+#### `test/OtherClickedTest.java` *(new file)* — 5 tests for Story Card #12
+- `backgroundClickDeselectsUnit` — `selectedUnit` is null after `otherClicked`.
+- `backgroundClickDeselectsCard` — `selectedHandPosition` is −1 after `otherClicked`.
+- `backgroundClickClearsAllHighlights` — mode-0 drawTile sent for all 45 board tiles.
+- `reclickingSameCardDeselectsIt` — clicking the same card position twice sets `selectedHandPosition` to −1.
+- `reclickingSameCardClearsHighlights` — no green (mode 2) highlights remain after card is deselected.
+- Author: Minghao
+
+#### `test/ManaIncreaseTest.java` *(new file)* — 5 tests for Story Card #19
+- `player1StartsWithMana2` — P1 mana equals 2 at game start.
+- `manaIncreasesEachTurn` — mana grows by 1 each turn for both players.
+- `manaFilledToMaxAtTurnStart` — mana is always replenished to the full turn maximum, regardless of spending.
+- `manaIsCappedAt9` — mana never exceeds 9 even after many turns.
+- `manaDisplayUpdatedAtTurnStart` — front-end receives correct `setPlayer1Mana` / `setPlayer2Mana` values each turn.
+- Author: Minghao
+
+---
+
+### Story Cards Addressed
+
+| # | Title | Changes |
+|---|-------|---------|
+| #12 | Cancel Selection | Full implementation in `OtherClicked`; toggle deselect added to `CardClicked` |
+| #19 | Mana Increase | Covered by SC#6 implementation; explicit test suite added |
+
+---
+
 ## [Unreleased] — 2026-03-03
 
 ### Added

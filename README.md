@@ -30,26 +30,30 @@ The human player (Player 1) competes against an AI opponent (Player 2) on a 9×5
 
 ## How to Run
 
+> **Java 21 users:** The project includes a `.sbtopts` file that automatically passes the required `--add-opens` flags to the JVM. No additional configuration is needed.
+
 1. **Clone the repository**
    ```bash
    git clone <repository-url>
    cd duelyst-card-project
    ```
 
-2. **Start the server**
+2. **Place frontend assets** — copy `public/js/` and `public/css/` into the `public/` directory (gitignored; obtain from the project template assets package).
+
+3. **Start the server**
    ```bash
-   sbt run
+   ./sbt run
    ```
    The first run will download all dependencies automatically. This may take a few minutes.
 
-3. **Open the game in your browser**
+4. **Open the game in your browser**
    ```
-   http://localhost:9000
+   http://localhost:9000/game
    ```
 
-4. **Run tests**
+5. **Run tests**
    ```bash
-   sbt test
+   ./sbt test
    ```
 
 ---
@@ -112,10 +116,26 @@ duelyst-card-project/
 
 ## Implemented Story Cards
 
-| # | Story Card | Status |
-|---|------------|--------|
-| #3 | Unit Selection & Movement Highlighting | Done |
-| #18 | Game Initialization & Setup | Done |
+| # | Story Card | Status | Author |
+|---|------------|--------|--------|
+| #3 | Unit Selection & Movement Highlighting | ✅ Done | Minghao |
+| #6 | Mana Display & Replenishment | ✅ Done | Minghao |
+| #12 | Cancel Selection | ✅ Done | Minghao |
+| #18 | Game Initialization & Setup | ✅ Done | Minghao |
+| #19 | Mana Increase | ✅ Done | Minghao |
+| #22 | Summon Tile Highlighting | ✅ Done | Minghao |
+
+## Test Coverage
+
+| Test File | Story Card | Tests |
+|-----------|------------|-------|
+| `InitalizationTest` | #18 | 1 |
+| `TileClickedTest` | #3 | 8 |
+| `EndTurnClickedTest` | #6 | 5 |
+| `CardClickedTest` | #22 | 5 |
+| `OtherClickedTest` | #12 | 5 |
+| `ManaIncreaseTest` | #19 | 5 |
+| **Total** | | **29 — all passing** |
 
 ---
 
