@@ -1,0 +1,48 @@
+[33m7ffb8ef[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mcleanup[m[33m, [m[1;31morigin/cleanup[m[33m)[m HEAD@{0}: commit: Added board init
+[33m40b24cc[m[33m ([m[1;31morigin/master[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmaster[m[33m)[m HEAD@{1}: checkout: moving from feature-end-turn-button to cleanup
+[33me1b57a2[m[33m ([m[1;32mfeature-end-turn-button[m[33m)[m HEAD@{2}: checkout: moving from cleanup to feature-end-turn-button
+[33m40b24cc[m[33m ([m[1;31morigin/master[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmaster[m[33m)[m HEAD@{3}: checkout: moving from master to cleanup
+[33m40b24cc[m[33m ([m[1;31morigin/master[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmaster[m[33m)[m HEAD@{4}: checkout: moving from merge-attack-main to master
+[33maa62876[m HEAD@{5}: commit: merged files and solved conflicts
+[33m9e7c075[m HEAD@{6}: commit (merge): Merge remote-tracking branch 'origin/master' into merge-attack-main
+[33m9990597[m[33m ([m[1;31morigin/Unit-Attack[m[33m)[m HEAD@{7}: checkout: moving from Unit-Attack to merge-attack-main
+[33m9990597[m[33m ([m[1;31morigin/Unit-Attack[m[33m)[m HEAD@{8}: checkout: moving from test-init to Unit-Attack
+[33mb564b8c[m HEAD@{9}: commit (merge): Merge branch 'refs/heads/feature-ai-logic-creation' into test-init
+[33m9990597[m[33m ([m[1;31morigin/Unit-Attack[m[33m)[m HEAD@{10}: checkout: moving from Unit-Attack to test-init
+[33m9990597[m[33m ([m[1;31morigin/Unit-Attack[m[33m)[m HEAD@{11}: checkout: moving from feature-ai-logic-creation to Unit-Attack
+[33mfaed48b[m HEAD@{12}: commit: placed in empty test
+[33m2473cf8[m HEAD@{13}: commit: timer rundown works
+[33m508c162[m HEAD@{14}: checkout: moving from Unit-Attack to feature-ai-logic-creation
+[33m9990597[m[33m ([m[1;31morigin/Unit-Attack[m[33m)[m HEAD@{15}: checkout: moving from feature-ai-logic-creation to Unit-Attack
+[33m508c162[m HEAD@{16}: commit: timer rundown works
+[33ma2fce87[m[33m ([m[1;32mfind-actorref[m[33m)[m HEAD@{17}: checkout: moving from Minghao to feature-ai-logic-creation
+[33ma33bd76[m[33m ([m[1;32mMinghao[m[33m)[m HEAD@{18}: checkout: moving from feature-ai-logic-creation to Minghao
+[33ma2fce87[m[33m ([m[1;32mfind-actorref[m[33m)[m HEAD@{19}: checkout: moving from find-actorref to feature-ai-logic-creation
+[33ma2fce87[m[33m ([m[1;32mfind-actorref[m[33m)[m HEAD@{20}: commit (merge): Merge branch 'feature-end-turn-button' into find-actorref
+[33mf6c2695[m HEAD@{21}: commit: Creating new actorref in test works
+[33m6a6d58f[m HEAD@{22}: checkout: moving from master to find-actorref
+[33mf49c692[m HEAD@{23}: checkout: moving from feature-end-turn-button to master
+[33me1b57a2[m[33m ([m[1;32mfeature-end-turn-button[m[33m)[m HEAD@{24}: commit: Not sure how to test this :/
+[33m8cceb20[m HEAD@{25}: checkout: moving from test-avatar-hp-link to feature-end-turn-button
+[33m2881339[m HEAD@{26}: checkout: moving from feature-end-turn-button to test-avatar-hp-link
+[33m8cceb20[m HEAD@{27}: commit: wip
+[33mcca2f84[m HEAD@{28}: commit: Will have to come back to this
+[33m2881339[m HEAD@{29}: checkout: moving from feature-avatar-hp-link to feature-end-turn-button
+[33meb5334f[m HEAD@{30}: checkout: moving from test-avatar-hp-link to feature-avatar-hp-link
+[33m2881339[m HEAD@{31}: commit (amend): additional test
+[33mfd36749[m HEAD@{32}: commit: additional test
+[33m3cf11cd[m HEAD@{33}: commit: Avatar HP link tested
+[33meb5334f[m HEAD@{34}: checkout: moving from feature-avatar-hp-link to test-avatar-hp-link
+[33meb5334f[m HEAD@{35}: commit: Avatar HP link added (untested)
+[33mafd6228[m HEAD@{36}: commit: unit attributes added w/ methods
+[33mf49c692[m HEAD@{37}: checkout: moving from master to feature-avatar-hp-link
+[33mf49c692[m HEAD@{38}: checkout: moving from feature-avatar-player-hp-link to master
+[33mf49c692[m HEAD@{39}: checkout: moving from master to feature-avatar-player-hp-link
+[33mf49c692[m HEAD@{40}: checkout: moving from feature-avatar-player-hp-link to master
+[33mf49c692[m HEAD@{41}: checkout: moving from test_initialise to feature-avatar-player-hp-link
+[33mf49c692[m HEAD@{42}: checkout: moving from feature-avatar-player-hp-link to test_initialise
+[33mf49c692[m HEAD@{43}: checkout: moving from test-initialise to feature-avatar-player-hp-link
+[33mf49c692[m HEAD@{44}: checkout: moving from feature-avatar-player-hp-link to test-initialise
+[33mf49c692[m HEAD@{45}: checkout: moving from master to feature-avatar-player-hp-link
+[33mf49c692[m HEAD@{46}: commit: Test commit
+[33me5357b4[m HEAD@{47}: clone: from https://github.com/ScottVint/duelyst-card-project.git
