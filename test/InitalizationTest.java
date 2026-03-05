@@ -1,6 +1,3 @@
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 import org.junit.Test;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -10,8 +7,11 @@ import commands.CheckMessageIsNotNullOnTell;
 import events.Initalize;
 import play.libs.Json;
 import structures.GameState;
+import structures.basic.BetterUnit;
 import structures.basic.Tile;
 import utils.BasicObjectBuilders;
+
+import static org.junit.Assert.*;
 
 /**
  * This is an example of a JUnit test. In this case, we want to be able to test the logic
@@ -52,6 +52,43 @@ public class InitalizationTest {
 		Tile tile = BasicObjectBuilders.loadTile(3, 2); // create a tile
 		BasicCommands.drawTile(null, tile, 0); // draw tile, but will use altTell, so nothing should happen
 		
+	}
+
+	@Test
+	public void checkPlayerHands () {
+		CheckMessageIsNotNullOnTell altTell = new CheckMessageIsNotNullOnTell(); // create an alternative tell
+		BasicCommands.altTell = altTell; // specify that the alternative tell should be used
+
+		// As we are not starting the front-end, we have no GameActor, so lets manually create
+		// the components we want to test
+		GameState gameState = new GameState(); // create state storage
+		Initalize initalizeProcessor =  new Initalize(); // create an initalize event processor
+
+		// lets simulate recieveing an initalize message
+		ObjectNode eventMessage = Json.newObject();
+		initalizeProcessor.processEvent(null, gameState, eventMessage);
+
+
+		assert gameState.player.getHand().getCards().size() == 3;
+		assert gameState.ai.getHand().getCards().size() == 3;
+	}
+
+		@Test
+	public void checkAvatarsInitalised() {
+		CheckMessageIsNotNullOnTell altTell = new CheckMessageIsNotNullOnTell(); // create an alternative tell
+		BasicCommands.altTell = altTell; // specify that the alternative tell should be used
+
+		// As we are not starting the front-end, we have no GameActor, so lets manually create
+		// the components we want to test
+		GameState gameState = new GameState(); // create state storage
+		Initalize initalizeProcessor =  new Initalize(); // create an initalize event processor
+
+		// lets simulate recieveing an initalize message
+		ObjectNode eventMessage = Json.newObject();
+		initalizeProcessor.processEvent(null, gameState, eventMessage);
+
+		assert gameState.board.getTiles()[2][3].getUnitOnTile().getClass() == BetterUnit.class;
+		assert gameState.board.getTiles()[8][3].getUnitOnTile().getClass() == BetterUnit.class;
 	}
 	
 }

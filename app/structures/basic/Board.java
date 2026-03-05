@@ -19,6 +19,8 @@ public class Board {
         }
     }
 
+    public Tile[][] getTiles() { return tiles; }
+
     /// Resets tile state to 0 (white).
     /// @param out
     ///

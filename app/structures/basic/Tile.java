@@ -97,6 +97,9 @@ public class Tile {
 	public void setTiley(int tiley) {
 		this.tiley = tiley;
 	}
+
+	// More accessors
+	public Unit getUnitOnTile() { return unitOnTile; }
 	
 	/**
 	 * Loads a tile from a configuration file
@@ -117,7 +120,7 @@ public class Tile {
 		
 	}
 
-	
+
 	
 	
 }
