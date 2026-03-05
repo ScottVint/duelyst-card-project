@@ -1,10 +1,11 @@
 package structures.basic.players;
 
+import structures.basic.Card;
 import structures.basic.Deck;
 import structures.basic.Hand;
 
 /**
- * A basic representation of of the Player. A player
+ * A basic representation of the Player. A player
  * has health and mana.
  * 
  * @author Dr. Richard McCreadie
@@ -15,7 +16,7 @@ public class Player {
 	// For use in subclasses, these are now protected instead of private
 	protected int health;
 	protected int mana;
-	protected Deck deck = new Deck(this.getClass());
+	protected Deck deck = new Deck(this);
 	protected Hand hand = new Hand();
 
 	public Player() {
@@ -39,6 +40,16 @@ public class Player {
 	}
 	public void setMana(int mana) {
 		this.mana = mana;
+	}
+
+	// Shared methods
+	public Deck getDeck() { return deck; }
+	public Hand getHand() { return hand; }
+
+	public void drawToHand() {
+		Card card = this.deck.drawFromDeck();
+		System.out.println(card);
+		hand.addCard(card);
 	}
 	
 	

@@ -1,5 +1,6 @@
 package structures.basic;
 
+import play.utils.Reflect;
 import structures.basic.players.*;
 import utils.OrderedCardLoader;
 
@@ -11,13 +12,16 @@ public class Deck {
     private List<Card> cards;
 
     /// Draws all cards into deck, then shuffles.
-    public Deck(Class<? extends Player> playerClass) {
-        if(playerClass == HumanPlayer.class) {
-            cards = OrderedCardLoader.getPlayer1Cards(20);
-        } else if(playerClass == AIPlayer.class) {
-            cards = OrderedCardLoader.getPlayer2Cards(20);
+    public Deck(Player player) {
+        if(player instanceof HumanPlayer) {
+            cards = OrderedCardLoader.getPlayer1Cards(2);
+        } else if(player instanceof AIPlayer) {
+            cards = OrderedCardLoader.getPlayer2Cards(2);
+        } else {
+            System.err.println("Invalid player type");
         }
         shuffle();
+        System.out.println(cards.size());
     }
 
     private void shuffle() {

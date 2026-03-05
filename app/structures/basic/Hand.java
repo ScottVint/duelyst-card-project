@@ -8,15 +8,23 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Hand {
-    List<Card> cards;
+    protected List<Card> cards;
 
     public Hand() {
-        List<Card> cards = new ArrayList<Card>();
+        cards = new ArrayList<Card>(6);
     }
 
     public void showHand(ActorRef out) {
         for(Card card : cards) {
             BasicCommands.drawCard(out, card, cards.indexOf(card), 0);
+        }
+    }
+
+    public void addCard(Card card) {
+        try {
+            cards.add(card);
+        } catch(NullPointerException e) {
+            System.err.println("Deck empty!");
         }
     }
 }
