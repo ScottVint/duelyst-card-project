@@ -1,7 +1,11 @@
-package structures.basic;
+package structures.basic.players;
+import akka.actor.ActorRef;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import structures.basic.Card;
+import structures.basic.Unit;
 
 /**
  * A basic representation of of the Player. A player
@@ -15,8 +19,9 @@ import java.util.List;
  */
 public class Player {
 
-	int health;
-	int mana;
+	// For use in subclasses, these are now protected instead of private
+	protected int health;
+	protected int mana;
 	/** The avatar unit representing this player on the board. @author Minghao */
 	Unit avatar;
 	/** The remaining cards in this player's draw pile. @author Minghao */
@@ -44,10 +49,16 @@ public class Player {
 	public void setHealth(int health) {
 		this.health = health;
 	}
+	public void setHealth(ActorRef out, int health) {
+		throw new Error("Unknown Player subclass");
+	}
 	public int getMana() {
 		return mana;
 	}
 	public void setMana(int mana) {
+		this.mana = mana;
+	}
+	public void setMana(ActorRef out, int mana) {
 		this.mana = mana;
 	}
 	/**

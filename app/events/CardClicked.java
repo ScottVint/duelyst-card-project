@@ -9,7 +9,7 @@ import commands.BasicCommands;
 import structures.Board;
 import structures.GameState;
 import structures.basic.Card;
-import structures.basic.Player;
+import structures.basic.players.Player;
 import structures.basic.Tile;
 import structures.basic.Unit;
 

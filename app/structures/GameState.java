@@ -1,6 +1,6 @@
 package structures;
 
-import structures.basic.Player;
+import structures.basic.players.Player;
 import structures.basic.Unit;
 import utils.BasicObjectBuilders;
 import utils.OrderedCardLoader;
@@ -17,6 +17,7 @@ import utils.StaticConfFiles;
  * @author Minghao
  *
  */
+
 public class GameState {
 
 	public boolean gameInitalised = false;

@@ -3,16 +3,14 @@ package events;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import akka.actor.ActorRef;
-import demo.CommandDemo;
-import demo.Loaders_2024_Check;
+import commands.BasicCommands;
 import structures.GameState;
 
 // Import the necessary structural classes
 import structures.basic.Card;
-import structures.basic.Player;
+import structures.basic.players.Player;
 import structures.basic.Unit;
 import structures.basic.Tile;
-import commands.BasicCommands;
 import java.util.List;
 
 /**
@@ -56,13 +54,13 @@ public class Initalize implements EventProcessor {
         // ==========================================
         player1.setHealth(20);
         player2.setHealth(20);
-        
+
         avatar1.setHealth(20);
         avatar1.setMaxHealth(20);
-        
+
         avatar2.setHealth(20);
         avatar2.setMaxHealth(20);
-        
+
         // Send commands to the front-end to update the players' health display
         BasicCommands.setPlayer1Health(out, player1);
         BasicCommands.setPlayer2Health(out, player2);
@@ -76,7 +74,7 @@ public class Initalize implements EventProcessor {
         // ==========================================
         // Story Card #18 Acceptance Test: Set initial avatar positions
         // ==========================================
-        
+
         // Player 1 avatar starts at [2,3] [cite: 161]
         Tile tileP1 = gameState.getBoard().getTile(2, 3);
         tileP1.setUnit(avatar1);
@@ -100,7 +98,7 @@ public class Initalize implements EventProcessor {
             player1.drawCard();
             player2.drawCard();
         }
-        
+
         // Render Player 1's initial hand on the front-end.
         // BasicCommands.drawCard takes a hand position (1-indexed, 1-6) and mode (0 = normal).
         // Only Player 1's hand is shown; Player 2 is the AI and has no visible hand.
@@ -111,8 +109,6 @@ public class Initalize implements EventProcessor {
         }
 
         // Note: As per the template's instructions, comment out the demo execution when implementing your own solution
-        // CommandDemo.executeDemo(out); 
+        // CommandDemo.executeDemo(out);
     }
 }
-
-
