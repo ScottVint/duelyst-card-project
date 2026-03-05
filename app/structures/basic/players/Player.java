@@ -1,4 +1,7 @@
-package structures.basic;
+package structures.basic.players;
+
+import structures.basic.Deck;
+import structures.basic.Hand;
 
 /**
  * A basic representation of of the Player. A player
@@ -12,6 +15,8 @@ public class Player {
 	// For use in subclasses, these are now protected instead of private
 	protected int health;
 	protected int mana;
+	protected Deck deck = new Deck(this.getClass());
+	protected Hand hand = new Hand();
 
 	public Player() {
 		super();

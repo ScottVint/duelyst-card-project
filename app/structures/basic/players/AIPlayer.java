@@ -3,7 +3,7 @@ package structures.basic.players;
 import akka.actor.ActorRef;
 import commands.BasicCommands;
 
-public class AIPlayer extends structures.basic.Player{
+public class AIPlayer extends Player {
     public AIPlayer() {
         super();
     }

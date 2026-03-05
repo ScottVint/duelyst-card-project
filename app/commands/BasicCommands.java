@@ -7,7 +7,7 @@ import akka.actor.ActorRef;
 import play.libs.Json;
 import structures.basic.Card;
 import structures.basic.EffectAnimation;
-import structures.basic.Player;
+import structures.basic.players.Player;
 import structures.basic.Tile;
 import structures.basic.Unit;
 import structures.basic.UnitAnimation;
