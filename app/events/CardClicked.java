@@ -38,6 +38,13 @@ public class CardClicked implements EventProcessor {
 
 		int handPosition = message.get("position").asInt(); // 1-indexed
 
+		// Story Card #12: clicking the same card a second time deselects it
+		if (gameState.getSelectedHandPosition() == handPosition) {
+			gameState.setSelectedHandPosition(-1);
+			clearAllHighlights(out, gameState);
+			return;
+		}
+
 		// Deselect any previously selected unit and clear board highlights
 		gameState.setSelectedUnit(null);
 		clearAllHighlights(out, gameState);
