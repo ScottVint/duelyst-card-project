@@ -4,6 +4,7 @@ import akka.actor.ActorRef;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import commands.BasicCommands;
+import structures.basic.players.Player;
 
 /**
  * This is a representation of a Unit on the game board.
@@ -12,49 +13,58 @@ import commands.BasicCommands;
  * or attack. The position is the physical position on the
  * board. UnitAnimationSet contains the underlying information
  * about the animation frames, while ImageCorrection has
- * information for centering the unit on the tile. 
- * 
+ * information for centering the unit on the tile.
+ * <p>
+ * Extended to include combat stats (health, maxHealth, attack).
+ *
  * @author Dr. Richard McCreadie
+ * @author Minghao
  *
  */
 public class Unit {
 
 	@JsonIgnore
 	protected static ObjectMapper mapper = new ObjectMapper(); // Jackson Java Object Serializer, is used to read java objects from a file
-	
+
 	int id;
 	UnitAnimationType animation;
 	Position position;
 	UnitAnimationSet animations;
 	ImageCorrection correction;
+	/** The player who owns this unit. Not serialised to JSON. @author Minghao */
+	@JsonIgnore
+	Player owner;
+	/** Maximum hit points of this unit. @author Minghao */
 	int maxHealth;
+	/** Current hit points of this unit. @author Minghao */
 	int health;
+	/** Attack damage this unit deals per strike. @author Minghao */
 	int attack;
-	
+
 	public Unit() {}
-	
+
 	public Unit(int id, UnitAnimationSet animations, ImageCorrection correction) {
 		super();
 		this.id = id;
 		this.animation = UnitAnimationType.idle;
-		
+
 		position = new Position(0,0,0,0);
 		this.correction = correction;
 		this.animations = animations;
 	}
-	
+
 	public Unit(int id, UnitAnimationSet animations, ImageCorrection correction, Tile currentTile) {
 		super();
 		this.id = id;
 		this.animation = UnitAnimationType.idle;
-		
+
 		position = new Position(currentTile.getXpos(),currentTile.getYpos(),currentTile.getTilex(),currentTile.getTiley());
 		this.correction = correction;
 		this.animations = animations;
 	}
-	
-	
-	
+
+
+
 	public Unit(int id, UnitAnimationType animation, Position position, UnitAnimationSet animations,
 			ImageCorrection correction) {
 		super();
@@ -124,6 +134,53 @@ public class Unit {
 	}
 
 	/**
+	 * Returns the player who owns this unit.
+	 * @author Minghao
+	 */
+	public Player getOwner() {
+		return owner;
+	}
+	/**
+	 * Sets the owning player of this unit.
+	 * @param owner the player to assign as owner
+	 * @author Minghao
+	 */
+	public void setOwner(Player owner) {
+		this.owner = owner;
+	}
+
+	/**
+	 * Returns the maximum health of the unit.
+	 * @author Minghao
+	 */
+	public int getMaxHealth() {
+		return maxHealth;
+	}
+	/**
+	 * Sets the maximum health of the unit.
+	 * @param maxHealth new maximum health value
+	 * @author Minghao
+	 */
+	public void setMaxHealth(int maxHealth) {
+		this.maxHealth = maxHealth;
+	}
+	/**
+	 * Returns the attack damage of the unit.
+	 * @author Minghao
+	 */
+	public int getAttack() {
+		return attack;
+	}
+	/**
+	 * Sets the attack damage of the unit.
+	 * @param attack new attack value
+	 * @author Minghao
+	 */
+	public void setAttack(int attack) {
+		this.attack = attack;
+	}
+
+	/**
 	 * This command sets the position of the Unit to a specified
 	 * tile.
 	 * @param tile
@@ -137,7 +194,6 @@ public class Unit {
 	 * This command automatically calls setUnitHealth to the
 	 * new health value based on the damage taken, and
 	 * displays it to the UI.
-	 * <br /> Unimplemented.
 	 * @param out
 	 * @param damage
 	 * @author Scott

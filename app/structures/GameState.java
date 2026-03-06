@@ -1,106 +1,68 @@
 package structures;
 
-import akka.actor.ActorRef;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import structures.basic.Tile;
+import structures.basic.BetterUnit;
+import structures.basic.Board;
+import structures.basic.players.Player;
 import structures.basic.Unit;
-
-import structures.basic.players.*;
-import structures.logic.AI;
-
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import structures.basic.Tile;
-import structures.basic.Unit;
-
+import utils.BasicObjectBuilders;
+import utils.OrderedCardLoader;
+import utils.StaticConfFiles;
 
 /**
  * This class can be used to hold information about the on-going game.
- * It's created with the GameActor.
- * 
+ * Its created with the GameActor.
+ * <p>
+ * Extended to initialise the board, both players, their avatars and decks
+ * at the start of a game session.
+ *
  * @author Dr. Richard McCreadie
+ * @author Minghao
  *
  */
-
 public class GameState {
 
-	
 	public boolean gameInitalised = false;
-	
 	public boolean something = false;
 
-	public boolean player1Turn = true; // Tracks current active turn
+	public Player player1;
+	public Player player2;
+	public Board board;
+	public Unit selectedUnit;
+	public boolean player1Turn = true;
 
+	/** Current round number (shared by both players). Increments when P2 ends their turn. */
+	public int turnCount = 1;
 
-	// Player classes
-	public HumanPlayer player = new HumanPlayer();
-	public AIPlayer ai = new AIPlayer();
+	/** 1-indexed hand position of the selected card, or null if none selected. */
+	public Integer selectedHandPosition = null;
 
-    // Selected unit
-    public Unit selectedUnit = null;
+	// TODO: Move player/avatar/deck initialisation into the Player class constructor
 
-    // Tiles and units captured from CommandDemo
-    public Tile[][] board = new Tile[10][6]; // use indices 1..9 and 1..5
-    public Map<Integer, Unit> unitsById = new HashMap<>();
-    public Map<String, Integer> occupiedByUnitId = new HashMap<>(); // "x,y" -> unitId
+	public GameState() {
+		board = new Board();
 
-    // For demo: identify player avatars by spawn tiles
-    public Integer p1AvatarId = null; // unit on (2,3)
-    public Integer p2AvatarId = null; // unit on (8,3)
+		BetterUnit avatar1 = (BetterUnit) BasicObjectBuilders.loadUnit(StaticConfFiles.humanAvatar, 1, BetterUnit.class);
+		BetterUnit avatar2 = (BetterUnit) BasicObjectBuilders.loadUnit(StaticConfFiles.aiAvatar, 2, BetterUnit.class);
 
-    // Highlight caches
-    public Set<String> validMoveTiles = new HashSet<>();
-    public Set<String> validAttackTiles = new HashSet<>();
+		player1 = new Player();
+		player1.setAvatar(avatar1);
+		player1.setDeck(OrderedCardLoader.getPlayer1Cards(2));
 
-    // Animation lock
-    public boolean isAnimating = false;
-
-    public void advanceTurn(ActorRef out, HumanPlayer player1, AIPlayer player2) {
-		player1Turn = !player1Turn;
-		player1.setMana(out,0);
-		player2.setMana(out,0);
-		if(player1Turn) {
-			System.out.println("Player 1 Turn");
-		} else {
-			System.out.println("Player 2 turn");
-			AI.AILogic.runAI(out, this, player1, player2);
-		}
+		player2 = new Player();
+		player2.setAvatar(avatar2);
+		player2.setDeck(OrderedCardLoader.getPlayer2Cards(2));
 	}
 
+	public Player getPlayer1() { return player1; }
+	public Player getPlayer2() { return player2; }
+	public Board getBoard() { return board; }
+	public Unit getSelectedUnit() { return selectedUnit; }
+	public void setSelectedUnit(Unit unit) { this.selectedUnit = unit; }
+	public boolean isPlayer1Turn() { return player1Turn; }
+	public void setPlayer1Turn(boolean player1Turn) { this.player1Turn = player1Turn; }
+	public int getTurnCount() { return turnCount; }
+	public void incrementTurnCount() { turnCount++; }
+	public Integer getSelectedHandPosition() { return selectedHandPosition; }
+	public void setSelectedHandPosition(Integer pos) { this.selectedHandPosition = pos; }
 
- // Selected unit
-    public Unit selectedUnit = null;
-
-    //TODO Check wtf is going on here
-    public Map<Integer, Unit> unitsById = new HashMap<>();
-    public Map<String, Integer> occupiedByUnitId = new HashMap<>(); // "x,y" -> unitId
-
-    // For demo: identify player avatars by spawn tiles
-    //TODO I don't think this is needed?
-    public Integer p1AvatarId = null; // unit on (2,3)
-    public Integer p2AvatarId = null; // unit on (8,3)
-
-    // Highlight caches
-    public Set<String> validMoveTiles = new HashSet<>();
-    public Set<String> validAttackTiles = new HashSet<>();
-
-    // Animation lock
-    public boolean isAnimating = false;
-
-    //TODO These shouldn't be here
-    public static String key(int x, int y) { return x + "," + y; }
-
-    public void clearHighlights() {
-        validMoveTiles.clear();
-        validAttackTiles.clear();
-    }
-
-    public void clearSelection() {
-        selectedUnit = null;
-    }
 }
