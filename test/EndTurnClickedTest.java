@@ -183,11 +183,11 @@ public class EndTurnClickedTest {
     public void endTurnClearsSelectedHandPosition() {
         gameState.setSelectedHandPosition(2);
         assertEquals("Pre-condition: selectedHandPosition should be 2",
-                2, gameState.getSelectedHandPosition());
+                2, (int) gameState.getSelectedHandPosition());
 
         processor.processEvent(null, gameState, Json.newObject());
 
-        assertEquals("selectedHandPosition must be -1 after ending the turn",
-                -1, gameState.getSelectedHandPosition());
+        assertNull("selectedHandPosition must be null after ending the turn",
+                gameState.getSelectedHandPosition());
     }
 }

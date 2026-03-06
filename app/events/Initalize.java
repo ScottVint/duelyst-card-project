@@ -7,6 +7,7 @@ import commands.BasicCommands;
 import structures.GameState;
 
 // Import the necessary structural classes
+import structures.basic.BetterUnit;
 import structures.basic.Card;
 import structures.basic.players.Player;
 import structures.basic.Unit;
@@ -40,8 +41,8 @@ public class Initalize implements EventProcessor {
         Player player2 = gameState.getPlayer2();
 
         // Retrieve the Avatar units for both players
-        Unit avatar1 = player1.getAvatar();
-        Unit avatar2 = player2.getAvatar();
+        BetterUnit avatar1 = player1.getAvatar();
+        BetterUnit avatar2 = player2.getAvatar();
 
         // Set avatar ownership so that unit-selection logic (Story Card #3) can
         // correctly identify which units belong to the human player.

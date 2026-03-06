@@ -134,13 +134,13 @@ public class OtherClickedTest {
     public void backgroundClickDeselectsCard() {
         // Select card at position 1
         cardClicked.processEvent(null, gameState, cardClickMsg(1));
-        assertEquals(1, gameState.getSelectedHandPosition());
+        assertEquals(1, (int) gameState.getSelectedHandPosition());
 
         recorder.messages.clear();
         otherClicked.processEvent(null, gameState, otherClickMsg());
 
-        assertEquals("selectedHandPosition must be -1 after otherClicked",
-                -1, gameState.getSelectedHandPosition());
+        assertNull("selectedHandPosition must be null after otherClicked",
+                gameState.getSelectedHandPosition());
     }
 
     // -----------------------------------------------------------------------
@@ -182,15 +182,15 @@ public class OtherClickedTest {
     public void reclickingSameCardDeselectsIt() {
         // First click — selects the card
         cardClicked.processEvent(null, gameState, cardClickMsg(1));
-        assertEquals(1, gameState.getSelectedHandPosition());
+        assertEquals(1, (int) gameState.getSelectedHandPosition());
 
         recorder.messages.clear();
 
         // Second click on the same card — must deselect
         cardClicked.processEvent(null, gameState, cardClickMsg(1));
 
-        assertEquals("Re-clicking same card must set selectedHandPosition to -1",
-                -1, gameState.getSelectedHandPosition());
+        assertNull("Re-clicking same card must set selectedHandPosition to null",
+                gameState.getSelectedHandPosition());
     }
 
     // -----------------------------------------------------------------------

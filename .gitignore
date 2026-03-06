@@ -19,6 +19,8 @@ app/assets/**
 null/**
 
 # SBT Components
+.sbtopts
+build.sbt
 logs/**
 project/target/**
 project/project/**

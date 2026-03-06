@@ -1,5 +1,7 @@
 package structures;
 
+import structures.basic.BetterUnit;
+import structures.basic.Board;
 import structures.basic.players.Player;
 import structures.basic.Unit;
 import utils.BasicObjectBuilders;
@@ -17,40 +19,30 @@ import utils.StaticConfFiles;
  * @author Minghao
  *
  */
-
 public class GameState {
 
 	public boolean gameInitalised = false;
 	public boolean something = false;
 
-	/** Human player (Player 1). @author Minghao */
-	private Player player1;
-	/** AI player (Player 2). @author Minghao */
-	private Player player2;
-	/** The 9x5 game board. @author Minghao */
-	private Board board;
-	/** The unit currently selected by the player, or null if none. @author Minghao */
-	private Unit selectedUnit;
-	/** True when it is Player 1's turn to act. @author Minghao */
-	private boolean player1Turn = true;
-	/** How many turns Player 1 has had (starts at 1 since the game opens on P1's first turn). @author Minghao */
-	private int player1TurnCount = 1;
-	/** How many turns Player 2 has had (0 until P1 first ends their turn). @author Minghao */
-	private int player2TurnCount = 0;
-	/** Hand position (1-indexed) of the card selected by the player, or -1 if none. @author Minghao */
-	private int selectedHandPosition = -1;
+	public Player player1;
+	public Player player2;
+	public Board board;
+	public Unit selectedUnit;
+	public boolean player1Turn = true;
 
-	/**
-	 * Initialises the board, loads both avatars from config, and prepares
-	 * each player with their starting deck (2 copies).
-	 *
-	 * @author Minghao
-	 */
+	/** Current round number (shared by both players). Increments when P2 ends their turn. */
+	public int turnCount = 1;
+
+	/** 1-indexed hand position of the selected card, or null if none selected. */
+	public Integer selectedHandPosition = null;
+
+	// TODO: Move player/avatar/deck initialisation into the Player class constructor
+
 	public GameState() {
 		board = new Board();
 
-		Unit avatar1 = BasicObjectBuilders.loadUnit(StaticConfFiles.humanAvatar, 1, Unit.class);
-		Unit avatar2 = BasicObjectBuilders.loadUnit(StaticConfFiles.aiAvatar, 2, Unit.class);
+		BetterUnit avatar1 = (BetterUnit) BasicObjectBuilders.loadUnit(StaticConfFiles.humanAvatar, 1, BetterUnit.class);
+		BetterUnit avatar2 = (BetterUnit) BasicObjectBuilders.loadUnit(StaticConfFiles.aiAvatar, 2, BetterUnit.class);
 
 		player1 = new Player();
 		player1.setAvatar(avatar1);
@@ -61,69 +53,16 @@ public class GameState {
 		player2.setDeck(OrderedCardLoader.getPlayer2Cards(2));
 	}
 
-	/**
-	 * Returns the human player (Player 1).
-	 * @author Minghao
-	 */
-	public Player getPlayer1() {
-		return player1;
-	}
-
-	/**
-	 * Returns the AI player (Player 2).
-	 * @author Minghao
-	 */
-	public Player getPlayer2() {
-		return player2;
-	}
-
-	/**
-	 * Returns the game board.
-	 * @author Minghao
-	 */
-	public Board getBoard() {
-		return board;
-	}
-
-	/**
-	 * Returns the currently selected unit, or null if none is selected.
-	 * @author Minghao
-	 */
-	public Unit getSelectedUnit() {
-		return selectedUnit;
-	}
-
-	/**
-	 * Sets the currently selected unit. Pass null to deselect.
-	 * @param unit the unit to select, or null
-	 * @author Minghao
-	 */
-	public void setSelectedUnit(Unit unit) {
-		this.selectedUnit = unit;
-	}
-
-	/** Returns true when it is Player 1's turn. @author Minghao */
+	public Player getPlayer1() { return player1; }
+	public Player getPlayer2() { return player2; }
+	public Board getBoard() { return board; }
+	public Unit getSelectedUnit() { return selectedUnit; }
+	public void setSelectedUnit(Unit unit) { this.selectedUnit = unit; }
 	public boolean isPlayer1Turn() { return player1Turn; }
-
-	/** Sets whose turn it is. @author Minghao */
 	public void setPlayer1Turn(boolean player1Turn) { this.player1Turn = player1Turn; }
-
-	/** Returns how many turns Player 1 has had so far. @author Minghao */
-	public int getPlayer1TurnCount() { return player1TurnCount; }
-
-	/** Returns how many turns Player 2 has had so far. @author Minghao */
-	public int getPlayer2TurnCount() { return player2TurnCount; }
-
-	/** Increments Player 1's turn counter (called when P1's new turn begins). @author Minghao */
-	public void incrementPlayer1TurnCount() { player1TurnCount++; }
-
-	/** Increments Player 2's turn counter (called when P2's new turn begins). @author Minghao */
-	public void incrementPlayer2TurnCount() { player2TurnCount++; }
-
-	/** Returns the 1-indexed hand position of the selected card, or -1 if none. @author Minghao */
-	public int getSelectedHandPosition() { return selectedHandPosition; }
-
-	/** Sets the selected hand position. Pass -1 to deselect. @author Minghao */
-	public void setSelectedHandPosition(int pos) { this.selectedHandPosition = pos; }
+	public int getTurnCount() { return turnCount; }
+	public void incrementTurnCount() { turnCount++; }
+	public Integer getSelectedHandPosition() { return selectedHandPosition; }
+	public void setSelectedHandPosition(Integer pos) { this.selectedHandPosition = pos; }
 
 }

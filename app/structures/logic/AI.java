@@ -79,7 +79,7 @@ public class AI {
             canMove = true;
             canAttack = true;
             hasTime = true;
-            gs.advanceTurn(out, p1, p2);
+            // TODO: trigger end-of-AI-turn via EndTurnClicked event
         }
 
 

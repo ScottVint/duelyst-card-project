@@ -4,6 +4,7 @@ import akka.actor.ActorRef;
 import java.util.ArrayList;
 import java.util.List;
 
+import structures.basic.BetterUnit;
 import structures.basic.Card;
 import structures.basic.Unit;
 
@@ -23,7 +24,8 @@ public class Player {
 	protected int health;
 	protected int mana;
 	/** The avatar unit representing this player on the board. @author Minghao */
-	Unit avatar;
+	BetterUnit avatar;
+	// TODO: Replace List<Card> deck/hand with a Deck class that handles loading and shuffling
 	/** The remaining cards in this player's draw pile. @author Minghao */
 	List<Card> deck;
 	/** The cards currently held in this player's hand. @author Minghao */
@@ -65,15 +67,10 @@ public class Player {
 	 * Returns this player's avatar unit.
 	 * @author Minghao
 	 */
-	public Unit getAvatar() {
+	public BetterUnit getAvatar() {
 		return avatar;
 	}
-	/**
-	 * Sets this player's avatar unit.
-	 * @param avatar the avatar unit to assign
-	 * @author Minghao
-	 */
-	public void setAvatar(Unit avatar) {
+	public void setAvatar(BetterUnit avatar) {
 		this.avatar = avatar;
 	}
 	/**

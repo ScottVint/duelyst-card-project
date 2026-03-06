@@ -104,7 +104,7 @@ public class CardClickedTest {
         processor.processEvent(null, gameState, cardClickMsg(1));
 
         assertEquals("selectedHandPosition must be 1 after clicking position 1",
-                1, gameState.getSelectedHandPosition());
+                1, (int) gameState.getSelectedHandPosition());
     }
 
     // -----------------------------------------------------------------------
