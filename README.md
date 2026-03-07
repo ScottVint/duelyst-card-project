@@ -11,7 +11,7 @@ The human player (Player 1) competes against an AI opponent (Player 2) on a 9×5
 | Name | GitLab Username |
 |------|-----------------|
 | Minghao | minghao |
-| *(add team member)* | |
+| Scott Vint | ScottVint |
 | *(add team member)* | |
 | *(add team member)* | |
 
@@ -78,10 +78,10 @@ duelyst-card-project/
 │   │   └── OtherClicked.java       # Click outside interactive areas
 │   ├── structures/
 │   │   ├── GameState.java          # Central game state (board, players, selected unit)
-│   │   ├── Board.java              # 9x5 grid of Tile objects
 │   │   └── basic/
 │   │       ├── Player.java         # Player: health, mana, deck, hand, avatar
 │   │       ├── Unit.java           # Unit: id, HP, attack, position, owner
+│   │       ├── Board.java              # 9x5 grid of Tile objects
 │   │       ├── Tile.java           # Board tile: grid position, occupying unit
 │   │       └── Card.java           # Card: id, name, mana cost
 │   └── utils/
