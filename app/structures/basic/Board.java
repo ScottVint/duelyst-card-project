@@ -6,17 +6,11 @@ import structures.basic.players.Player;
 import utils.BasicObjectBuilders;
 
 /**
- * Represents the 9x5 game board, holding a grid of Tile objects.
- * Each tile is initialised via {@link BasicObjectBuilders#loadTile(int, int)}
- * using grid coordinates (x = column 0-8, y = row 0-4).
- *
- * @author Minghao
+ * Represents the 9x5 game board.
  */
 public class Board {
 
-	/** Number of columns on the board. */
 	public static final int BOARD_WIDTH = 9;
-	/** Number of rows on the board. */
 	public static final int BOARD_HEIGHT = 5;
 
 	private Tile[][] tiles;
@@ -46,40 +40,47 @@ public class Board {
 		return BOARD_HEIGHT;
 	}
 
+	private void pause() {
+		try {
+			Thread.sleep(30);
+		} catch (InterruptedException e) {
+			Thread.currentThread().interrupt();
+		}
+	}
+
 	/**
-	 * Resets every tile to its default (unhighlighted) state.
-	 * Call before applying new highlights to avoid stale state.
-	 * @author Scott
+	 * Reset every tile to default.
 	 */
 	public void clearSelection(ActorRef out) {
-		for (Tile[] row : tiles) {
-			for (Tile tile : row) {
-				BasicCommands.drawTile(out, tile, 0); // grey
+		for (int x = 0; x < BOARD_WIDTH; x++) {
+			for (int y = 0; y < BOARD_HEIGHT; y++) {
+				BasicCommands.drawTile(out, tiles[x][y], 0);
+				pause();
 			}
 		}
 	}
 
 	/**
-	 * Highlights valid movement tiles (white, mode 1) for the unit on startTile.
-	 * Cardinal directions: up to 2 steps with path blocking.
-	 * Diagonal directions: exactly 1 step, no path blocking.
-	 * Only empty tiles are highlighted.
-	 * @author Minghao
+	 * Highlight valid movement tiles for a selected unit.
 	 */
 	public void highlightMovement(ActorRef out, Tile startTile) {
 		int sx = startTile.getTilex();
 		int sy = startTile.getTiley();
 
-		// Cardinal directions: up to 2 steps with path blocking
+		// Cardinal directions: up to 2 steps
 		int[][] cardinalDirs = { {1, 0}, {-1, 0}, {0, 1}, {0, -1} };
 		for (int[] dir : cardinalDirs) {
 			for (int step = 1; step <= 2; step++) {
 				int nx = sx + dir[0] * step;
 				int ny = sy + dir[1] * step;
+
 				if (nx < 0 || nx >= BOARD_WIDTH || ny < 0 || ny >= BOARD_HEIGHT) break;
+
 				Tile nextTile = tiles[nx][ny];
-				if (nextTile.getUnit() != null) break; // path blocked
+				if (nextTile.getUnit() != null) break;
+
 				BasicCommands.drawTile(out, nextTile, 1);
+				pause();
 			}
 		}
 
@@ -88,18 +89,19 @@ public class Board {
 		for (int[] dir : diagonalDirs) {
 			int nx = sx + dir[0];
 			int ny = sy + dir[1];
+
 			if (nx < 0 || nx >= BOARD_WIDTH || ny < 0 || ny >= BOARD_HEIGHT) continue;
+
 			Tile diagTile = tiles[nx][ny];
 			if (diagTile.getUnit() == null) {
 				BasicCommands.drawTile(out, diagTile, 1);
+				pause();
 			}
 		}
 	}
 
 	/**
-	 * Highlights all empty tiles adjacent (8-directional) to any friendly unit
-	 * owned by player1 in green (mode 2). Used for creature card summon targeting.
-	 * @author Minghao
+	 * Highlight all valid summon tiles adjacent to any friendly unit.
 	 */
 	public void highlightSummonTiles(ActorRef out, Player player1) {
 		for (int x = 0; x < BOARD_WIDTH; x++) {
@@ -110,11 +112,15 @@ public class Board {
 				for (int dx = -1; dx <= 1; dx++) {
 					for (int dy = -1; dy <= 1; dy++) {
 						if (dx == 0 && dy == 0) continue;
+
 						int nx = x + dx;
 						int ny = y + dy;
+
 						if (nx < 0 || nx >= BOARD_WIDTH || ny < 0 || ny >= BOARD_HEIGHT) continue;
+
 						if (tiles[nx][ny].getUnit() == null) {
 							BasicCommands.drawTile(out, tiles[nx][ny], 2);
+							pause();
 						}
 					}
 				}

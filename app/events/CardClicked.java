@@ -37,7 +37,9 @@ public class CardClicked implements EventProcessor {
 
 		List<Card> hand = gameState.getPlayer1().getHand();
 		int index = handPosition - 1;
-		if (index < 0 || index >= hand.size()) return;
+		if (index < 0 || index >= hand.size()) {
+			return;
+		}
 
 		Card card = hand.get(index);
 
@@ -48,11 +50,17 @@ public class CardClicked implements EventProcessor {
 
 		gameState.setSelectedHandPosition(handPosition);
 
-		// Creature card -> highlight summon tiles
 		if (card.isCreature()) {
+			BasicCommands.addPlayer1Notification(out, "Creature selected", 2);
 			gameState.getBoard().highlightSummonTiles(out, gameState.getPlayer1());
-		}
+		} else if ("Horn of the Forsaken".equals(card.getCardname())) {
+			BasicCommands.addPlayer1Notification(out, "Click your avatar to equip Horn", 2);
 
-		// Spell target highlighting can be added later
+			int ax = gameState.getPlayer1().getAvatar().getPosition().getTilex();
+			int ay = gameState.getPlayer1().getAvatar().getPosition().getTiley();
+			BasicCommands.drawTile(out, gameState.getBoard().getTile(ax, ay), 1);
+		} else {
+			BasicCommands.addPlayer1Notification(out, "Spell/artifact not implemented yet.", 2);
+		}
 	}
 }

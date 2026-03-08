@@ -19,14 +19,12 @@ public class EndTurnClicked implements EventProcessor {
 		gameState.clearSelections(out);
 
 		if (gameState.isPlayer1Turn()) {
-			// Player 1 ends -> AI starts
 			gameState.setPlayer1Turn(false);
 			int mana = Math.min(gameState.getTurnCount() + 1, MAX_MANA);
 			gameState.getPlayer2().setMana(mana);
 			BasicCommands.setPlayer2Mana(out, gameState.getPlayer2());
 			BasicCommands.addPlayer1Notification(out, "AI Turn", 2);
 		} else {
-			// AI ends -> Player 1 starts
 			gameState.setPlayer1Turn(true);
 			gameState.incrementTurnCount();
 			int mana = Math.min(gameState.getTurnCount() + 1, MAX_MANA);

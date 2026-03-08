@@ -26,14 +26,17 @@ public class GameState {
 	public Unit selectedUnit;
 	public boolean player1Turn = true;
 
-	/** Current round number (shared by both players). */
+	/** Current round number */
 	public int turnCount = 1;
 
-	/** 1-indexed hand position of the selected card, or null if none selected. */
+	/** 1-indexed hand position of the selected card, or null if none selected */
 	public Integer selectedHandPosition = null;
 
-	/** Next unique unit id for summoned units. Avatars already use 1 and 2. */
+	/** Next unique unit id for summoned units. Avatars already use 1 and 2 */
 	private int nextUnitId = 3;
+
+	/** Horn of the Forsaken charges for player 1 */
+	private int player1HornCharges = 0;
 
 	public GameState() {
 		board = new Board();
@@ -44,10 +47,12 @@ public class GameState {
 		player1 = new Player();
 		player1.setAvatar(avatar1);
 		player1.setDeck(OrderedCardLoader.getPlayer1Cards(2));
+		avatar1.setOwner(player1);
 
 		player2 = new Player();
 		player2.setAvatar(avatar2);
 		player2.setDeck(OrderedCardLoader.getPlayer2Cards(2));
+		avatar2.setOwner(player2);
 	}
 
 	public Player getPlayer1() { return player1; }
@@ -70,6 +75,24 @@ public class GameState {
 		selectedUnit = null;
 		selectedHandPosition = null;
 		board.clearSelection(out);
+	}
+
+	public int getPlayer1HornCharges() {
+		return player1HornCharges;
+	}
+
+	public void equipPlayer1Horn() {
+		player1HornCharges = 3;
+	}
+
+	public boolean player1HasHorn() {
+		return player1HornCharges > 0;
+	}
+
+	public void usePlayer1HornCharge() {
+		if (player1HornCharges > 0) {
+			player1HornCharges--;
+		}
 	}
 
 	/**

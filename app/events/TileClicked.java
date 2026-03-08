@@ -34,23 +34,87 @@ public class TileClicked implements EventProcessor {
         if (clickedTile.getUnit() != null) {
             Unit clickedUnit = clickedTile.getUnit();
 
+            // If a non-creature card is selected, try using it on this unit first
+            if (gameState.getSelectedHandPosition() != null) {
+                int handPosition = gameState.getSelectedHandPosition();
+                List<Card> hand = gameState.getPlayer1().getHand();
+
+                int cardIndex = handPosition - 1;
+                if (cardIndex >= 0 && cardIndex < hand.size()) {
+                    Card selectedCard = hand.get(cardIndex);
+
+                    if (!selectedCard.isCreature()) {
+                        useNonCreatureCardOnUnit(out, gameState, selectedCard, clickedUnit, cardIndex);
+                        return;
+                    }
+                }
+            }
+
             if (clickedUnit.getOwner() == gameState.getPlayer1()) {
                 gameState.getBoard().clearSelection(out);
                 gameState.setSelectedHandPosition(null);
                 gameState.setSelectedUnit(clickedUnit);
-                BasicCommands.drawTile(out, clickedTile, 1); // white
+                BasicCommands.drawTile(out, clickedTile, 1);
                 gameState.getBoard().highlightMovement(out, clickedTile);
+            } else {
+                BasicCommands.addPlayer1Notification(out, "Clicked enemy unit", 2);
             }
             return;
         }
 
-        // Empty tile + selected card => try summon
+        // Empty tile + selected card
         if (gameState.getSelectedHandPosition() != null) {
-            summonSelectedUnit(out, gameState, clickedTile);
+            int handPosition = gameState.getSelectedHandPosition();
+            List<Card> hand = gameState.getPlayer1().getHand();
+            int cardIndex = handPosition - 1;
+
+            if (cardIndex >= 0 && cardIndex < hand.size()) {
+                Card selectedCard = hand.get(cardIndex);
+
+                if (selectedCard.isCreature()) {
+                    summonSelectedUnit(out, gameState, clickedTile);
+                } else {
+                    BasicCommands.addPlayer1Notification(out, "This card must target a unit.", 2);
+                }
+            }
+            return;
+        }
+    }
+
+    private void useNonCreatureCardOnUnit(ActorRef out,
+                                          GameState gameState,
+                                          Card card,
+                                          Unit targetUnit,
+                                          int cardIndex) {
+
+        if ("Horn of the Forsaken".equals(card.getCardname())) {
+
+            if (targetUnit != gameState.getPlayer1().getAvatar()) {
+                BasicCommands.addPlayer1Notification(out, "Horn must target your avatar", 2);
+                return;
+            }
+
+            if (gameState.getPlayer1().getMana() < card.getManacost()) {
+                BasicCommands.addPlayer1Notification(out, "Not enough mana", 2);
+                return;
+            }
+
+            gameState.equipPlayer1Horn();
+
+            gameState.getPlayer1().setMana(gameState.getPlayer1().getMana() - card.getManacost());
+            BasicCommands.setPlayer1Mana(out, gameState.getPlayer1());
+
+            List<Card> hand = gameState.getPlayer1().getHand();
+            hand.remove(cardIndex);
+            redrawPlayerHand(out, hand);
+
+            gameState.clearSelections(out);
+
+            BasicCommands.addPlayer1Notification(out, "Horn equipped (3)", 2);
             return;
         }
 
-        // TODO: Story Card #4 — move selected unit to this empty tile
+        BasicCommands.addPlayer1Notification(out, "Spell/artifact not implemented yet.", 2);
     }
 
     private void summonSelectedUnit(ActorRef out, GameState gameState, Tile clickedTile) {
