@@ -2,6 +2,9 @@ package structures.basic.players;
 
 import akka.actor.ActorRef;
 import commands.BasicCommands;
+import structures.basic.BetterUnit;
+import utils.BasicObjectBuilders;
+import utils.StaticConfFiles;
 
 /**
  * This class represents the human player of the game.
@@ -21,5 +24,10 @@ public class HumanPlayer extends Player {
     public void setMana(ActorRef out, int mana) {
         this.mana = mana;
         BasicCommands.setPlayer1Mana(out, this);
+    }
+
+    @Override
+    public void setAvatar() {
+        this.avatar = (BetterUnit) BasicObjectBuilders.loadUnit(StaticConfFiles.humanAvatar, useUnitId(), BetterUnit.class);
     }
 }

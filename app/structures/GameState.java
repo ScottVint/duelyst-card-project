@@ -2,6 +2,8 @@ package structures;
 
 import structures.basic.BetterUnit;
 import structures.basic.Board;
+import structures.basic.players.AIPlayer;
+import structures.basic.players.HumanPlayer;
 import structures.basic.players.Player;
 import structures.basic.Unit;
 import utils.BasicObjectBuilders;
@@ -24,8 +26,8 @@ public class GameState {
 	public boolean gameInitalised = false;
 	public boolean something = false;
 
-	public Player player1;
-	public Player player2;
+	public HumanPlayer player1;
+	public AIPlayer player2;
 	public Board board;
 	public Unit selectedUnit;
 	public boolean player1Turn = true;
@@ -44,13 +46,9 @@ public class GameState {
 		BetterUnit avatar1 = (BetterUnit) BasicObjectBuilders.loadUnit(StaticConfFiles.humanAvatar, 1, BetterUnit.class);
 		BetterUnit avatar2 = (BetterUnit) BasicObjectBuilders.loadUnit(StaticConfFiles.aiAvatar, 2, BetterUnit.class);
 
-		player1 = new Player();
-		player1.setAvatar(avatar1);
-		player1.setDeck(OrderedCardLoader.getPlayer1Cards(2));
+		player1 = new HumanPlayer();
 
-		player2 = new Player();
-		player2.setAvatar(avatar2);
-		player2.setDeck(OrderedCardLoader.getPlayer2Cards(2));
+		player2 = new AIPlayer();
 	}
 
 	public Player getPlayer1() { return player1; }
