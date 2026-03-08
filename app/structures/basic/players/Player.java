@@ -49,65 +49,41 @@ public class Player {
 		this.hand = new ArrayList<>();
 	}
 
-	public int getHealth() {
-		return health;
-	}
-
-	public void setHealth(int health) {
-		this.health = health;
-	}
+	public int getHealth() { return health; }
+	public void setHealth(int health) { this.health = health; }
 
 	public void setHealth(ActorRef out, int health) {
 		throw new Error("Unknown Player subclass");
 	}
 
-	public int getMana() {
-		return mana;
-	}
-
-	public void setMana(int mana) {
-		this.mana = mana;
-	}
+	public int getMana() { return mana; }
+	public void setMana(int mana) { this.mana = mana; }
 
 	public void setMana(ActorRef out, int mana) {
+		if (mana > 9) {
+			mana = 9;
+		} else if (mana < 0) {
+			mana = 0;
+		}
 		this.mana = mana;
 	}
 
-	/**
-	 * Returns this player's avatar unit.
-	 *
-	 * @author Minghao
-	 */
-	public BetterUnit getAvatar() {
-		return avatar;
-	}
+	public BetterUnit getAvatar() { return avatar; }
 
 	public void setAvatar() {
 		throw new Error("Unknown Player subclass");
 	}
 
-	/**
-	 * Returns the player's draw pile.
-	 * @author Minghao
-	 */
-	public List<Card> getDeck() {
-		return deck.cards;
-	}
+	public List<Card> getDeck() { return deck.cards; }
+
+	// setDeck() removed. It never needs to be set after initialisation.
+
+	public List<Card> getHand() { return hand; }
 
 	/**
-	 * // setDeck() removed. It never needs to be set after initialisation.
-	 * /**
-	 * Returns the cards currently in the player's hand.
+	 * Draws the top card from the deck into the hand. Does nothing if the deck is empty or full.
 	 * @author Minghao
-	 */
-	public List<Card> getHand() {
-		return hand;
-	}
-
-	/**
-	 * Draws the top card from the deck into the hand.
-	 * Does nothing if the deck is empty.
-	 * @author Minghao
+	 * @author Scott
 	 */
 	public void drawCardIntoHand() { // Changed the name for less confusion with BasicCommands -- Scott
 		if (deck != null && !deck.cards.isEmpty()) {

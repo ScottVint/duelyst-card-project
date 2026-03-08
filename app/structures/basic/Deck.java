@@ -10,7 +10,6 @@ public class Deck {
     public List<Card> cards; // Making this public, because I don't think any of this
                              // is accessible outside of the player's deck attribute?
 
-    /// Draws all cards into deck, then shuffles.
     public Deck(Player player) {
         try {
             if (player instanceof HumanPlayer) {
@@ -26,10 +25,6 @@ public class Deck {
             System.exit(1);
         }
 
-    }
-
-    private void shuffle() {
-        Collections.shuffle(cards);
     }
 
 }
