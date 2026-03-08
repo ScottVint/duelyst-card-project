@@ -38,6 +38,11 @@ public class GameState {
 	/** Horn of the Forsaken charges for player 1 */
 	private int player1HornCharges = 0;
 
+	/** Movement state */
+	public Unit movingUnit = null;
+	public Tile moveTargetTile = null;
+	public boolean unitMoving = false;
+
 	public GameState() {
 		board = new Board();
 
@@ -58,23 +63,21 @@ public class GameState {
 	public Player getPlayer1() { return player1; }
 	public Player getPlayer2() { return player2; }
 	public Board getBoard() { return board; }
+
 	public Unit getSelectedUnit() { return selectedUnit; }
 	public void setSelectedUnit(Unit unit) { this.selectedUnit = unit; }
+
 	public boolean isPlayer1Turn() { return player1Turn; }
 	public void setPlayer1Turn(boolean player1Turn) { this.player1Turn = player1Turn; }
+
 	public int getTurnCount() { return turnCount; }
 	public void incrementTurnCount() { turnCount++; }
+
 	public Integer getSelectedHandPosition() { return selectedHandPosition; }
 	public void setSelectedHandPosition(Integer pos) { this.selectedHandPosition = pos; }
 
 	public int getNextUnitId() {
 		return nextUnitId++;
-	}
-
-	public void clearSelections(ActorRef out) {
-		selectedUnit = null;
-		selectedHandPosition = null;
-		board.clearSelection(out);
 	}
 
 	public int getPlayer1HornCharges() {
@@ -93,6 +96,21 @@ public class GameState {
 		if (player1HornCharges > 0) {
 			player1HornCharges--;
 		}
+	}
+
+	public Unit getMovingUnit() { return movingUnit; }
+	public void setMovingUnit(Unit movingUnit) { this.movingUnit = movingUnit; }
+
+	public Tile getMoveTargetTile() { return moveTargetTile; }
+	public void setMoveTargetTile(Tile moveTargetTile) { this.moveTargetTile = moveTargetTile; }
+
+	public boolean isUnitMoving() { return unitMoving; }
+	public void setUnitMoving(boolean unitMoving) { this.unitMoving = unitMoving; }
+
+	public void clearSelections(ActorRef out) {
+		selectedUnit = null;
+		selectedHandPosition = null;
+		board.clearSelection(out);
 	}
 
 	/**

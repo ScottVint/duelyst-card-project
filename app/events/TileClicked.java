@@ -28,6 +28,11 @@ public class TileClicked implements EventProcessor {
             return;
         }
 
+        if (gameState.isUnitMoving()) {
+            BasicCommands.addPlayer1Notification(out, "A unit is already moving.", 2);
+            return;
+        }
+
         int tilex = message.get("tilex").asInt();
         int tiley = message.get("tiley").asInt();
 
@@ -53,6 +58,7 @@ public class TileClicked implements EventProcessor {
                 }
             }
 
+            // Select friendly unit for movement
             if (clickedUnit.getOwner() == gameState.getPlayer1()) {
                 gameState.getBoard().clearSelection(out);
                 gameState.setSelectedHandPosition(null);
@@ -82,6 +88,80 @@ public class TileClicked implements EventProcessor {
             }
             return;
         }
+
+        // Empty tile + selected unit => try move
+        if (gameState.getSelectedUnit() != null) {
+            moveSelectedUnit(out, gameState, clickedTile);
+        }
+    }
+
+    private void moveSelectedUnit(ActorRef out, GameState gameState, Tile clickedTile) {
+        Unit selectedUnit = gameState.getSelectedUnit();
+        if (selectedUnit == null) return;
+
+        if (clickedTile.getUnit() != null) {
+            BasicCommands.addPlayer1Notification(out, "Tile occupied.", 2);
+            return;
+        }
+
+        if (!isValidMoveTile(gameState, selectedUnit, clickedTile)) {
+            BasicCommands.addPlayer1Notification(out, "Invalid move tile.", 2);
+            return;
+        }
+
+        gameState.setMovingUnit(selectedUnit);
+        gameState.setMoveTargetTile(clickedTile);
+        gameState.setUnitMoving(true);
+
+        gameState.getBoard().clearSelection(out);
+        gameState.setSelectedUnit(null);
+        gameState.setSelectedHandPosition(null);
+
+        BasicCommands.moveUnitToTile(out, selectedUnit, clickedTile);
+    }
+
+    private boolean isValidMoveTile(GameState gameState, Unit selectedUnit, Tile clickedTile) {
+        int sx = selectedUnit.getPosition().getTilex();
+        int sy = selectedUnit.getPosition().getTiley();
+        int tx = clickedTile.getTilex();
+        int ty = clickedTile.getTiley();
+
+        int dx = tx - sx;
+        int dy = ty - sy;
+
+        if (dx == 0 && dy == 0) return false;
+        if (clickedTile.getUnit() != null) return false;
+
+        // Diagonal: exactly 1
+        if (Math.abs(dx) == 1 && Math.abs(dy) == 1) {
+            return true;
+        }
+
+        // Horizontal: 1 or 2, no blocking
+        if (dy == 0 && (Math.abs(dx) == 1 || Math.abs(dx) == 2)) {
+            int step = dx > 0 ? 1 : -1;
+            for (int i = 1; i <= Math.abs(dx); i++) {
+                Tile pathTile = gameState.getBoard().getTile(sx + i * step, sy);
+                if (i < Math.abs(dx) && pathTile.getUnit() != null) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        // Vertical: 1 or 2, no blocking
+        if (dx == 0 && (Math.abs(dy) == 1 || Math.abs(dy) == 2)) {
+            int step = dy > 0 ? 1 : -1;
+            for (int i = 1; i <= Math.abs(dy); i++) {
+                Tile pathTile = gameState.getBoard().getTile(sx, sy + i * step);
+                if (i < Math.abs(dy) && pathTile.getUnit() != null) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        return false;
     }
 
     private void useNonCreatureCardOnEmptyTile(ActorRef out,
@@ -114,7 +194,6 @@ public class TileClicked implements EventProcessor {
         String cardName = card.getCardname();
 
         if ("Horn of the Forsaken".equals(cardName)) {
-
             if (targetUnit != gameState.getPlayer1().getAvatar()) {
                 BasicCommands.addPlayer1Notification(out, "Horn must target your avatar", 2);
                 return;
@@ -127,7 +206,6 @@ public class TileClicked implements EventProcessor {
 
             gameState.equipPlayer1Horn();
             spendManaRemoveCardAndClear(out, gameState, cardIndex, card.getManacost());
-
             BasicCommands.addPlayer1Notification(out, "Horn equipped (3)", 2);
             return;
         }
@@ -208,14 +286,12 @@ public class TileClicked implements EventProcessor {
         int summoned = 0;
         Set<String> used = new HashSet<>();
 
-        // Prefer the tile the player clicked if it is valid
         if (clickedTile != null && clickedTile.getUnit() == null && isValidSummonTile(gameState, clickedTile)) {
             gameState.summonWraithling(out, clickedTile, gameState.getPlayer1());
             used.add(clickedTile.getTilex() + "," + clickedTile.getTiley());
             summoned++;
         }
 
-        // Snapshot original friendly units only, avoid chain-summoning from fresh tokens
         List<int[]> friendlyPositions = new ArrayList<>();
         for (int x = 0; x < 9; x++) {
             for (int y = 0; y < 5; y++) {
