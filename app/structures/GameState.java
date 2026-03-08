@@ -1,9 +1,12 @@
 package structures;
 
+import akka.actor.ActorRef;
+import commands.BasicCommands;
 import structures.basic.BetterUnit;
 import structures.basic.Board;
-import structures.basic.players.Player;
+import structures.basic.Tile;
 import structures.basic.Unit;
+import structures.basic.players.Player;
 import utils.BasicObjectBuilders;
 import utils.OrderedCardLoader;
 import utils.StaticConfFiles;
@@ -11,13 +14,6 @@ import utils.StaticConfFiles;
 /**
  * This class can be used to hold information about the on-going game.
  * Its created with the GameActor.
- * <p>
- * Extended to initialise the board, both players, their avatars and decks
- * at the start of a game session.
- *
- * @author Dr. Richard McCreadie
- * @author Minghao
- *
  */
 public class GameState {
 
@@ -30,13 +26,14 @@ public class GameState {
 	public Unit selectedUnit;
 	public boolean player1Turn = true;
 
-	/** Current round number (shared by both players). Increments when P2 ends their turn. */
+	/** Current round number (shared by both players). */
 	public int turnCount = 1;
 
 	/** 1-indexed hand position of the selected card, or null if none selected. */
 	public Integer selectedHandPosition = null;
 
-	// TODO: Move player/avatar/deck initialisation into the Player class constructor
+	/** Next unique unit id for summoned units. Avatars already use 1 and 2. */
+	private int nextUnitId = 3;
 
 	public GameState() {
 		board = new Board();
@@ -65,4 +62,40 @@ public class GameState {
 	public Integer getSelectedHandPosition() { return selectedHandPosition; }
 	public void setSelectedHandPosition(Integer pos) { this.selectedHandPosition = pos; }
 
+	public int getNextUnitId() {
+		return nextUnitId++;
+	}
+
+	public void clearSelections(ActorRef out) {
+		selectedUnit = null;
+		selectedHandPosition = null;
+		board.clearSelection(out);
+	}
+
+	/**
+	 * Unified damage helper for combat / spell damage.
+	 */
+	public void dealDamage(ActorRef out, Unit attacker, Unit target) {
+		if (attacker == null || target == null) return;
+
+		target.takeDamage(out, attacker.getAttack());
+
+		// Avatar HP must also update the player HUD
+		if (target == player1.getAvatar()) {
+			player1.setHealth(target.getHealth());
+			BasicCommands.setPlayer1Health(out, player1);
+		} else if (target == player2.getAvatar()) {
+			player2.setHealth(target.getHealth());
+			BasicCommands.setPlayer2Health(out, player2);
+		}
+
+		// Remove dead units from board + UI
+		if (target.getHealth() <= 0 && target.getPosition() != null) {
+			Tile tile = board.getTile(target.getPosition().getTilex(), target.getPosition().getTiley());
+			if (tile != null) {
+				tile.setUnit(null);
+			}
+			BasicCommands.deleteUnit(out, target);
+		}
+	}
 }

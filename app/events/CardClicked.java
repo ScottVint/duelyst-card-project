@@ -11,35 +11,27 @@ import structures.basic.Card;
 
 /**
  * Indicates that the user has clicked a card in their hand.
- * <p>
- * Handles Story Card #22: selecting a creature card highlights all empty board tiles
- * adjacent (8-directional) to a friendly unit in green (mode 2).
- * Handles Story Card #12: re-clicking the same card deselects it.
- *
- * {
- *   messageType = "cardClicked"
- *   position = &lt;hand index position [1-6]&gt;
- * }
- *
- * @author Dr. Richard McCreadie
- * @author Minghao
- *
  */
 public class CardClicked implements EventProcessor {
 
 	@Override
 	public void processEvent(ActorRef out, GameState gameState, JsonNode message) {
 
+		if (!gameState.isPlayer1Turn()) {
+			BasicCommands.addPlayer1Notification(out, "It is not your turn.", 2);
+			return;
+		}
+
 		int handPosition = message.get("position").asInt(); // 1-indexed
 
-		// Story Card #12: re-clicking the same card deselects it
+		// Re-click same card -> deselect
 		if (Integer.valueOf(handPosition).equals(gameState.getSelectedHandPosition())) {
 			gameState.setSelectedHandPosition(null);
 			gameState.getBoard().clearSelection(out);
 			return;
 		}
 
-		// Deselect any previously selected unit and clear highlights
+		// Clear previous selections
 		gameState.setSelectedUnit(null);
 		gameState.getBoard().clearSelection(out);
 
@@ -48,12 +40,19 @@ public class CardClicked implements EventProcessor {
 		if (index < 0 || index >= hand.size()) return;
 
 		Card card = hand.get(index);
+
+		if (gameState.getPlayer1().getMana() < card.getManacost()) {
+			BasicCommands.addPlayer1Notification(out, "Not enough mana.", 2);
+			return;
+		}
+
 		gameState.setSelectedHandPosition(handPosition);
 
-		// Story Card #22: creature cards → highlight valid summon tiles in green
+		// Creature card -> highlight summon tiles
 		if (card.isCreature()) {
 			gameState.getBoard().highlightSummonTiles(out, gameState.getPlayer1());
 		}
-	}
 
+		// Spell target highlighting can be added later
+	}
 }
