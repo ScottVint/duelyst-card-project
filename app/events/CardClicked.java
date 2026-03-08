@@ -59,8 +59,16 @@ public class CardClicked implements EventProcessor {
 			int ax = gameState.getPlayer1().getAvatar().getPosition().getTilex();
 			int ay = gameState.getPlayer1().getAvatar().getPosition().getTiley();
 			BasicCommands.drawTile(out, gameState.getBoard().getTile(ax, ay), 1);
+		} else if ("Wraithling Swarm".equals(card.getCardname())) {
+			BasicCommands.addPlayer1Notification(out, "Click an empty tile to cast Wraithling Swarm", 2);
+		} else if ("Truestrike".equals(card.getCardname())) {
+			BasicCommands.addPlayer1Notification(out, "Click an enemy unit for Truestrike", 2);
+		} else if ("Sundrop Elixir".equals(card.getCardname())) {
+			BasicCommands.addPlayer1Notification(out, "Click a unit to heal 5", 2);
+		} else if ("Dark Terminus".equals(card.getCardname())) {
+			BasicCommands.addPlayer1Notification(out, "Click an enemy non-avatar unit", 2);
 		} else {
 			BasicCommands.addPlayer1Notification(out, "Spell/artifact not implemented yet.", 2);
 		}
 	}
-}
+	}

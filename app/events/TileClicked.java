@@ -1,6 +1,9 @@
 package events;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -74,11 +77,32 @@ public class TileClicked implements EventProcessor {
                 if (selectedCard.isCreature()) {
                     summonSelectedUnit(out, gameState, clickedTile);
                 } else {
-                    BasicCommands.addPlayer1Notification(out, "This card must target a unit.", 2);
+                    useNonCreatureCardOnEmptyTile(out, gameState, selectedCard, clickedTile, cardIndex);
                 }
             }
             return;
         }
+    }
+
+    private void useNonCreatureCardOnEmptyTile(ActorRef out,
+                                               GameState gameState,
+                                               Card card,
+                                               Tile clickedTile,
+                                               int cardIndex) {
+
+        String cardName = card.getCardname();
+
+        if ("Wraithling Swarm".equals(cardName)) {
+            castWraithlingSwarm(out, gameState, clickedTile, cardIndex);
+            return;
+        }
+
+        if ("Horn of the Forsaken".equals(cardName)) {
+            BasicCommands.addPlayer1Notification(out, "Horn must target your avatar", 2);
+            return;
+        }
+
+        BasicCommands.addPlayer1Notification(out, "This card must target a unit.", 2);
     }
 
     private void useNonCreatureCardOnUnit(ActorRef out,
@@ -87,7 +111,9 @@ public class TileClicked implements EventProcessor {
                                           Unit targetUnit,
                                           int cardIndex) {
 
-        if ("Horn of the Forsaken".equals(card.getCardname())) {
+        String cardName = card.getCardname();
+
+        if ("Horn of the Forsaken".equals(cardName)) {
 
             if (targetUnit != gameState.getPlayer1().getAvatar()) {
                 BasicCommands.addPlayer1Notification(out, "Horn must target your avatar", 2);
@@ -100,21 +126,145 @@ public class TileClicked implements EventProcessor {
             }
 
             gameState.equipPlayer1Horn();
-
-            gameState.getPlayer1().setMana(gameState.getPlayer1().getMana() - card.getManacost());
-            BasicCommands.setPlayer1Mana(out, gameState.getPlayer1());
-
-            List<Card> hand = gameState.getPlayer1().getHand();
-            hand.remove(cardIndex);
-            redrawPlayerHand(out, hand);
-
-            gameState.clearSelections(out);
+            spendManaRemoveCardAndClear(out, gameState, cardIndex, card.getManacost());
 
             BasicCommands.addPlayer1Notification(out, "Horn equipped (3)", 2);
             return;
         }
 
+        if ("Truestrike".equals(cardName)) {
+            if (targetUnit.getOwner() != gameState.getPlayer2()) {
+                BasicCommands.addPlayer1Notification(out, "Truestrike must target an enemy unit", 2);
+                return;
+            }
+
+            if (gameState.getPlayer1().getMana() < card.getManacost()) {
+                BasicCommands.addPlayer1Notification(out, "Not enough mana", 2);
+                return;
+            }
+
+            gameState.dealDirectDamage(out, targetUnit, 2);
+            spendManaRemoveCardAndClear(out, gameState, cardIndex, card.getManacost());
+            BasicCommands.addPlayer1Notification(out, "Truestrike cast", 2);
+            return;
+        }
+
+        if ("Sundrop Elixir".equals(cardName)) {
+            if (gameState.getPlayer1().getMana() < card.getManacost()) {
+                BasicCommands.addPlayer1Notification(out, "Not enough mana", 2);
+                return;
+            }
+
+            gameState.healUnit(out, targetUnit, 5);
+            spendManaRemoveCardAndClear(out, gameState, cardIndex, card.getManacost());
+            BasicCommands.addPlayer1Notification(out, "Sundrop Elixir cast", 2);
+            return;
+        }
+
+        if ("Dark Terminus".equals(cardName)) {
+            if (targetUnit.getOwner() != gameState.getPlayer2()) {
+                BasicCommands.addPlayer1Notification(out, "Dark Terminus must target an enemy unit", 2);
+                return;
+            }
+
+            if (targetUnit == gameState.getPlayer2().getAvatar()) {
+                BasicCommands.addPlayer1Notification(out, "Dark Terminus cannot target enemy avatar", 2);
+                return;
+            }
+
+            if (gameState.getPlayer1().getMana() < card.getManacost()) {
+                BasicCommands.addPlayer1Notification(out, "Not enough mana", 2);
+                return;
+            }
+
+            Tile deathTile = gameState.getBoard().getTile(
+                    targetUnit.getPosition().getTilex(),
+                    targetUnit.getPosition().getTiley()
+            );
+
+            gameState.removeUnit(out, targetUnit);
+            gameState.summonWraithling(out, deathTile, gameState.getPlayer1());
+
+            spendManaRemoveCardAndClear(out, gameState, cardIndex, card.getManacost());
+            BasicCommands.addPlayer1Notification(out, "Dark Terminus cast", 2);
+            return;
+        }
+
         BasicCommands.addPlayer1Notification(out, "Spell/artifact not implemented yet.", 2);
+    }
+
+    private void castWraithlingSwarm(ActorRef out,
+                                     GameState gameState,
+                                     Tile clickedTile,
+                                     int cardIndex) {
+
+        Card card = gameState.getPlayer1().getHand().get(cardIndex);
+
+        if (gameState.getPlayer1().getMana() < card.getManacost()) {
+            BasicCommands.addPlayer1Notification(out, "Not enough mana", 2);
+            return;
+        }
+
+        int summoned = 0;
+        Set<String> used = new HashSet<>();
+
+        // Prefer the tile the player clicked if it is valid
+        if (clickedTile != null && clickedTile.getUnit() == null && isValidSummonTile(gameState, clickedTile)) {
+            gameState.summonWraithling(out, clickedTile, gameState.getPlayer1());
+            used.add(clickedTile.getTilex() + "," + clickedTile.getTiley());
+            summoned++;
+        }
+
+        // Snapshot original friendly units only, avoid chain-summoning from fresh tokens
+        List<int[]> friendlyPositions = new ArrayList<>();
+        for (int x = 0; x < 9; x++) {
+            for (int y = 0; y < 5; y++) {
+                Tile tile = gameState.getBoard().getTile(x, y);
+                Unit unit = tile.getUnit();
+                if (unit != null && unit.getOwner() == gameState.getPlayer1()) {
+                    friendlyPositions.add(new int[]{x, y});
+                }
+            }
+        }
+
+        for (int[] pos : friendlyPositions) {
+            if (summoned >= 3) break;
+
+            int x = pos[0];
+            int y = pos[1];
+
+            for (int dx = -1; dx <= 1; dx++) {
+                if (summoned >= 3) break;
+
+                for (int dy = -1; dy <= 1; dy++) {
+                    if (summoned >= 3) break;
+                    if (dx == 0 && dy == 0) continue;
+
+                    int nx = x + dx;
+                    int ny = y + dy;
+
+                    if (nx < 0 || nx >= 9 || ny < 0 || ny >= 5) continue;
+
+                    Tile candidate = gameState.getBoard().getTile(nx, ny);
+                    String key = nx + "," + ny;
+
+                    if (used.contains(key)) continue;
+                    if (candidate.getUnit() != null) continue;
+
+                    gameState.summonWraithling(out, candidate, gameState.getPlayer1());
+                    used.add(key);
+                    summoned++;
+                }
+            }
+        }
+
+        if (summoned == 0) {
+            BasicCommands.addPlayer1Notification(out, "No valid space for Wraithling Swarm", 2);
+            return;
+        }
+
+        spendManaRemoveCardAndClear(out, gameState, cardIndex, card.getManacost());
+        BasicCommands.addPlayer1Notification(out, "Wraithling Swarm cast", 2);
     }
 
     private void summonSelectedUnit(ActorRef out, GameState gameState, Tile clickedTile) {
@@ -156,9 +306,18 @@ public class TileClicked implements EventProcessor {
         BasicCommands.setUnitAttack(out, summonedUnit, summonedUnit.getAttack());
         BasicCommands.setUnitHealth(out, summonedUnit, summonedUnit.getHealth());
 
-        gameState.getPlayer1().setMana(gameState.getPlayer1().getMana() - card.getManacost());
+        spendManaRemoveCardAndClear(out, gameState, cardIndex, card.getManacost());
+    }
+
+    private void spendManaRemoveCardAndClear(ActorRef out,
+                                             GameState gameState,
+                                             int cardIndex,
+                                             int manaCost) {
+
+        gameState.getPlayer1().setMana(gameState.getPlayer1().getMana() - manaCost);
         BasicCommands.setPlayer1Mana(out, gameState.getPlayer1());
 
+        List<Card> hand = gameState.getPlayer1().getHand();
         hand.remove(cardIndex);
         redrawPlayerHand(out, hand);
 
