@@ -1,18 +1,39 @@
 package events;
-
 import java.util.List;
-
 import com.fasterxml.jackson.databind.JsonNode;
-
 import akka.actor.ActorRef;
 import commands.BasicCommands;
 import structures.GameState;
+import structures.basic.Tile;
 import structures.basic.Card;
 
 /**
  * Indicates that the user has clicked a card in their hand.
  */
+/* <p>Collapse commentComment on line L14ScottVint commented on Mar 9, 2026 ScottVinton Mar 9, 2026More actions? Why are we deleting all of thisReactWrite a replyResolve comment
+// * Handles Story Card #22: selecting a creature card highlights all empty board tiles
+// * adjacent (8-directional) to a friendly unit in green (mode 2).
+//		* Handles Story Card #12: re-clicking the same card deselects it.
+//		*
+//		* {
+//		*   messageType = "cardClicked"
+//		*   position = &lt;hand index position [1-6]&gt;
+// * }
+//		 *
+//		 * @author Dr. Richard McCreadie
+// * @author Minghao
+// 		 */
+
+/**
+ * Indicates that the user has clicked a card in their hand.
+ */
 public class CardClicked implements EventProcessor {
+
+	private static final String HORN_OF_THE_FORSAKEN = "Horn of the Forsaken";
+	private static final String WRAITHLING_SWARM = "Wraithling Swarm";
+	private static final String TRUESTRIKE = "Truestrike";
+	private static final String SUNDROP_ELIXIR = "Sundrop Elixir";
+	private static final String DARK_TERMINUS = "Dark Terminus";
 
 	@Override
 	public void processEvent(ActorRef out, GameState gameState, JsonNode message) {
@@ -43,32 +64,55 @@ public class CardClicked implements EventProcessor {
 
 		Card card = hand.get(index);
 
-		if (gameState.getPlayer1().getMana() < card.getManacost()) {
-			BasicCommands.addPlayer1Notification(out, "Not enough mana.", 2);
-			return;
-		}
-
+		// Important:
+		// Do NOT block card selection here based on mana.
+		// Preview/highlight should still happen on card-click.
+		// Mana is checked later in TileClicked when the player actually casts/places the card.
 		gameState.setSelectedHandPosition(handPosition);
 
 		if (card.isCreature()) {
 			BasicCommands.addPlayer1Notification(out, "Creature selected", 2);
 			gameState.getBoard().highlightSummonTiles(out, gameState.getPlayer1());
-		} else if ("Horn of the Forsaken".equals(card.getCardname())) {
+			return;
+		}
+
+		showSpellPreview(out, gameState, card);
+	}
+
+	private void showSpellPreview(ActorRef out, GameState gameState, Card card) {
+		String cardName = card.getCardname();
+
+		if (HORN_OF_THE_FORSAKEN.equals(cardName)) {
 			BasicCommands.addPlayer1Notification(out, "Click your avatar to equip Horn", 2);
 
 			int ax = gameState.getPlayer1().getAvatar().getPosition().getTilex();
 			int ay = gameState.getPlayer1().getAvatar().getPosition().getTiley();
-			BasicCommands.drawTile(out, gameState.getBoard().getTile(ax, ay), 1);
-		} else if ("Wraithling Swarm".equals(card.getCardname())) {
-			BasicCommands.addPlayer1Notification(out, "Click an empty tile to cast Wraithling Swarm", 2);
-		} else if ("Truestrike".equals(card.getCardname())) {
-			BasicCommands.addPlayer1Notification(out, "Click an enemy unit for Truestrike", 2);
-		} else if ("Sundrop Elixir".equals(card.getCardname())) {
-			BasicCommands.addPlayer1Notification(out, "Click a unit to heal 5", 2);
-		} else if ("Dark Terminus".equals(card.getCardname())) {
-			BasicCommands.addPlayer1Notification(out, "Click an enemy non-avatar unit", 2);
-		} else {
-			BasicCommands.addPlayer1Notification(out, "Spell/artifact not implemented yet.", 2);
+			Tile avatarTile = gameState.getBoard().getTile(ax, ay);
+			BasicCommands.drawTile(out, avatarTile, 1);
+			return;
 		}
+
+		if (WRAITHLING_SWARM.equals(cardName)) {
+			BasicCommands.addPlayer1Notification(out, "Click an empty tile to cast Wraithling Swarm", 2);
+			return;
+		}
+
+		if (TRUESTRIKE.equals(cardName)) {
+			BasicCommands.addPlayer1Notification(out, "Click an enemy unit for Truestrike", 2);
+			return;
+		}
+
+		if (SUNDROP_ELIXIR.equals(cardName)) {
+			BasicCommands.addPlayer1Notification(out, "Click a unit to heal 5", 2);
+			return;
+		}
+
+		if (DARK_TERMINUS.equals(cardName)) {
+			BasicCommands.addPlayer1Notification(out, "Click an enemy non-avatar unit", 2);
+			return;
+		}
+
+		BasicCommands.addPlayer1Notification(out, "Spell/artifact not implemented yet.", 2);
 	}
-	}
+}
+// TODO: add spell target highlighting

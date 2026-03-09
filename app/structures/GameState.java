@@ -53,11 +53,17 @@ public class GameState {
 		player1.setAvatar(avatar1);
 		player1.setDeck(OrderedCardLoader.getPlayer1Cards(2));
 		avatar1.setOwner(player1);
+		avatar1.setAttack(2);
+		avatar1.setMaxHealth(20);
+		avatar1.setHealth(20);
 
 		player2 = new Player();
 		player2.setAvatar(avatar2);
 		player2.setDeck(OrderedCardLoader.getPlayer2Cards(2));
 		avatar2.setOwner(player2);
+		avatar2.setAttack(2);
+		avatar2.setMaxHealth(20);
+		avatar2.setHealth(20);
 	}
 
 	public Player getPlayer1() { return player1; }
@@ -118,16 +124,27 @@ public class GameState {
 	 */
 	public void dealDamage(ActorRef out, Unit attacker, Unit target) {
 		if (attacker == null || target == null) return;
-		dealDirectDamage(out, target, attacker.getAttack());
+
+		int damage = attacker.getAttack();
+
+		if (damage <= 0) {
+			BasicCommands.addPlayer1Notification(out, "Attacker has 0 attack.", 2);
+			return;
+		}
+
+		dealDirectDamage(out, target, damage);
 	}
 
 	/**
-	 * Direct spell damage.
+	 * Direct spell / combat damage.
 	 */
 	public void dealDirectDamage(ActorRef out, Unit target, int damage) {
 		if (target == null || damage <= 0) return;
 
-		target.takeDamage(out, damage);
+		int newHealth = target.getHealth() - damage;
+		target.setHealth(newHealth);
+
+		BasicCommands.setUnitHealth(out, target, target.getHealth());
 
 		if (target == player1.getAvatar()) {
 			player1.setHealth(target.getHealth());
@@ -141,7 +158,6 @@ public class GameState {
 			removeUnit(out, target);
 		}
 	}
-
 	/**
 	 * Heal a unit, capped by maxHealth.
 	 */

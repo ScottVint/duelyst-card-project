@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
 import com.fasterxml.jackson.databind.JsonNode;
 
 import akka.actor.ActorRef;
@@ -13,6 +12,8 @@ import structures.GameState;
 import structures.basic.Card;
 import structures.basic.Tile;
 import structures.basic.Unit;
+import structures.basic.UnitAnimationType;
+import structures.basic.BetterUnit;
 import utils.BasicObjectBuilders;
 
 /**
@@ -58,7 +59,13 @@ public class TileClicked implements EventProcessor {
                 }
             }
 
-            // Select friendly unit for movement
+            // If a friendly unit is already selected and player clicks an enemy -> try attack
+            if (gameState.getSelectedUnit() != null && clickedUnit.getOwner() != gameState.getPlayer1()) {
+                tryAttackSelectedUnit(out, gameState, clickedUnit);
+                return;
+            }
+
+            // Select friendly unit for movement / attack
             if (clickedUnit.getOwner() == gameState.getPlayer1()) {
                 gameState.getBoard().clearSelection(out);
                 gameState.setSelectedHandPosition(null);
@@ -93,6 +100,42 @@ public class TileClicked implements EventProcessor {
         if (gameState.getSelectedUnit() != null) {
             moveSelectedUnit(out, gameState, clickedTile);
         }
+    }
+
+    private void tryAttackSelectedUnit(ActorRef out, GameState gameState, Unit targetUnit) {
+        Unit attacker = gameState.getSelectedUnit();
+        if (attacker == null || targetUnit == null) return;
+
+        if (attacker.getOwner() != gameState.getPlayer1()) {
+            BasicCommands.addPlayer1Notification(out, "Only your unit can attack.", 2);
+            return;
+        }
+
+        if (targetUnit.getOwner() == gameState.getPlayer1()) {
+            BasicCommands.addPlayer1Notification(out, "Cannot attack friendly unit.", 2);
+            return;
+        }
+
+        if (!isAdjacent(attacker, targetUnit)) {
+            BasicCommands.addPlayer1Notification(out, "Target is not adjacent.", 2);
+            return;
+        }
+
+        gameState.getBoard().clearSelection(out);
+
+        BasicCommands.playUnitAnimation(out, attacker, UnitAnimationType.attack);
+        BasicCommands.playUnitAnimation(out, targetUnit, UnitAnimationType.hit);
+
+        gameState.dealDamage(out, attacker, targetUnit);
+
+        gameState.setSelectedUnit(null);
+        gameState.setSelectedHandPosition(null);
+    }
+
+    private boolean isAdjacent(Unit a, Unit b) {
+        int dx = Math.abs(a.getPosition().getTilex() - b.getPosition().getTilex());
+        int dy = Math.abs(a.getPosition().getTiley() - b.getPosition().getTiley());
+        return dx <= 1 && dy <= 1 && !(dx == 0 && dy == 0);
     }
 
     private void moveSelectedUnit(ActorRef out, GameState gameState, Tile clickedTile) {
@@ -368,7 +411,7 @@ public class TileClicked implements EventProcessor {
         Unit summonedUnit = BasicObjectBuilders.loadUnit(
                 card.getUnitConfig(),
                 gameState.getNextUnitId(),
-                Unit.class
+                BetterUnit.class
         );
 
         summonedUnit.setOwner(gameState.getPlayer1());
@@ -390,8 +433,8 @@ public class TileClicked implements EventProcessor {
                                              int cardIndex,
                                              int manaCost) {
 
-        gameState.getPlayer1().setMana(gameState.getPlayer1().getMana() - manaCost);
-        BasicCommands.setPlayer1Mana(out, gameState.getPlayer1());
+        int newMana = gameState.getPlayer1().getMana() - manaCost;
+        gameState.getPlayer1().setMana(out, newMana);
 
         List<Card> hand = gameState.getPlayer1().getHand();
         hand.remove(cardIndex);
