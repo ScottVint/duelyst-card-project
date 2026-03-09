@@ -11,7 +11,7 @@ import structures.basic.Deck;
 import structures.basic.Unit;
 
 /**
- * A basic representation of of the Player. A player
+ * A basic representation of the Player. A player
  * has health and mana.
  * <p>
  * Extended to include the player's avatar unit, deck, hand, and card-draw logic.
@@ -25,6 +25,7 @@ public class Player {
 	// For use in subclasses, these are now protected instead of private
 	protected int health;
 	protected int mana;
+	private static final int MAX_MANA = 9;
 	protected int unitId; // TODO This will link up with a 'units' attribute, mapping units to an ID.
 	protected BetterUnit avatar;
 	protected Deck deck;
@@ -57,8 +58,6 @@ public class Player {
 	}
 
 	public int getMana() { return mana; }
-	public void setMana(int mana) { this.mana = mana; }
-
 	public void setMana(ActorRef out, int mana) {
 		if (mana > 9) {
 			mana = 9;
@@ -67,6 +66,8 @@ public class Player {
 		}
 		this.mana = mana;
 	}
+
+	public static int getMaxMana() { return MAX_MANA; }
 
 	public BetterUnit getAvatar() { return avatar; }
 
@@ -110,5 +111,9 @@ public class Player {
 		int id = unitId;
 		unitId++;
 		return id;
+	}
+
+	public String toString() {
+		return "Unknown Player";
 	}
 }
