@@ -1,5 +1,7 @@
 package structures;
 
+import akka.actor.ActorRef;
+import commands.BasicCommands;
 import structures.basic.BetterUnit;
 import structures.basic.Board;
 import structures.basic.players.AIPlayer;
@@ -63,4 +65,13 @@ public class GameState {
 	public Integer getSelectedHandPosition() { return selectedHandPosition; }
 	public void setSelectedHandPosition(Integer pos) { this.selectedHandPosition = pos; }
 
+	public void endTurn(ActorRef out, Player playerEndingTurn, Player playerStartingTurn) {
+		player1Turn = !player1Turn;
+		int startingMana = Math.min(turnCount + 1, Player.getMaxMana());
+		playerStartingTurn.setMana(out, startingMana);
+		playerEndingTurn.setMana(out, 0);
+		// TODO consolidate into setMana function
+		BasicCommands.setPlayer1Mana(out, player1);
+		BasicCommands.setPlayer2Mana(out, player2);
+	}
 }
