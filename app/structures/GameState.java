@@ -70,8 +70,5 @@ public class GameState {
 		int startingMana = Math.min(turnCount + 1, Player.getMaxMana());
 		playerStartingTurn.setMana(out, startingMana);
 		playerEndingTurn.setMana(out, 0);
-		// TODO consolidate into setMana function
-		BasicCommands.setPlayer1Mana(out, player1);
-		BasicCommands.setPlayer2Mana(out, player2);
 	}
 }

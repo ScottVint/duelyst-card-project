@@ -3,6 +3,7 @@ package structures.basic;
 import structures.basic.players.*;
 import utils.OrderedCardLoader;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -11,20 +12,19 @@ public class Deck {
                              // is accessible outside of the player's deck attribute?
 
     public Deck(Player player) {
-        try {
-            if (player instanceof HumanPlayer) {
-                cards = OrderedCardLoader.getPlayer1Cards(2);
-            } else if (player instanceof AIPlayer) {
-                cards = OrderedCardLoader.getPlayer2Cards(2);
-            } else {
-                throw new ClassNotFoundException("Invalid player type");
-            }
-            Collections.shuffle(cards);
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-            System.exit(1);
+        if (player instanceof HumanPlayer) {
+            cards = OrderedCardLoader.getPlayer1Cards(2);
+        } else if (player instanceof AIPlayer) {
+            cards = OrderedCardLoader.getPlayer2Cards(2);
+        } else {
+            throw new IllegalArgumentException("Invalid player type.");
         }
+        Collections.shuffle(cards);
 
+    }
+
+    public Deck() {
+        this.cards = new ArrayList<>();
     }
 
 }

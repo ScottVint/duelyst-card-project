@@ -37,7 +37,12 @@ public class Player {
 		this.mana = 0;
 		// Check player class and pass it to deck.
 		// Return an error otherwise.
-		this.deck = new Deck(this);
+		try {
+			this.deck = new Deck(this);
+		}  catch (IllegalArgumentException e) {
+			System.err.println(e.getMessage() + "Initialising empty deck...");
+			this.deck = new Deck();
+		}
 		this.hand = new ArrayList<>();
 		setAvatar();
 	}
@@ -59,6 +64,15 @@ public class Player {
 
 	public int getMana() { return mana; }
 	public void setMana(ActorRef out, int mana) {
+		if (mana > 9) {
+			mana = 9;
+		} else if (mana < 0) {
+			mana = 0;
+		}
+		this.mana = mana;
+	}
+
+	public void setMana(int mana) {
 		if (mana > 9) {
 			mana = 9;
 		} else if (mana < 0) {
@@ -90,7 +104,6 @@ public class Player {
 		if (deck != null && !deck.cards.isEmpty()) {
 			if (this.hand.size() < 6) {
 				hand.add(deck.cards.get(0));
-//			}
 				deck.cards.remove(0);
 			}
 			// TODO Add game lose condition if deck is empty
@@ -101,7 +114,7 @@ public class Player {
 	/// @author Scott
 	public void drawHand(ActorRef out) {
 		for (Card card : hand) {
-			BasicCommands.drawCard(out, card, hand.indexOf(card), 0);
+			BasicCommands.drawCard(out, card, hand.indexOf(card) + 1, 0);
 		}
 	}
 
