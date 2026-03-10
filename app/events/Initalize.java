@@ -73,8 +73,8 @@ public class Initalize implements EventProcessor {
 
         // Player starts their first turn with 2 mana [cite: SC6]
 
-        player1.setMana(2);
-        BasicCommands.setPlayer1Mana(out, player1);
+        player1.setMana(out, 2);
+//        BasicCommands.setPlayer1Mana(out, player1);
 
         // ==========================================
         // Story Card #18 Acceptance Test: Set initial avatar positions
@@ -101,18 +101,11 @@ public class Initalize implements EventProcessor {
         // Story Card #18 Acceptance Test: Each player starts with 3 cards drawn from the deck [cite: 162]
         // ==========================================
         for (int i = 0; i < 3; i++) {
-            player1.drawCard();
-            player2.drawCard();
+            player1.drawCardIntoHand();
+            player2.drawCardIntoHand();
         }
 
-        // Render Player 1's initial hand on the front-end.
-        // BasicCommands.drawCard takes a hand position (1-indexed, 1-6) and mode (0 = normal).
-        // Only Player 1's hand is shown; Player 2 is the AI and has no visible hand.
-        // @author Minghao
-        List<Card> p1Hand = player1.getHand();
-        for (int i = 0; i < p1Hand.size(); i++) {
-            BasicCommands.drawCard(out, p1Hand.get(i), i + 1, 0);
-        }
+        gameState.player1.drawHand(out);
 
         // Note: As per the template's instructions, comment out the demo execution when implementing your own solution
         // CommandDemo.executeDemo(out);
