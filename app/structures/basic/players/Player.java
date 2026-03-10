@@ -26,10 +26,10 @@ public class Player {
 	protected int health;
 	protected int mana;
 	private static final int MAX_MANA = 9;
-	protected int unitId; // TODO This will link up with a 'units' attribute, mapping units to an ID.
 	protected BetterUnit avatar;
 	protected Deck deck;
 	protected List<Card> hand;
+	// TODO make units hashmap?
 
 	public Player() {
 		super();
@@ -120,11 +120,12 @@ public class Player {
 
 	/// Gets the current unitId, then increments the count.
 	/// @author Scott
-	protected int useUnitId() {
-		int id = unitId;
-		unitId++;
-		return id;
-	}
+	// TODO See if this should be put in GameState or if there's already a function for that
+//	protected int useUnitId() {
+//		int id = unitId;
+//		unitId++;
+//		return id;
+//	}
 
 	public String toString() {
 		return "Unknown Player";
