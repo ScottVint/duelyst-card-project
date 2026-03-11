@@ -28,7 +28,7 @@ public class HumanPlayer extends Player {
 
     @Override
     public void setAvatar() {
-        this.avatar = (BetterUnit) BasicObjectBuilders.loadUnit(StaticConfFiles.humanAvatar, useUnitId(), BetterUnit.class);
+        this.avatar = (BetterUnit) BasicObjectBuilders.loadUnit(StaticConfFiles.humanAvatar, 0, BetterUnit.class); // TODO Replace 0 with dynamic ID function
     }
 
     @Override

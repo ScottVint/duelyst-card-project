@@ -30,7 +30,7 @@ public class AIPlayer extends Player {
 
     @Override
     public void setAvatar() {
-        this.avatar = (BetterUnit) BasicObjectBuilders.loadUnit(StaticConfFiles.aiAvatar, useUnitId(), BetterUnit.class);
+        this.avatar = (BetterUnit) BasicObjectBuilders.loadUnit(StaticConfFiles.aiAvatar, 1, BetterUnit.class); // TODO Replace 1 with dynamic ID function
     }
 
 
