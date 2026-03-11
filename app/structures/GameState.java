@@ -1,5 +1,7 @@
 package structures;
 
+import akka.actor.ActorRef;
+import commands.BasicCommands;
 import structures.basic.BetterUnit;
 import structures.basic.Board;
 import structures.basic.players.AIPlayer;
@@ -7,7 +9,6 @@ import structures.basic.players.HumanPlayer;
 import structures.basic.players.Player;
 import structures.basic.Unit;
 import utils.BasicObjectBuilders;
-import utils.OrderedCardLoader;
 import utils.StaticConfFiles;
 
 /**
@@ -26,8 +27,8 @@ public class GameState {
 	public boolean gameInitalised = false;
 	public boolean something = false;
 
-	public Player player1;
-	public Player player2;
+	public HumanPlayer player1;
+	public AIPlayer player2;
 	public Board board;
 	public Unit selectedUnit;
 	public boolean player1Turn = true;
@@ -48,11 +49,9 @@ public class GameState {
 
 		player1 = new HumanPlayer();
 		player1.setAvatar(avatar1);
-		player1.setDeck(OrderedCardLoader.getPlayer1Cards(2));
 
 		player2 = new AIPlayer();
 		player2.setAvatar(avatar2);
-		player2.setDeck(OrderedCardLoader.getPlayer2Cards(2));
 	}
 
 	public Player getPlayer1() { return player1; }
@@ -67,4 +66,10 @@ public class GameState {
 	public Integer getSelectedHandPosition() { return selectedHandPosition; }
 	public void setSelectedHandPosition(Integer pos) { this.selectedHandPosition = pos; }
 
+	public void endTurn(ActorRef out, Player playerEndingTurn, Player playerStartingTurn) {
+		player1Turn = !player1Turn;
+		int startingMana = Math.min(turnCount + 1, Player.getMaxMana());
+		playerStartingTurn.setMana(out, startingMana);
+		playerEndingTurn.setMana(out, 0);
+	}
 }

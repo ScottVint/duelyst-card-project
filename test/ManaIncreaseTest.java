@@ -139,7 +139,7 @@ public class ManaIncreaseTest {
     @Test
     public void manaFilledToMaxAtTurnStart() {
         // Simulate P1 spending some mana mid-turn
-        gameState.getPlayer1().setMana(0);
+        gameState.getPlayer1().setMana(null, 0);
 
         // P1 ends turn → P2's turn 1 begins with full 2 mana
         endTurn.processEvent(null, gameState, endTurnMsg());
@@ -147,7 +147,7 @@ public class ManaIncreaseTest {
                 2, gameState.getPlayer2().getMana());
 
         // P2 spends all mana
-        gameState.getPlayer2().setMana(0);
+        gameState.getPlayer2().setMana(null, 0);
 
         // P2 ends turn → P1's turn 2 begins with full 3 mana
         endTurn.processEvent(null, gameState, endTurnMsg());

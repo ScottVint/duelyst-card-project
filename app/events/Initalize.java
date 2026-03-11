@@ -36,6 +36,9 @@ public class Initalize implements EventProcessor {
         // Mark the game state as initialized
         gameState.gameInitalised = true;
 
+        // Display tiles on the board
+        gameState.getBoard().clearSelection(out);
+
         // Retrieve player objects (Assuming player1 and player2 are already instantiated within gameState)
         Player player1 = gameState.getPlayer1();
         Player player2 = gameState.getPlayer2();
@@ -47,12 +50,14 @@ public class Initalize implements EventProcessor {
         // Set avatar ownership so that unit-selection logic (Story Card #3) can
         // correctly identify which units belong to the human player.
         // Without this, getOwner() returns null and avatar clicks are ignored.
+        // TODO consolidate to summoning method when it is created
         avatar1.setOwner(player1); // @author Minghao
         avatar2.setOwner(player2); // @author Minghao
 
         // ==========================================
         // Story Card #18 Acceptance Test: Both players and their avatars have initial HP set to 20 [cite: 160]
         // ==========================================
+        // TODO consolidate to my linked methods -- Scott
         player1.setHealth(20);
         player2.setHealth(20);
 
@@ -66,16 +71,16 @@ public class Initalize implements EventProcessor {
         BasicCommands.setPlayer1Health(out, player1);
         BasicCommands.setPlayer2Health(out, player2);
 
-        // ==========================================
-        // Story Card #6 Acceptance Test: Player 1 starts their first turn with 2 mana [cite: SC6]
-        // ==========================================
-        player1.setMana(2);
-        BasicCommands.setPlayer1Mana(out, player1);
+        // Player starts their first turn with 2 mana [cite: SC6]
+
+        player1.setMana(out, 2);
+//        BasicCommands.setPlayer1Mana(out, player1);
 
         // ==========================================
         // Story Card #18 Acceptance Test: Set initial avatar positions
         // ==========================================
 
+        // TODO place this in a method
         // Player 1 avatar starts at [2,3] [cite: 161]
         Tile tileP1 = gameState.getBoard().getTile(2, 3);
         tileP1.setUnit(avatar1);
@@ -100,14 +105,7 @@ public class Initalize implements EventProcessor {
             player2.drawCard();
         }
 
-        // Render Player 1's initial hand on the front-end.
-        // BasicCommands.drawCard takes a hand position (1-indexed, 1-6) and mode (0 = normal).
-        // Only Player 1's hand is shown; Player 2 is the AI and has no visible hand.
-        // @author Minghao
-        List<Card> p1Hand = player1.getHand();
-        for (int i = 0; i < p1Hand.size(); i++) {
-            BasicCommands.drawCard(out, p1Hand.get(i), i + 1, 0);
-        }
+        gameState.player1.drawHand(out);
 
         // Note: As per the template's instructions, comment out the demo execution when implementing your own solution
         // CommandDemo.executeDemo(out);

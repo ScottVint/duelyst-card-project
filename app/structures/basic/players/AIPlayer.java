@@ -21,8 +21,11 @@ public class AIPlayer extends Player {
 
     @Override
     public void setMana(ActorRef out, int mana) {
-        this.mana = mana;
+        super.setMana(out, mana);
         BasicCommands.setPlayer2Mana(out, this);
     }
+
+
+
 }
 

@@ -19,7 +19,12 @@ public class HumanPlayer extends Player {
     }
 
     public void setMana(ActorRef out, int mana) {
-        this.mana = mana;
+        super.setMana(out, mana);
         BasicCommands.setPlayer1Mana(out, this);
+    }
+
+    @Override
+    public String toString() {
+        return "Player 1";
     }
 }
