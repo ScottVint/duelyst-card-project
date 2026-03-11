@@ -95,15 +95,24 @@ public class Player {
 	public List<Card> getHand() {
 		return hand;
 	}
+	/** Maximum number of cards a player can hold in hand (Story Card #21). */
+	public static final int MAX_HAND_SIZE = 6;
+
 	/**
-	 * Draws the top card from the deck into the hand.
+	 * Draws the top card from the deck (Story Card #21).
+	 * The card is always removed from the deck; it is added to the hand only
+	 * if the hand has fewer than MAX_HAND_SIZE cards.  If the hand is already
+	 * full the drawn card is silently discarded.
 	 * Does nothing if the deck is empty.
 	 * @author Minghao
 	 */
 	public void drawCard() {
-		if (deck != null && !deck.isEmpty()) {
-			hand.add(deck.remove(0));
+		if (deck == null || deck.isEmpty()) return;
+		Card drawn = deck.remove(0);
+		if (hand.size() < MAX_HAND_SIZE) {
+			hand.add(drawn);
 		}
+		// drawn card is silently discarded when hand is full
 	}
 
 

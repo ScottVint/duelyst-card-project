@@ -56,11 +56,11 @@ public class Initalize implements EventProcessor {
         player1.setHealth(20);
         player2.setHealth(20);
 
-        avatar1.setHealth(20);
         avatar1.setMaxHealth(20);
+        avatar1.setHealth(20);
 
-        avatar2.setHealth(20);
         avatar2.setMaxHealth(20);
+        avatar2.setHealth(20);
 
         // Send commands to the front-end to update the players' health display
         BasicCommands.setPlayer1Health(out, player1);

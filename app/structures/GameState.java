@@ -2,6 +2,8 @@ package structures;
 
 import structures.basic.BetterUnit;
 import structures.basic.Board;
+import structures.basic.players.AIPlayer;
+import structures.basic.players.HumanPlayer;
 import structures.basic.players.Player;
 import structures.basic.Unit;
 import utils.BasicObjectBuilders;
@@ -44,11 +46,11 @@ public class GameState {
 		BetterUnit avatar1 = (BetterUnit) BasicObjectBuilders.loadUnit(StaticConfFiles.humanAvatar, 1, BetterUnit.class);
 		BetterUnit avatar2 = (BetterUnit) BasicObjectBuilders.loadUnit(StaticConfFiles.aiAvatar, 2, BetterUnit.class);
 
-		player1 = new Player();
+		player1 = new HumanPlayer();
 		player1.setAvatar(avatar1);
 		player1.setDeck(OrderedCardLoader.getPlayer1Cards(2));
 
-		player2 = new Player();
+		player2 = new AIPlayer();
 		player2.setAvatar(avatar2);
 		player2.setDeck(OrderedCardLoader.getPlayer2Cards(2));
 	}

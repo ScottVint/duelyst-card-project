@@ -1,10 +1,14 @@
 package events;
 
+import java.util.List;
+
 import com.fasterxml.jackson.databind.JsonNode;
 
 import akka.actor.ActorRef;
 import commands.BasicCommands;
 import structures.GameState;
+import structures.basic.Card;
+import structures.basic.players.Player;
 
 /**
  * Indicates that the user has clicked the end-turn button.
@@ -49,6 +53,24 @@ public class EndTurnClicked implements EventProcessor {
 			int mana = Math.min(gameState.getTurnCount() + 1, MAX_MANA);
 			gameState.getPlayer1().setMana(mana);
 			BasicCommands.setPlayer1Mana(out, gameState.getPlayer1());
+
+			// Story Card #21: draw one card for player 1 at the start of their turn
+			gameState.getPlayer1().drawCard();
+			redrawHand(out, gameState.getPlayer1());
+		}
+	}
+
+	/**
+	 * Clears all six hand slots on the front-end, then redraws the current hand.
+	 * @author Minghao
+	 */
+	private void redrawHand(ActorRef out, Player player) {
+		for (int i = 1; i <= Player.MAX_HAND_SIZE; i++) {
+			BasicCommands.deleteCard(out, i);
+		}
+		List<Card> hand = player.getHand();
+		for (int i = 0; i < hand.size(); i++) {
+			BasicCommands.drawCard(out, hand.get(i), i + 1, 0);
 		}
 	}
 
