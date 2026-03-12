@@ -23,6 +23,7 @@ public class Initalize implements EventProcessor {
 
     @Override
     public void processEvent(ActorRef out, GameState gameState, JsonNode message) {
+        // Mark the game state as initialized
         gameState.gameInitalised = true;
 
         gameState.getBoard().clearSelection(out);
@@ -36,23 +37,38 @@ public class Initalize implements EventProcessor {
         avatar1.setOwner(player1);
         avatar2.setOwner(player2);
 
+        // Display tiles on the board
         player1.setHealth(20);
         player2.setHealth(20);
 
+        // Retrieve player objects (Assuming player1 and player2 are already instantiated within gameState)
         avatar1.setAttack(2);
         avatar1.setHealth(20);
         avatar1.setMaxHealth(20);
 
+        // Retrieve the Avatar units for both players
         avatar2.setAttack(2);
         avatar2.setHealth(20);
         avatar2.setMaxHealth(20);
 
+        // Set avatar ownership so that unit-selection logic (Story Card #3) can
+        // correctly identify which units belong to the human player.
+        // Without this, getOwner() returns null and avatar clicks are ignored.
+        // TODO consolidate to summoning method when it is created
+        avatar1.setOwner(player1); // @author Minghao
+        avatar2.setOwner(player2); // @author Minghao
+
+        // ==========================================
+        // Story Card #18 Acceptance Test: Both players and their avatars have initial HP set to 20 [cite: 160]
+        // ==========================================
+        // TODO consolidate to my linked methods -- Scott
         BasicCommands.setPlayer1Health(out, player1);
         BasicCommands.setPlayer2Health(out, player2);
 
         player1.setMana(2);
         BasicCommands.setPlayer1Mana(out, player1);
 
+        // Send commands to the front-end to update the players' health display
         Tile tileP1 = gameState.getBoard().getTile(2, 3);
         tileP1.setUnit(avatar1);
         avatar1.setPositionByTile(tileP1);
