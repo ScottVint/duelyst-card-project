@@ -18,6 +18,19 @@ import utils.BasicObjectBuilders;
 
 /**
  * Indicates that the user has clicked a tile on the game canvas.
+ *  * <p>
+ *  * Handles Story Card #3: when the human player clicks one of their units, the unit is
+ *  * selected and its valid movement range is highlighted in white.
+ *  * <pre>
+ *  * {
+ *  *   messageType = "tileClicked"
+ *  *   tilex = &lt;x index of the tile&gt;
+ *  *   tiley = &lt;y index of the tile&gt;
+ *  * }
+ *  * </pre>
+ *  *
+ *  * @author Dr. Richard McCreadie
+ *  * @author Minghao
  */
 public class TileClicked implements EventProcessor {
 
