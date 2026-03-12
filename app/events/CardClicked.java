@@ -9,26 +9,25 @@ import structures.basic.Card;
 
 /**
  * Indicates that the user has clicked a card in their hand.
- */
-/* <p>Collapse commentComment on line L14ScottVint commented on Mar 9, 2026 ScottVinton Mar 9, 2026More actions? Why are we deleting all of thisReactWrite a replyResolve comment
-// * Handles Story Card #22: selecting a creature card highlights all empty board tiles
-// * adjacent (8-directional) to a friendly unit in green (mode 2).
-//		* Handles Story Card #12: re-clicking the same card deselects it.
-//		*
-//		* {
-//		*   messageType = "cardClicked"
-//		*   position = &lt;hand index position [1-6]&gt;
-// * }
-//		 *
-//		 * @author Dr. Richard McCreadie
-// * @author Minghao
-// 		 */
+ *
+ * Handles Story Card #22: selecting a creature card highlights all empty board tiles
+ * adjacent (8-directional) to a friendly unit in green (mode 2).
+ * Handles Story Card #12: re-clicking the same card deselects it.
+ *
+ * {
+ *   messageType = "cardClicked"
+ *   position = &lt;hand index position [1-6]&gt;
+ * }
+ *
+ * @author Dr. Richard McCreadie
+ * @author Minghao
+ *
 
 /**
  * Indicates that the user has clicked a card in their hand.
  */
 public class CardClicked implements EventProcessor {
-
+	//TODO implement cards as subclasses
 	private static final String HORN_OF_THE_FORSAKEN = "Horn of the Forsaken";
 	private static final String WRAITHLING_SWARM = "Wraithling Swarm";
 	private static final String TRUESTRIKE = "Truestrike";
@@ -58,9 +57,6 @@ public class CardClicked implements EventProcessor {
 
 		List<Card> hand = gameState.getPlayer1().getHand();
 		int index = handPosition - 1;
-		if (index < 0 || index >= hand.size()) {
-			return;
-		}
 
 		Card card = hand.get(index);
 
@@ -71,12 +67,10 @@ public class CardClicked implements EventProcessor {
 		gameState.setSelectedHandPosition(handPosition);
 
 		if (card.isCreature()) {
-			BasicCommands.addPlayer1Notification(out, "Creature selected", 2);
 			gameState.getBoard().highlightSummonTiles(out, gameState.getPlayer1());
-			return;
 		}
 
-		showSpellPreview(out, gameState, card);
+		showSpellPreview(out, gameState, card);//TODO move methods elsewhere
 	}
 
 	private void showSpellPreview(ActorRef out, GameState gameState, Card card) {
