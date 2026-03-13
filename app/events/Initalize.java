@@ -65,8 +65,10 @@ public class Initalize implements EventProcessor {
         BasicCommands.setPlayer1Health(out, player1);
         BasicCommands.setPlayer2Health(out, player2);
 
-        player1.setMana(2);
-        BasicCommands.setPlayer1Mana(out, player1);
+        // Player starts their first turn with 2 mana [cite: SC6]
+
+        player1.setMana(out, 2);
+//        BasicCommands.setPlayer1Mana(out, player1);
 
         // Send commands to the front-end to update the players' health display
         Tile tileP1 = gameState.getBoard().getTile(2, 3);
@@ -103,13 +105,13 @@ public class Initalize implements EventProcessor {
         BasicCommands.setUnitHealth(out, testEnemy, testEnemy.getHealth());
 
         for (int i = 0; i < 3; i++) {
-            player1.drawCard();
-            player2.drawCard();
+            player1.drawCardIntoHand();
+            player2.drawCardIntoHand();
         }
 
-        List<Card> p1Hand = player1.getHand();
-        for (int i = 0; i < p1Hand.size() && i < 6; i++) {
-            BasicCommands.drawCard(out, p1Hand.get(i), i + 1, 0);
-        }
+        gameState.player1.drawHand(out);
+
+        // Note: As per the template's instructions, comment out the demo execution when implementing your own solution
+        // CommandDemo.executeDemo(out);
     }
 }

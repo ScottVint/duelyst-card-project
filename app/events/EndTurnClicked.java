@@ -8,6 +8,8 @@ import akka.actor.ActorRef;
 import commands.BasicCommands;
 import structures.GameState;
 import structures.basic.Card;
+import structures.basic.players.Player;
+
 /**
  * Indicates that the user has clicked the end-turn button.
  * <p>
@@ -25,34 +27,24 @@ import structures.basic.Card;
  */
 public class EndTurnClicked implements EventProcessor {
 
-	// TODO: Move MAX_MANA constant into the Player class
-	private static final int MAX_MANA = 9;
-
 	@Override
 	public void processEvent(ActorRef out, GameState gameState, JsonNode message) {
 
 		// Clear any active unit/card selection
 		gameState.setSelectedUnit(null);
 		gameState.setSelectedHandPosition(null);
+
 		gameState.getBoard().clearSelection(out);
 
 		if (gameState.isPlayer1Turn()) {
-			// Player ends -> AI turn
-
-			BasicCommands.addPlayer1Notification(out, "AI Turn", 2);
+			// Player 1 ends their turn → Player 2's turn begins (same round)
+			gameState.endTurn(out, gameState.getPlayer1(), gameState.getPlayer2());
 		} else {
-			// AI ends -> Player turn
+			// Player 2 ends their turn → Player 1's turn begins (new round)
+			gameState.incrementTurnCount();
+			gameState.endTurn(out, gameState.getPlayer2(), gameState.getPlayer1());
 
-			BasicCommands.addPlayer1Notification(out, "Player Turn", 2);
 		}
-	}
-
-	//TODO Merge with proper method
-	private void drawOneCardForPlayer1(ActorRef out, GameState gameState) {
-		if (gameState.getPlayer1().getHand().size() < 6) {
-			gameState.getPlayer1().drawCard();
-		}
-		redrawPlayerHand(out, gameState);
 	}
 
 	//TODO Merge with proper method
