@@ -70,12 +70,14 @@ public class CardClicked implements EventProcessor {
 			gameState.getBoard().highlightSummonTiles(out, gameState.getPlayer1());
 		}
 
-		showSpellPreview(out, gameState, card);//TODO move methods elsewhere
+		showSpellPreview(out, gameState, card);
 	}
 
+	//TODO move methods elsewhere
 	private void showSpellPreview(ActorRef out, GameState gameState, Card card) {
 		String cardName = card.getCardname();
 
+		//TODO create subclasses for these
 		if (HORN_OF_THE_FORSAKEN.equals(cardName)) {
 			BasicCommands.addPlayer1Notification(out, "Click your avatar to equip Horn", 2);
 

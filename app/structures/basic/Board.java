@@ -40,9 +40,14 @@ public class Board {
 		return BOARD_HEIGHT;
 	}
 
-	private void pause() {
+	//TODO move into a more general class
+
+	/** Creates a small pause.
+	 * This is necessary for the tiles to load without encountering a BufferOverflow.
+	 */
+	private void blink() {
 		try {
-			Thread.sleep(30);
+			Thread.sleep(1);
 		} catch (InterruptedException e) {
 			Thread.currentThread().interrupt();
 		}
@@ -55,7 +60,7 @@ public class Board {
 		for (int x = 0; x < BOARD_WIDTH; x++) {
 			for (int y = 0; y < BOARD_HEIGHT; y++) {
 				BasicCommands.drawTile(out, tiles[x][y], 0);
-				pause();
+				blink();
 			}
 		}
 	}
@@ -80,7 +85,7 @@ public class Board {
 				if (nextTile.getUnit() != null) break;
 
 				BasicCommands.drawTile(out, nextTile, 1);
-				pause();
+				blink();
 			}
 		}
 
@@ -95,7 +100,7 @@ public class Board {
 			Tile diagTile = tiles[nx][ny];
 			if (diagTile.getUnit() == null) {
 				BasicCommands.drawTile(out, diagTile, 1);
-				pause();
+				blink();
 			}
 		}
 	}
@@ -120,11 +125,11 @@ public class Board {
 
 						if (tiles[nx][ny].getUnit() == null) {
 							BasicCommands.drawTile(out, tiles[nx][ny], 2);
-							pause();
+							blink();
 						}
 					}
 				}
-			}
+			} // OH MY GOD WHAT
 		}
 	}
 }

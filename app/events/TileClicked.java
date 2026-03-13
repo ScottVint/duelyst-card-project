@@ -115,6 +115,8 @@ public class TileClicked implements EventProcessor {
         }
     }
 
+
+    //TODO move ALL OF THIS elsewhere
     private void tryAttackSelectedUnit(ActorRef out, GameState gameState, Unit targetUnit) {
         Unit attacker = gameState.getSelectedUnit();
         if (attacker == null || targetUnit == null) return;
@@ -173,7 +175,7 @@ public class TileClicked implements EventProcessor {
         gameState.setSelectedUnit(null);
         gameState.setSelectedHandPosition(null);
 
-        BasicCommands.moveUnitToTile(out, selectedUnit, clickedTile);
+        BasicCommands.moveUnitToTile(out, selectedUnit, clickedTile); //TODO add action tracking for unit
     }
 
     private boolean isValidMoveTile(GameState gameState, Unit selectedUnit, Tile clickedTile) {
@@ -220,6 +222,7 @@ public class TileClicked implements EventProcessor {
         return false;
     }
 
+    //TODO Move this
     private void useNonCreatureCardOnEmptyTile(ActorRef out,
                                                GameState gameState,
                                                Card card,
@@ -267,7 +270,7 @@ public class TileClicked implements EventProcessor {
         }
 
         if ("Truestrike".equals(cardName)) {
-            if (targetUnit.getOwner() != gameState.getPlayer2()) {
+            if (targetUnit.getOwner() != gameState.getPlayer2()) { //TODO Use subclasses, also delete duplicate code
                 BasicCommands.addPlayer1Notification(out, "Truestrike must target an enemy unit", 2);
                 return;
             }
@@ -277,7 +280,7 @@ public class TileClicked implements EventProcessor {
                 return;
             }
 
-            gameState.dealDirectDamage(out, targetUnit, 2);
+            gameState.dealDirectDamage(out, targetUnit, 2); //TODO Create DamageLogic Class
             spendManaRemoveCardAndClear(out, gameState, cardIndex, card.getManacost());
             BasicCommands.addPlayer1Notification(out, "Truestrike cast", 2);
             return;
@@ -316,7 +319,7 @@ public class TileClicked implements EventProcessor {
                     targetUnit.getPosition().getTiley()
             );
 
-            gameState.removeUnit(out, targetUnit);
+            gameState.death(out, targetUnit);
             gameState.summonWraithling(out, deathTile, gameState.getPlayer1());
 
             spendManaRemoveCardAndClear(out, gameState, cardIndex, card.getManacost());
@@ -427,7 +430,7 @@ public class TileClicked implements EventProcessor {
                 BetterUnit.class
         );
 
-        summonedUnit.setOwner(gameState.getPlayer1());
+        summonedUnit.setOwner(gameState.getPlayer1()); //TODO still need to prevent summon and move on same turn (In summon method)
         summonedUnit.setAttack(card.getBigCard().getAttack());
         summonedUnit.setMaxHealth(card.getBigCard().getHealth());
         summonedUnit.setHealth(card.getBigCard().getHealth());
@@ -453,7 +456,7 @@ public class TileClicked implements EventProcessor {
         hand.remove(cardIndex);
         redrawPlayerHand(out, hand);
 
-        gameState.clearSelections(out);
+        gameState.board.clearSelection(out);
     }
 
     private boolean isValidSummonTile(GameState gameState, Tile clickedTile) {
@@ -480,6 +483,7 @@ public class TileClicked implements EventProcessor {
         return false;
     }
 
+    //TODO this is already a method in Player
     private void redrawPlayerHand(ActorRef out, List<Card> hand) {
         for (int i = 1; i <= 6; i++) {
             BasicCommands.deleteCard(out, i);
