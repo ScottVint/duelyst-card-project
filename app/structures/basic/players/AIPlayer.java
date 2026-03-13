@@ -8,9 +8,7 @@ import utils.StaticConfFiles;
 
 // Called AIPlayer for our purposes, but more realistically
 // can be used as a player 2.
-//                                      --Scott
 public class AIPlayer extends Player {
-
 
     public AIPlayer() {
         super();

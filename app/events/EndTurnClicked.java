@@ -1,10 +1,13 @@
 package events;
 
+import java.util.List;
+
 import com.fasterxml.jackson.databind.JsonNode;
 
 import akka.actor.ActorRef;
 import commands.BasicCommands;
 import structures.GameState;
+import structures.basic.Card;
 import structures.basic.players.Player;
 
 /**
@@ -44,4 +47,15 @@ public class EndTurnClicked implements EventProcessor {
 		}
 	}
 
+	//TODO Merge with proper method
+	private void redrawPlayerHand(ActorRef out, GameState gameState) {
+		for (int i = 1; i <= 6; i++) {
+			BasicCommands.deleteCard(out, i);
+		}
+
+		List<Card> hand = gameState.getPlayer1().getHand();
+		for (int i = 0; i < hand.size() && i < 6; i++) {
+			BasicCommands.drawCard(out, hand.get(i), i + 1, 0);
+		}
+	}
 }
