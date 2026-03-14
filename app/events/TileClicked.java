@@ -38,12 +38,14 @@ public class TileClicked implements EventProcessor {
 
     @Override
     public void processEvent(ActorRef out, GameState gameState, JsonNode message) {
+        // Give nothing if clicked outside of turn
+        // or if a unit is moving
         if (!gameState.player1Turn) {
             BasicCommands.addPlayer1Notification(out, "It is not your turn.", 2);
             return;
         }
 
-        if (gameState.isUnitMoving()) {
+        else if (gameState.unitMoving) {
             BasicCommands.addPlayer1Notification(out, "A unit is already moving.", 2);
             return;
         }
@@ -51,69 +53,64 @@ public class TileClicked implements EventProcessor {
         int tilex = message.get("tilex").asInt();
         int tiley = message.get("tiley").asInt();
 
+        // Get information
         Board board = gameState.board;
         Tile clickedTile = gameState.getBoard().getTile(tilex, tiley);
+        Card selectedCard = null;
+        Integer cardIndex = null;
+
+        // Clear board selection
+        BoardLogic.clearSelection(out, board);
+
+        // Check if a card is selected in hand
+        if (gameState.selectedHandPosition != null) {
+            int handPosition = gameState.selectedHandPosition;
+            cardIndex = handPosition - 1;
+            selectedCard = gameState.getPlayer1().getHand().get(cardIndex);
+        }
 
         // Clicked on a unit
         if (clickedTile.getUnit() != null) {
             Unit clickedUnit = clickedTile.getUnit();
 
             // If a non-creature card is selected, try using it on this unit first
-            if (gameState.getSelectedHandPosition() != null) {
-                int handPosition = gameState.getSelectedHandPosition();
-                List<Card> hand = gameState.getPlayer1().getHand();
-
-                int cardIndex = handPosition - 1;
-                if (cardIndex >= 0 && cardIndex < hand.size()) {
-                    Card selectedCard = hand.get(cardIndex);
-
-                    if (!selectedCard.isCreature()) {
-                        useNonCreatureCardOnUnit(out, gameState, selectedCard, clickedUnit, cardIndex);
-                        return;
-                    }
-                }
+            if (selectedCard != null && !selectedCard.isCreature()) {
+                useNonCreatureCardOnUnit(out, gameState, selectedCard, clickedUnit, cardIndex); //TODO Refactor into Spell.cast()
+                return;
             }
 
             // If a friendly unit is already selected and player clicks an enemy -> try attack
-            if (gameState.getSelectedUnit() != null && clickedUnit.getOwner() != gameState.getPlayer1()) {
-                tryAttackSelectedUnit(out, gameState, clickedUnit, board);
+            else if (gameState.selectedUnit != null && clickedUnit.getOwner() != gameState.getPlayer1()) {
+                tryAttackSelectedUnit(out, gameState, clickedUnit, board); //TODO rename and refactor into CombatLogic
                 return;
             }
 
             // Select friendly unit for movement / attack
-            if (clickedUnit.getOwner() == gameState.getPlayer1()) {
-                BoardLogic.clearSelection(out, board);
-                gameState.setSelectedHandPosition(null);
-                gameState.setSelectedUnit(clickedUnit);
+            else if (clickedUnit.getOwner() == gameState.getPlayer1()) {
+                gameState.selectedHandPosition = null;
+                gameState.selectedUnit = clickedUnit;
                 BasicCommands.drawTile(out, clickedTile, 1); // white highlight
                 BoardLogic.highlightMovement(out, clickedTile, clickedUnit, board);
 
-            } else {
+            }
+
+            // Else, enemy unit is clicked
+            else {
                 BasicCommands.addPlayer1Notification(out, "Clicked enemy unit", 2);
             }
-            return;
         }
 
         // Empty tile + selected card
-        if (gameState.getSelectedHandPosition() != null) {
-            int handPosition = gameState.getSelectedHandPosition();
-            List<Card> hand = gameState.getPlayer1().getHand();
-            int cardIndex = handPosition - 1;
-
-            if (cardIndex >= 0 && cardIndex < hand.size()) {
-                Card selectedCard = hand.get(cardIndex);
-
+        else if (selectedCard != null) {
                 if (selectedCard.isCreature()) {
                     summonSelectedUnit(out, gameState, clickedTile);
                 } else {
                     useNonCreatureCardOnEmptyTile(out, gameState, selectedCard, clickedTile, cardIndex);
                 }
             }
-            return;
-        }
 
         // Empty tile + selected unit => try move
-        if (gameState.getSelectedUnit() != null) {
+        else if (gameState.getSelectedUnit() != null) {
             moveSelectedUnit(out, gameState, clickedTile, board);
         }
     }
@@ -146,8 +143,8 @@ public class TileClicked implements EventProcessor {
 
         gameState.dealDamage(out, attacker, targetUnit);
 
-        gameState.setSelectedUnit(null);
-        gameState.setSelectedHandPosition(null);
+        gameState.selectedUnit = null;
+        gameState.selectedHandPosition = null;
     }
 
     private boolean isAdjacent(Unit a, Unit b) {
@@ -170,13 +167,13 @@ public class TileClicked implements EventProcessor {
             return;
         }
 
-        gameState.setMovingUnit(selectedUnit);
-        gameState.setMoveTargetTile(clickedTile);
-        gameState.setUnitMoving(true);
+        gameState.movingUnit = selectedUnit;
+        gameState.moveTargetTile = clickedTile;
+        gameState.unitMoving = true;
 
         BoardLogic.clearSelection(out, board);
-        gameState.setSelectedUnit(null);
-        gameState.setSelectedHandPosition(null);
+        gameState.selectedUnit = null;
+        gameState.selectedHandPosition = null;
 
         BasicCommands.moveUnitToTile(out, selectedUnit, clickedTile); //TODO add action tracking for unit
     }
@@ -406,7 +403,7 @@ public class TileClicked implements EventProcessor {
     }
 
     private void summonSelectedUnit(ActorRef out, GameState gameState, Tile clickedTile) {
-        int handPosition = gameState.getSelectedHandPosition();
+        int handPosition = gameState.selectedHandPosition;
         List<Card> hand = gameState.getPlayer1().getHand();
 
         int cardIndex = handPosition - 1;
