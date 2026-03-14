@@ -6,18 +6,10 @@ import akka.actor.ActorRef;
 import commands.BasicCommands;
 import structures.GameState;
 import structures.basic.BetterUnit;
-import structures.basic.Card;
-import structures.basic.players.Player;
-import structures.basic.Unit;
 import structures.basic.Tile;
+import structures.basic.players.Player;
 import structures.logic.BoardLogic;
 
-import structures.basic.Unit;
-import structures.basic.players.Player;
-import utils.BasicObjectBuilders;
-import utils.StaticConfFiles;
-
-import java.util.List;
 
 /**
  * Indicates that both the core game loop in the browser is starting, meaning
@@ -55,23 +47,23 @@ public class Initalize implements EventProcessor {
         // Set avatar ownership so that unit-selection logic (Story Card #3) can
         // correctly identify which units belong to the human player.
         // Without this, getOwner() returns null and avatar clicks are ignored.
-        // TODO consolidate to summoning method when it is created
-        avatar1.setOwner(player1); // @author Minghao
-        avatar2.setOwner(player2); // @author Minghao
+        // TODO consolidate to summoning method when it is create-----finished zechao
 
         // ==========================================
         // Story Card #18 Acceptance Test: Both players and their avatars have initial HP set to 20 [cite: 160]
         // ==========================================
-        // TODO consolidate to my linked methods -- Scott
-        avatar1.setMaxHealth(20);
-        avatar1.setAttack(2);
+        // TODO consolidate to my linked methods -- Scott---finished zechaowu
+        setupAvatar(avatar1, player1);
+        setupAvatar(avatar2, player2);
 
-        avatar2.setMaxHealth(20);
-        avatar2.setAttack(2);
+        // Initialise avatar stats --Zechao Wu
+
 
         // Send commands to the front-end to update the players' health display
-        BasicCommands.setPlayer1Health(out, player1);
-        BasicCommands.setPlayer2Health(out, player2);
+
+        // Initialise player HUD health--Zechao Wu
+        player1.setHealth(out, 20);
+        player2.setHealth(out, 20);
 
         // Player starts their first turn with 2 mana
         player1.setMana(out, 2);
@@ -80,40 +72,17 @@ public class Initalize implements EventProcessor {
         // Story Card #18 Acceptance Test: Set initial avatar positions
         // ==========================================
 
-        // TODO place this in a method
+        // TODO place this in a method   finished -zechao wu
+
+
         // Player 1 avatar starts at [2,3]
-        Tile tileP1 = gameState.getBoard().getTile(1, 2); //It's 0-indexed
-        tileP1.setUnit(avatar1);
-        avatar1.setPositionByTile(tileP1);
-        BasicCommands.drawUnit(out, avatar1, tileP1); // Notify front-end to render the unit on the board
-        BasicCommands.setUnitHealth(out, avatar1, avatar1.getHealth());
-        BasicCommands.setUnitAttack(out, avatar1, avatar1.getAttack());
+        Tile tileP1 = gameState.getBoard().getTile(1, 2); // It's 0-indexed
+        placeAvatar(out, avatar1, tileP1);
 
         // Player 2 avatar starts at [8,3]
         Tile tileP2 = gameState.getBoard().getTile(7, 2);
-        tileP2.setUnit(avatar2);
-        avatar2.setPositionByTile(tileP2);
-        BasicCommands.drawUnit(out, avatar2, tileP2);
-        BasicCommands.setUnitAttack(out, avatar2, avatar2.getAttack());
+        placeAvatar(out, avatar2, tileP2);
 
-        // Temporary enemy non-avatar unit for testing Dark Terminus
-        Unit testEnemy = BasicObjectBuilders.loadUnit(
-                "conf/gameconfs/units/gloom_chaser.json",
-                gameState.getNextUnitId(),
-                Unit.class
-        );
-        testEnemy.setOwner(player2);
-        testEnemy.setAttack(3);
-        testEnemy.setMaxHealth(1);
-        testEnemy.setHealth(out, 1);
-
-        Tile enemyTestTile = gameState.getBoard().getTile(7, 2);
-        enemyTestTile.setUnit(testEnemy);
-        testEnemy.setPositionByTile(enemyTestTile);
-
-        BasicCommands.drawUnit(out, testEnemy, enemyTestTile);
-        BasicCommands.setUnitAttack(out, testEnemy, testEnemy.getAttack());
-        BasicCommands.setUnitHealth(out, testEnemy, testEnemy.getHealth());
 
         // Each player starts with 3 cards drawn from the deck
 
@@ -122,9 +91,23 @@ public class Initalize implements EventProcessor {
             player2.drawCardIntoHand();
         }
 
-        gameState.player1.drawHand(out);
+        player1.drawHand(out);
 
         // Note: As per the template's instructions, comment out the demo execution when implementing your own solution
         // CommandDemo.executeDemo(out);
     }
+    private void placeAvatar(ActorRef out, BetterUnit avatar, Tile tile) {
+        tile.setUnit(avatar);
+        avatar.setPositionByTile(tile);
+        BasicCommands.drawUnit(out, avatar, tile);
+        BasicCommands.setUnitHealth(out, avatar, avatar.getHealth());
+        BasicCommands.setUnitAttack(out, avatar, avatar.getAttack());
+    }
+    private void setupAvatar(BetterUnit avatar, Player owner) {
+        avatar.setOwner(owner);
+        avatar.setMaxHealth(20);
+        avatar.setHealth(20);
+        avatar.setAttack(2);
+    }
+
 }
