@@ -95,31 +95,85 @@ public class BoardLogic {
 		}
 	}
 
+	/// Finds all adjacent tiles to the given Tile.
+	/// Searches both cardinal and diagonal directions.
+	public static Set<Tile> findAdjacentTiles(Tile startingTile, Board board) {
+		Set<Tile> result = new HashSet<>();
+		int x = board.getX();
+		int y = board.getY();
+
+		int[] xoffset = {1, -1, 0,  0, 1,  1, -1, -1};
+		int[] yoffset = {0,  0, 1, -1, 1, -1,  1, -1};
+		for (int i = 0; i < xoffset.length; i++) {
+			try {
+				result.add(board.getTiles()[x + xoffset[i]][y + yoffset[i]]);
+			} catch (ArrayIndexOutOfBoundsException e) {
+				continue;
+			}
+		}
+		return result;
+	}
+
+	public static Set<Tile> findValidAttackUnits(Tile startingTile, Unit unit, Board board) {
+		Set<Tile> targets = findAdjacentTiles(startingTile, board);
+		Set<Tile> validTargets = new HashSet<>();
+		for (Tile target : targets) {
+			if (target.getUnit().getOwner() != unit.getOwner()) {
+				validTargets.add(target);
+			}
+		}
+		return validTargets;
+	}
+
+	public static Set<Tile> findValidSummonTiles(Unit unit, Board board) {
+		Tile[][] boardTiles = board.getTiles();
+		Set<Tile> alliedUnits = new HashSet<>();
+		// Find all allied units on the board
+		for (Tile[] row : boardTiles) {
+			for (Tile tile : row) {
+				if (tile.getUnit().getOwner() == unit.getOwner()) {
+				alliedUnits.add(tile);
+				}
+			}
+		}
+
+		Set<Tile> validTargets = new HashSet<>();
+
+		// Find the valid summoning spaces
+		for (Tile unitPos : alliedUnits) {
+			Set<Tile> targets = findAdjacentTiles(unitPos, board);
+			for (Tile target : targets) {
+				if (target.getUnit() == null) {
+					validTargets.add(target);
+				}
+			}
+		}
+		return validTargets;
+	}
+
+
+	public static void highlightAttackTiles(ActorRef out, Tile startingTile, Unit unit, Board board) {
+		Set<Tile> targets = findValidAttackUnits(startingTile, unit, board);
+		for  (Tile target : targets) {
+			BasicCommands.drawTile(out, target, 3);
+			blink();
+		}
+	}
+
 	/**
 	 * Highlights all empty tiles adjacent (8-directional) to any friendly unit
 	 * owned by player1 in green (mode 2). Used for creature card summon targeting.
 	 *
 	 * @author Minghao
 	 */
-	public static void highlightSummonTiles(ActorRef out, Player player1, Board board) {
-		for (int x = 0; x < board.getX(); x++) {
-			for (int y = 0; y < board.getY(); y++) {
-				Unit unit = board.getTiles()[x][y].getUnit();
-				if (unit == null || unit.getOwner() != player1) continue;
-
-				for (int dx = -1; dx <= 1; dx++) {
-					for (int dy = -1; dy <= 1; dy++) {
-						if (dx == 0 && dy == 0) continue;
-						int nx = x + dx;
-						int ny = y + dy;
-						if (nx < 0 || nx >= board.getX() || ny < 0 || ny >= board.getY()) continue;
-						if (board.getTiles()[nx][ny].getUnit() == null) {
-							BasicCommands.drawTile(out, board.getTiles()[nx][ny], 2);
-						}
-					}
-				}
-			}
+	public static void highlightSummonTiles(ActorRef out, Unit unit, Board board) {
+		Set<Tile> targets = findValidSummonTiles(unit, board);
+		for  (Tile target : targets) {
+			BasicCommands.drawTile(out, target, 2);
+			blink();
 		}
 	}
+
+
 }
 
