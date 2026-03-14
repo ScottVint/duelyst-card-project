@@ -38,7 +38,7 @@ public class TileClicked implements EventProcessor {
 
     @Override
     public void processEvent(ActorRef out, GameState gameState, JsonNode message) {
-        if (!gameState.isPlayer1Turn()) {
+        if (!gameState.player1Turn) {
             BasicCommands.addPlayer1Notification(out, "It is not your turn.", 2);
             return;
         }

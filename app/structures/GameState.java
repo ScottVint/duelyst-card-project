@@ -44,6 +44,7 @@ public class GameState {
 	 */
 	private int nextUnitId = 3;
 
+	//TODO Move this
 	/**
 	 * Horn of the Forsaken charges for player 1
 	 */
@@ -72,40 +73,8 @@ public class GameState {
 		return selectedUnit;
 	}
 
-	public void setSelectedUnit(Unit unit) {
-		this.selectedUnit = unit;
-	}
-
-	public boolean isPlayer1Turn() {
-		return player1Turn;
-	}
-
-	public void setPlayer1Turn(boolean player1Turn) {
-		this.player1Turn = player1Turn;
-	}
-
-	public int getTurnCount() {
-		return turnCount;
-	}
-
-	public void incrementTurnCount() {
-		turnCount++;
-	}
-
-	public Integer getSelectedHandPosition() {
-		return selectedHandPosition;
-	}
-
-	public void setSelectedHandPosition(Integer pos) {
-		this.selectedHandPosition = pos;
-	}
-
 	public int getNextUnitId() {
 		return nextUnitId++;
-	}
-
-	public int getPlayer1HornCharges() {
-		return player1HornCharges;
 	}
 
 	public void equipPlayer1Horn() {
@@ -122,31 +91,7 @@ public class GameState {
 		}
 	}
 
-	public Unit getMovingUnit() {
-		return movingUnit;
-	}
-
-	public void setMovingUnit(Unit movingUnit) {
-		this.movingUnit = movingUnit;
-	}
-
-	public Tile getMoveTargetTile() {
-		return moveTargetTile;
-	}
-
-	public void setMoveTargetTile(Tile moveTargetTile) {
-		this.moveTargetTile = moveTargetTile;
-	}
-
-	public boolean isUnitMoving() {
-		return unitMoving;
-	}
-
-	public void setUnitMoving(boolean unitMoving) {
-		this.unitMoving = unitMoving;
-	}
-
-
+	//TODO Create CombatLogic class
 	/**
 	 * Combat damage based on attacker attack stat.
 	 */
