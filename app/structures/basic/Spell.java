@@ -1,4 +1,6 @@
 package structures.basic;
+import structures.basic.players.*;
 
-public class Spell {
+public interface Spell {
+    public void cast(Player player, Card selectedCard);
 }
