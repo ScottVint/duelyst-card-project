@@ -29,19 +29,12 @@ public class GameState {
 	public Unit selectedUnit;
 	public boolean player1Turn = true;
 
-	/**
-	 * Current round number
-	 */
 	public int turnCount = 1;
 
-	/**
-	 * 1-indexed hand position of the selected card, or null if none selected
-	 */
+	/** 1-indexed hand position of the selected card, or null if none selected */
 	public Integer selectedHandPosition = null;
 
-	/**
-	 * Next unique unit id for summoned units. Avatars already use 1 and 2
-	 */
+	/** Next unique unit id for summoned units. Avatars already use 1 and 2 */ //TODO make fit with summon method instead
 	private int nextUnitId = 3;
 
 	//TODO Move this
@@ -50,40 +43,24 @@ public class GameState {
 	 */
 	private int player1HornCharges = 0;
 
-	/**
-	 * Movement state
-	 */
+	/** Movement state */
 	public Unit movingUnit = null;
 	public Tile moveTargetTile = null;
 	public boolean unitMoving = false;
 
-	public Player getPlayer1() {
-		return player1;
-	}
+	public Player getPlayer1() { return player1; }
 
-	public Player getPlayer2() {
-		return player2;
-	}
+	public Player getPlayer2() { return player2; }
 
-	public Board getBoard() {
-		return board;
-	}
+	public Board getBoard() { return board; }
 
-	public Unit getSelectedUnit() {
-		return selectedUnit;
-	}
+	public Unit getSelectedUnit() { return selectedUnit; }
 
-	public int getNextUnitId() {
-		return nextUnitId++;
-	}
+	public int getNextUnitId() { return nextUnitId++; }
 
-	public void equipPlayer1Horn() {
-		player1HornCharges = 3;
-	}
+	public void equipPlayer1Horn() { player1HornCharges = 3; }
 
-	public boolean player1HasHorn() {
-		return player1HornCharges > 0;
-	}
+	public boolean player1HasHorn() { return player1HornCharges > 0; }
 
 	public void usePlayer1HornCharge() {
 		if (player1HornCharges > 0) {
