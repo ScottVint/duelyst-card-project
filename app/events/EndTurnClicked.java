@@ -32,17 +32,17 @@ public class EndTurnClicked implements EventProcessor {
 	public void processEvent(ActorRef out, GameState gameState, JsonNode message) {
 
 		// Clear any active unit/card selection
-		gameState.setSelectedUnit(null);
-		gameState.setSelectedHandPosition(null);
+		gameState.selectedUnit = null;
+		gameState.selectedHandPosition = null;
 
 		BoardLogic.clearSelection(out, gameState.board);
 
-		if (gameState.isPlayer1Turn()) {
+		if (gameState.player1Turn) {
 			// Player 1 ends their turn → Player 2's turn begins (same round)
 			gameState.endTurn(out, gameState.getPlayer1(), gameState.getPlayer2());
 		} else {
 			// Player 2 ends their turn → Player 1's turn begins (new round)
-			gameState.incrementTurnCount();
+			gameState.turnCount++;
 			gameState.endTurn(out, gameState.getPlayer2(), gameState.getPlayer1());
 
 		}

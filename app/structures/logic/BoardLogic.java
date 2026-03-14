@@ -2,7 +2,9 @@ package structures.logic;
 
 import akka.actor.ActorRef;
 import commands.BasicCommands;
+import structures.GameState;
 import structures.basic.Board;
+import structures.basic.Card;
 import structures.basic.Tile;
 import structures.basic.Unit;
 import structures.basic.players.Player;
@@ -125,13 +127,13 @@ public class BoardLogic {
 		return validTargets;
 	}
 
-	public static Set<Tile> findValidSummonTiles(Unit unit, Board board) {
+	public static Set<Tile> findValidSummonTiles(Player summoner, Board board) {
 		Tile[][] boardTiles = board.getTiles();
 		Set<Tile> alliedUnits = new HashSet<>();
 		// Find all allied units on the board
 		for (Tile[] row : boardTiles) {
 			for (Tile tile : row) {
-				if (tile.getUnit().getOwner() == unit.getOwner()) {
+				if (tile.getUnit().getOwner() == summoner) {
 				alliedUnits.add(tile);
 				}
 			}
@@ -166,14 +168,54 @@ public class BoardLogic {
 	 *
 	 * @author Minghao
 	 */
-	public static void highlightSummonTiles(ActorRef out, Unit unit, Board board) {
-		Set<Tile> targets = findValidSummonTiles(unit, board);
+	public static void highlightSummonTiles(ActorRef out, Player summoner, Board board) {
+		Set<Tile> targets = findValidSummonTiles(summoner, board);
 		for  (Tile target : targets) {
 			BasicCommands.drawTile(out, target, 2);
 			blink();
 		}
 	}
 
+	public static void showSpellPreview(ActorRef out, GameState gameState, Card card) {
+		//TODO implement cards as subclasses
+		final String HORN_OF_THE_FORSAKEN = "Horn of the Forsaken";
+		final String WRAITHLING_SWARM = "Wraithling Swarm";
+		final String TRUESTRIKE = "Truestrike";
+		final String SUNDROP_ELIXIR = "Sundrop Elixir";
+		final String DARK_TERMINUS = "Dark Terminus";
 
+		String cardName = card.getCardname();
+		switch (cardName) {
+			case HORN_OF_THE_FORSAKEN:
+				BasicCommands.addPlayer1Notification(out, "Click your avatar to equip Horn", 2);
+
+				int ax = gameState.getPlayer1().getAvatar().getPosition().getTilex();
+				int ay = gameState.getPlayer1().getAvatar().getPosition().getTiley();
+				Tile avatarTile = gameState.getBoard().getTile(ax, ay);
+				BasicCommands.drawTile(out, avatarTile, 1);
+				break;
+
+			case WRAITHLING_SWARM:
+				BasicCommands.addPlayer1Notification(out, "Click an empty tile to cast Wraithling Swarm", 2);
+				break;
+
+			case TRUESTRIKE:
+				BasicCommands.addPlayer1Notification(out, "Click an enemy unit for Truestrike", 2);
+				break;
+
+			case SUNDROP_ELIXIR:
+				BasicCommands.addPlayer1Notification(out, "Click a unit to heal 5", 2);
+				break;
+
+			case DARK_TERMINUS:
+				BasicCommands.addPlayer1Notification(out, "Click an enemy non-avatar unit", 2);
+				break;
+
+			default:
+				BasicCommands.addPlayer1Notification(out, "Spell/artifact not implemented yet.", 2);
+		}
+	}
+
+// TODO: add spell target highlighting
 }
 
