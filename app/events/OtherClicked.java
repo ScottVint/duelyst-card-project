@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 import akka.actor.ActorRef;
 import structures.GameState;
+import structures.logic.BoardLogic;
 
 /**
  * Indicates that the user has clicked a non-interactive area of the game canvas.
@@ -24,7 +25,7 @@ public class OtherClicked implements EventProcessor {
 	public void processEvent(ActorRef out, GameState gameState, JsonNode message) {
 		gameState.setSelectedUnit(null);
 		gameState.setSelectedHandPosition(null);
-		gameState.getBoard().clearSelection(out);
+		BoardLogic.clearSelection(out, gameState.board);
 	}
 
 }

@@ -29,49 +29,76 @@ public class GameState {
 	public Unit selectedUnit;
 	public boolean player1Turn = true;
 
-	/** Current round number */
+	/**
+	 * Current round number
+	 */
 	public int turnCount = 1;
 
-	/** 1-indexed hand position of the selected card, or null if none selected */
+	/**
+	 * 1-indexed hand position of the selected card, or null if none selected
+	 */
 	public Integer selectedHandPosition = null;
 
-	/** Next unique unit id for summoned units. Avatars already use 1 and 2 */
+	/**
+	 * Next unique unit id for summoned units. Avatars already use 1 and 2
+	 */
 	private int nextUnitId = 3;
 
-	/** Horn of the Forsaken charges for player 1 */
+	/**
+	 * Horn of the Forsaken charges for player 1
+	 */
 	private int player1HornCharges = 0;
 
-	/** Movement state */
+	/**
+	 * Movement state
+	 */
 	public Unit movingUnit = null;
 	public Tile moveTargetTile = null;
 	public boolean unitMoving = false;
 
-	public GameState() {
-		board = new Board();
-
-		BetterUnit avatar1 = (BetterUnit) BasicObjectBuilders.loadUnit(StaticConfFiles.humanAvatar, 1, BetterUnit.class);
-		BetterUnit avatar2 = (BetterUnit) BasicObjectBuilders.loadUnit(StaticConfFiles.aiAvatar, 2, BetterUnit.class);
-
-		player1 = new HumanPlayer();
-
-		player2 = new AIPlayer();
+	public Player getPlayer1() {
+		return player1;
 	}
 
-	public Player getPlayer1() { return player1; }
-	public Player getPlayer2() { return player2; }
-	public Board getBoard() { return board; }
+	public Player getPlayer2() {
+		return player2;
+	}
 
-	public Unit getSelectedUnit() { return selectedUnit; }
-	public void setSelectedUnit(Unit unit) { this.selectedUnit = unit; }
+	public Board getBoard() {
+		return board;
+	}
 
-	public boolean isPlayer1Turn() { return player1Turn; }
-	public void setPlayer1Turn(boolean player1Turn) { this.player1Turn = player1Turn; }
+	public Unit getSelectedUnit() {
+		return selectedUnit;
+	}
 
-	public int getTurnCount() { return turnCount; }
-	public void incrementTurnCount() { turnCount++; }
+	public void setSelectedUnit(Unit unit) {
+		this.selectedUnit = unit;
+	}
 
-	public Integer getSelectedHandPosition() { return selectedHandPosition; }
-	public void setSelectedHandPosition(Integer pos) { this.selectedHandPosition = pos; }
+	public boolean isPlayer1Turn() {
+		return player1Turn;
+	}
+
+	public void setPlayer1Turn(boolean player1Turn) {
+		this.player1Turn = player1Turn;
+	}
+
+	public int getTurnCount() {
+		return turnCount;
+	}
+
+	public void incrementTurnCount() {
+		turnCount++;
+	}
+
+	public Integer getSelectedHandPosition() {
+		return selectedHandPosition;
+	}
+
+	public void setSelectedHandPosition(Integer pos) {
+		this.selectedHandPosition = pos;
+	}
 
 	public int getNextUnitId() {
 		return nextUnitId++;
@@ -95,20 +122,30 @@ public class GameState {
 		}
 	}
 
-	public Unit getMovingUnit() { return movingUnit; }
-	public void setMovingUnit(Unit movingUnit) { this.movingUnit = movingUnit; }
-
-	public Tile getMoveTargetTile() { return moveTargetTile; }
-	public void setMoveTargetTile(Tile moveTargetTile) { this.moveTargetTile = moveTargetTile; }
-
-	public boolean isUnitMoving() { return unitMoving; }
-	public void setUnitMoving(boolean unitMoving) { this.unitMoving = unitMoving; }
-
-	public void clearSelections(ActorRef out) {
-		selectedUnit = null;
-		selectedHandPosition = null;
-		board.clearSelection(out);
+	public Unit getMovingUnit() {
+		return movingUnit;
 	}
+
+	public void setMovingUnit(Unit movingUnit) {
+		this.movingUnit = movingUnit;
+	}
+
+	public Tile getMoveTargetTile() {
+		return moveTargetTile;
+	}
+
+	public void setMoveTargetTile(Tile moveTargetTile) {
+		this.moveTargetTile = moveTargetTile;
+	}
+
+	public boolean isUnitMoving() {
+		return unitMoving;
+	}
+
+	public void setUnitMoving(boolean unitMoving) {
+		this.unitMoving = unitMoving;
+	}
+
 
 	/**
 	 * Combat damage based on attacker attack stat.
@@ -133,7 +170,7 @@ public class GameState {
 		if (target == null || damage <= 0) return;
 
 		int newHealth = target.getHealth() - damage;
-		target.setHealth(newHealth);
+		target.setHealth(out, newHealth);
 
 		BasicCommands.setUnitHealth(out, target, target.getHealth());
 
@@ -146,9 +183,11 @@ public class GameState {
 		}
 
 		if (target.getHealth() <= 0) {
-			removeUnit(out, target);
+			death(out, target);
 		}
 	}
+
+	//TODO delete
 	/**
 	 * Heal a unit, capped by maxHealth.
 	 */
@@ -156,7 +195,7 @@ public class GameState {
 		if (target == null || amount <= 0) return;
 
 		int healed = Math.min(target.getMaxHealth(), target.getHealth() + amount);
-		target.setHealth(healed);
+		target.setHealth(out, healed);
 		BasicCommands.setUnitHealth(out, target, target.getHealth());
 
 		if (target == player1.getAvatar()) {
@@ -171,7 +210,7 @@ public class GameState {
 	/**
 	 * Remove a dead unit from the board and UI.
 	 */
-	public void removeUnit(ActorRef out, Unit target) {
+	public void death(ActorRef out, Unit target) {
 		if (target == null) return;
 
 		if (target.getPosition() != null) {
@@ -183,6 +222,7 @@ public class GameState {
 		BasicCommands.deleteUnit(out, target);
 	}
 
+	//TODO set to summon method
 	/**
 	 * Summon a 1/1 Wraithling token to a tile.
 	 */
@@ -199,7 +239,7 @@ public class GameState {
 		wraithling.setOwner(owner);
 		wraithling.setAttack(1);
 		wraithling.setMaxHealth(1);
-		wraithling.setHealth(1);
+		wraithling.setHealth(out, 1);
 		wraithling.setPositionByTile(tile);
 		tile.setUnit(wraithling);
 
@@ -209,7 +249,7 @@ public class GameState {
 
 		return wraithling;
 	}
-}
+
 	public void endTurn(ActorRef out, Player playerEndingTurn, Player playerStartingTurn) {
 		player1Turn = !player1Turn;
 		int startingMana = Math.min(turnCount + 1, Player.getMaxMana());

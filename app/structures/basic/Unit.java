@@ -123,7 +123,7 @@ public class Unit {
 	 * @param value
 	 * @author Scott
 	 */
-	public void setHealth (int value) {
+	public void setHealth (ActorRef out, int value) {
 		if(value < 0) {
 			health = 0;
 		} else if (value > maxHealth) {
@@ -131,6 +131,10 @@ public class Unit {
 		} else {
 			health = value;
 		}
+	}
+
+	public void setHealth(ActorRef out, Player player, int health) {
+		setHealth(out,health);
 	}
 
 	/**
@@ -149,42 +153,23 @@ public class Unit {
 		this.owner = owner;
 	}
 
-	/**
-	 * Returns the maximum health of the unit.
-	 * @author Minghao
-	 */
 	public int getMaxHealth() {
 		return maxHealth;
 	}
-	/**
-	 * Sets the maximum health of the unit.
-	 * @param maxHealth new maximum health value
-	 * @author Minghao
-	 */
+
 	public void setMaxHealth(int maxHealth) {
 		this.maxHealth = maxHealth;
 	}
-	/**
-	 * Returns the attack damage of the unit.
-	 * @author Minghao
-	 */
+
+
 	public int getAttack() {
 		return attack;
 	}
-	/**
-	 * Sets the attack damage of the unit.
-	 * @param attack new attack value
-	 * @author Minghao
-	 */
+
 	public void setAttack(int attack) {
 		this.attack = attack;
 	}
 
-	/**
-	 * This command sets the position of the Unit to a specified
-	 * tile.
-	 * @param tile
-	 */
 	@JsonIgnore
 	public void setPositionByTile(Tile tile) {
 		position = new Position(tile.getXpos(),tile.getYpos(),tile.getTilex(),tile.getTiley());
@@ -200,7 +185,12 @@ public class Unit {
 	 */
 	@JsonIgnore
 	public void takeDamage(ActorRef out, int damage) {
-		setHealth(health-damage);
+		setHealth(out, health-damage);
 		BasicCommands.setUnitHealth(out, this, health);
+	}
+
+	/// Method for BetterUnit to override
+	public void takeDamage(ActorRef out, Player player, int damage) {
+		takeDamage(out, damage);
 	}
 }

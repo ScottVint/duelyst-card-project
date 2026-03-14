@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 import akka.actor.ActorRef;
 import structures.GameState;
+import structures.logic.BoardLogic;
 import structures.basic.Tile;
 import structures.basic.Unit;
 
@@ -13,8 +14,11 @@ import structures.basic.Unit;
  */
 public class UnitStopped implements EventProcessor {
 
-	@Override
-	public void processEvent(ActorRef out, GameState gameState, JsonNode message) {
+    @Override
+    public void processEvent(ActorRef out, GameState gameState, JsonNode message) {
+        // Clear all highlights and selection after unit finishes moving
+        BoardLogic.clearSelection(out, gameState.board);
+        gameState.setSelectedUnit(null);
 
 		int unitid = message.get("id").asInt();
 

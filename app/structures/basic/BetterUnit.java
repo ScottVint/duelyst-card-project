@@ -27,8 +27,9 @@ public class BetterUnit extends Unit {
 		this.keywords = keywords;
 	};
 
+	@Override
 	public void setHealth(ActorRef out, Player player, int health) {
-		super.setHealth(health);
+		super.setHealth(out, health);
 		player.setHealth(out, this.health);
 	}
 
@@ -41,6 +42,7 @@ public class BetterUnit extends Unit {
 	 * @param damage
 	 * @author Scott
 	 */
+	@Override
 	public void takeDamage(ActorRef out, Player player, int damage) {
 		super.takeDamage(out, damage);
 		player.setHealth(out, this.health);

@@ -6,6 +6,7 @@ import commands.BasicCommands;
 import structures.GameState;
 import structures.basic.Tile;
 import structures.basic.Card;
+import structures.logic.BoardLogic;
 
 /**
  * Indicates that the user has clicked a card in their hand.
@@ -47,13 +48,13 @@ public class CardClicked implements EventProcessor {
 		// Re-click same card -> deselect
 		if (Integer.valueOf(handPosition).equals(gameState.getSelectedHandPosition())) {
 			gameState.setSelectedHandPosition(null);
-			gameState.getBoard().clearSelection(out);
+			BoardLogic.clearSelection(out, gameState.board);
 			return;
 		}
 
 		// Clear previous selections
 		gameState.setSelectedUnit(null);
-		gameState.getBoard().clearSelection(out);
+		BoardLogic.clearSelection(out, gameState.board);
 
 		List<Card> hand = gameState.getPlayer1().getHand();
 		int index = handPosition - 1;
@@ -67,7 +68,7 @@ public class CardClicked implements EventProcessor {
 		gameState.setSelectedHandPosition(handPosition);
 
 		if (card.isCreature()) {
-			gameState.getBoard().highlightSummonTiles(out, gameState.getPlayer1());
+			BoardLogic.highlightSummonTiles(out, gameState.getPlayer1(), gameState.board);
 		}
 
 		showSpellPreview(out, gameState, card);

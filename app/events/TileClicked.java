@@ -9,34 +9,35 @@ import com.fasterxml.jackson.databind.JsonNode;
 import akka.actor.ActorRef;
 import commands.BasicCommands;
 import structures.GameState;
+import structures.basic.Board;
 import structures.basic.Card;
 import structures.basic.Tile;
 import structures.basic.Unit;
+import structures.logic.BoardLogic;
 import structures.basic.UnitAnimationType;
 import structures.basic.BetterUnit;
 import utils.BasicObjectBuilders;
 
 /**
  * Indicates that the user has clicked a tile on the game canvas.
- *  * <p>
- *  * Handles Story Card #3: when the human player clicks one of their units, the unit is
- *  * selected and its valid movement range is highlighted in white.
- *  * <pre>
- *  * {
- *  *   messageType = "tileClicked"
- *  *   tilex = &lt;x index of the tile&gt;
- *  *   tiley = &lt;y index of the tile&gt;
- *  * }
- *  * </pre>
- *  *
- *  * @author Dr. Richard McCreadie
- *  * @author Minghao
+ * <p>
+ * Handles Story Card #3: when the human player clicks one of their units, the unit is
+ * selected and its valid movement range is highlighted in white.
+ * <pre>
+ * {
+ *   messageType = "tileClicked"
+ *   tilex = &lt;x index of the tile&gt;
+ *   tiley = &lt;y index of the tile&gt;
+ * }
+ * </pre>
+ *
+ * @author Dr. Richard McCreadie
+ * @author Minghao
  */
 public class TileClicked implements EventProcessor {
 
     @Override
     public void processEvent(ActorRef out, GameState gameState, JsonNode message) {
-
         if (!gameState.isPlayer1Turn()) {
             BasicCommands.addPlayer1Notification(out, "It is not your turn.", 2);
             return;
@@ -50,6 +51,7 @@ public class TileClicked implements EventProcessor {
         int tilex = message.get("tilex").asInt();
         int tiley = message.get("tiley").asInt();
 
+        Board board = gameState.board;
         Tile clickedTile = gameState.getBoard().getTile(tilex, tiley);
 
         // Clicked on a unit
@@ -74,17 +76,18 @@ public class TileClicked implements EventProcessor {
 
             // If a friendly unit is already selected and player clicks an enemy -> try attack
             if (gameState.getSelectedUnit() != null && clickedUnit.getOwner() != gameState.getPlayer1()) {
-                tryAttackSelectedUnit(out, gameState, clickedUnit);
+                tryAttackSelectedUnit(out, gameState, clickedUnit, board);
                 return;
             }
 
             // Select friendly unit for movement / attack
             if (clickedUnit.getOwner() == gameState.getPlayer1()) {
-                gameState.getBoard().clearSelection(out);
+                BoardLogic.clearSelection(out, board);
                 gameState.setSelectedHandPosition(null);
                 gameState.setSelectedUnit(clickedUnit);
-                BasicCommands.drawTile(out, clickedTile, 1);
-                gameState.getBoard().highlightMovement(out, clickedTile);
+                BasicCommands.drawTile(out, clickedTile, 1); // white highlight
+                BoardLogic.highlightMovement(out, clickedTile, clickedUnit, board);
+
             } else {
                 BasicCommands.addPlayer1Notification(out, "Clicked enemy unit", 2);
             }
@@ -111,13 +114,13 @@ public class TileClicked implements EventProcessor {
 
         // Empty tile + selected unit => try move
         if (gameState.getSelectedUnit() != null) {
-            moveSelectedUnit(out, gameState, clickedTile);
+            moveSelectedUnit(out, gameState, clickedTile, board);
         }
     }
 
 
     //TODO move ALL OF THIS elsewhere
-    private void tryAttackSelectedUnit(ActorRef out, GameState gameState, Unit targetUnit) {
+    private void tryAttackSelectedUnit(ActorRef out, GameState gameState, Unit targetUnit, Board board) {
         Unit attacker = gameState.getSelectedUnit();
         if (attacker == null || targetUnit == null) return;
 
@@ -136,7 +139,7 @@ public class TileClicked implements EventProcessor {
             return;
         }
 
-        gameState.getBoard().clearSelection(out);
+        BoardLogic.clearSelection(out, board);
 
         BasicCommands.playUnitAnimation(out, attacker, UnitAnimationType.attack);
         BasicCommands.playUnitAnimation(out, targetUnit, UnitAnimationType.hit);
@@ -153,7 +156,7 @@ public class TileClicked implements EventProcessor {
         return dx <= 1 && dy <= 1 && !(dx == 0 && dy == 0);
     }
 
-    private void moveSelectedUnit(ActorRef out, GameState gameState, Tile clickedTile) {
+    private void moveSelectedUnit(ActorRef out, GameState gameState, Tile clickedTile, Board board) {
         Unit selectedUnit = gameState.getSelectedUnit();
         if (selectedUnit == null) return;
 
@@ -171,7 +174,7 @@ public class TileClicked implements EventProcessor {
         gameState.setMoveTargetTile(clickedTile);
         gameState.setUnitMoving(true);
 
-        gameState.getBoard().clearSelection(out);
+        BoardLogic.clearSelection(out, board);
         gameState.setSelectedUnit(null);
         gameState.setSelectedHandPosition(null);
 
@@ -433,7 +436,7 @@ public class TileClicked implements EventProcessor {
         summonedUnit.setOwner(gameState.getPlayer1()); //TODO still need to prevent summon and move on same turn (In summon method)
         summonedUnit.setAttack(card.getBigCard().getAttack());
         summonedUnit.setMaxHealth(card.getBigCard().getHealth());
-        summonedUnit.setHealth(card.getBigCard().getHealth());
+        summonedUnit.setHealth(out, card.getBigCard().getHealth());
         summonedUnit.setPositionByTile(clickedTile);
         clickedTile.setUnit(summonedUnit);
 
@@ -456,7 +459,7 @@ public class TileClicked implements EventProcessor {
         hand.remove(cardIndex);
         redrawPlayerHand(out, hand);
 
-        gameState.board.clearSelection(out);
+        BoardLogic.clearSelection(out, gameState.board);
     }
 
     private boolean isValidSummonTile(GameState gameState, Tile clickedTile) {

@@ -9,6 +9,7 @@ import commands.BasicCommands;
 import structures.GameState;
 import structures.basic.Card;
 import structures.basic.players.Player;
+import structures.logic.BoardLogic;
 
 /**
  * Indicates that the user has clicked the end-turn button.
@@ -34,7 +35,7 @@ public class EndTurnClicked implements EventProcessor {
 		gameState.setSelectedUnit(null);
 		gameState.setSelectedHandPosition(null);
 
-		gameState.getBoard().clearSelection(out);
+		BoardLogic.clearSelection(out, gameState.board);
 
 		if (gameState.isPlayer1Turn()) {
 			// Player 1 ends their turn → Player 2's turn begins (same round)
@@ -45,17 +46,6 @@ public class EndTurnClicked implements EventProcessor {
 			gameState.endTurn(out, gameState.getPlayer2(), gameState.getPlayer1());
 
 		}
-	}
-
-	//TODO Merge with proper method
-	private void redrawPlayerHand(ActorRef out, GameState gameState) {
-		for (int i = 1; i <= 6; i++) {
-			BasicCommands.deleteCard(out, i);
-		}
-
-		List<Card> hand = gameState.getPlayer1().getHand();
-		for (int i = 0; i < hand.size() && i < 6; i++) {
-			BasicCommands.drawCard(out, hand.get(i), i + 1, 0);
-		}
+		gameState.player1.drawHand(out);
 	}
 }

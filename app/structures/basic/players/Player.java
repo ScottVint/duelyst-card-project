@@ -8,7 +8,6 @@ import commands.BasicCommands;
 import structures.basic.BetterUnit;
 import structures.basic.Card;
 import structures.basic.Deck;
-import structures.basic.Unit;
 
 /**
  * A basic representation of the Player. A player
