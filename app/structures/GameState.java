@@ -1,18 +1,20 @@
 package structures;
+import java.util.HashSet;
+import java.util.Set;
 
 import akka.actor.ActorRef;
 import commands.BasicCommands;
-import structures.basic.BetterUnit;
+
 import structures.basic.Board;
 import structures.basic.Tile;
 import structures.basic.players.AIPlayer;
 import structures.basic.players.HumanPlayer;
-import structures.basic.players.Player;
 import structures.basic.Unit;
 import structures.basic.players.Player;
+
 import utils.BasicObjectBuilders;
-import utils.OrderedCardLoader;
 import utils.StaticConfFiles;
+
 
 /**
  * This class can be used to hold information about the on-going game.
@@ -55,6 +57,43 @@ public class GameState {
 	public Board getBoard() { return board; }
 
 	public Unit getSelectedUnit() { return selectedUnit; }
+
+	public void setSelectedUnit(Unit unit) {
+		this.selectedUnit = unit;
+	}
+
+	public Integer getSelectedHandPosition() {
+		return selectedHandPosition;
+	}
+
+	public void setSelectedHandPosition(Integer pos) {
+		this.selectedHandPosition = pos;
+	}
+
+	public Unit getMovingUnit() {
+		return movingUnit;
+	}
+
+	public void setMovingUnit(Unit movingUnit) {
+		this.movingUnit = movingUnit;
+	}
+
+	public Tile getMoveTargetTile() {
+		return moveTargetTile;
+	}
+
+	public void setMoveTargetTile(Tile moveTargetTile) {
+		this.moveTargetTile = moveTargetTile;
+	}
+
+	public boolean isUnitMoving() {
+		return unitMoving;
+	}
+
+	public void setUnitMoving(boolean unitMoving) {
+		this.unitMoving = unitMoving;
+	}
+
 
 	public int getNextUnitId() { return nextUnitId++; }
 
@@ -177,5 +216,31 @@ public class GameState {
 		int startingMana = Math.min(turnCount + 1, Player.getMaxMana());
 		playerStartingTurn.setMana(out, startingMana);
 		playerEndingTurn.setMana(out, 0);
+	}
+	private Set<Integer> actedUnitIds = new HashSet<>();
+	public boolean hasActed(Unit unit) {
+		return unit != null && actedUnitIds.contains(unit.getId());
+	}
+
+	public void markActed(Unit unit) {
+		if (unit != null) {
+			actedUnitIds.add(unit.getId());
+		}
+	}
+
+	public void clearActedUnits() {
+		actedUnitIds.clear();
+	}
+
+
+	public GameState() {
+		board = new Board();
+
+		player1 = new HumanPlayer();
+		player2 = new AIPlayer();
+
+		// make avatars belong to the correct players
+		player1.getAvatar().setOwner(player1);
+		player2.getAvatar().setOwner(player2);
 	}
 }

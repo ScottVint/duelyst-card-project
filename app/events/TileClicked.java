@@ -87,11 +87,15 @@ public class TileClicked implements EventProcessor {
 
             // Select friendly unit for movement / attack
             else if (clickedUnit.getOwner() == gameState.getPlayer1()) {
+                if (gameState.hasActed(clickedUnit)) {
+                    BasicCommands.addPlayer1Notification(out, "This unit has already acted this turn.", 2);
+                    return;
+                }
+
                 gameState.selectedHandPosition = null;
                 gameState.selectedUnit = clickedUnit;
-                BasicCommands.drawTile(out, clickedTile, 1); // white highlight
+                BasicCommands.drawTile(out, clickedTile, 1);
                 BoardLogic.highlightMovement(out, clickedTile, clickedUnit, board);
-
             }
 
             // Else, enemy unit is clicked
@@ -142,9 +146,11 @@ public class TileClicked implements EventProcessor {
         BasicCommands.playUnitAnimation(out, targetUnit, UnitAnimationType.hit);
 
         gameState.dealDamage(out, attacker, targetUnit);
+        gameState.markActed(attacker);
 
         gameState.selectedUnit = null;
         gameState.selectedHandPosition = null;
+
     }
 
     private boolean isAdjacent(Unit a, Unit b) {
@@ -175,7 +181,9 @@ public class TileClicked implements EventProcessor {
         gameState.selectedUnit = null;
         gameState.selectedHandPosition = null;
 
-        BasicCommands.moveUnitToTile(out, selectedUnit, clickedTile); //TODO add action tracking for unit
+        BasicCommands.moveUnitToTile(out, selectedUnit, clickedTile);
+        gameState.markActed(selectedUnit);
+        //TODO add action tracking for unit
     }
 
     private boolean isValidMoveTile(GameState gameState, Unit selectedUnit, Tile clickedTile) {
@@ -270,10 +278,11 @@ public class TileClicked implements EventProcessor {
         }
 
         if ("Truestrike".equals(cardName)) {
-            if (targetUnit.getOwner() != gameState.getPlayer2()) { //TODO Use subclasses, also delete duplicate code
+            if (!isEnemyUnit(gameState, targetUnit)) {
                 BasicCommands.addPlayer1Notification(out, "Truestrike must target an enemy unit", 2);
                 return;
             }
+
 
             if (gameState.getPlayer1().getMana() < card.getManacost()) {
                 BasicCommands.addPlayer1Notification(out, "Not enough mana", 2);
@@ -299,10 +308,11 @@ public class TileClicked implements EventProcessor {
         }
 
         if ("Dark Terminus".equals(cardName)) {
-            if (targetUnit.getOwner() != gameState.getPlayer2()) {
+            if (!isEnemyUnit(gameState, targetUnit)) {
                 BasicCommands.addPlayer1Notification(out, "Dark Terminus must target an enemy unit", 2);
                 return;
             }
+
 
             if (targetUnit == gameState.getPlayer2().getAvatar()) {
                 BasicCommands.addPlayer1Notification(out, "Dark Terminus cannot target enemy avatar", 2);
@@ -436,8 +446,10 @@ public class TileClicked implements EventProcessor {
         summonedUnit.setHealth(out, card.getBigCard().getHealth());
         summonedUnit.setPositionByTile(clickedTile);
         clickedTile.setUnit(summonedUnit);
+        gameState.markActed(summonedUnit);
 
         BasicCommands.drawUnit(out, summonedUnit, clickedTile);
+
         BasicCommands.setUnitAttack(out, summonedUnit, summonedUnit.getAttack());
         BasicCommands.setUnitHealth(out, summonedUnit, summonedUnit.getHealth());
 
@@ -454,12 +466,17 @@ public class TileClicked implements EventProcessor {
 
         List<Card> hand = gameState.getPlayer1().getHand();
         hand.remove(cardIndex);
-        redrawPlayerHand(out, hand);
 
+        gameState.getPlayer1().drawHand(out);
+
+        gameState.selectedHandPosition = null;
+        gameState.selectedUnit = null;
         BoardLogic.clearSelection(out, gameState.board);
+
     }
 
     private boolean isValidSummonTile(GameState gameState, Tile clickedTile) {
+
         int x = clickedTile.getTilex();
         int y = clickedTile.getTiley();
 
@@ -484,13 +501,10 @@ public class TileClicked implements EventProcessor {
     }
 
     //TODO this is already a method in Player
-    private void redrawPlayerHand(ActorRef out, List<Card> hand) {
-        for (int i = 1; i <= 6; i++) {
-            BasicCommands.deleteCard(out, i);
-        }
 
-        for (int i = 0; i < hand.size() && i < 6; i++) {
-            BasicCommands.drawCard(out, hand.get(i), i + 1, 0);
-        }
+    private boolean isEnemyUnit(GameState gameState, Unit unit) {
+        return unit != null
+                && unit.getOwner() != null
+                && unit.getOwner() != gameState.getPlayer1();
     }
 }

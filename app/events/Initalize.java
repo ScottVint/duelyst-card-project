@@ -34,7 +34,7 @@ public class Initalize implements EventProcessor {
         gameState.gameInitalised = true;
 
         // Display tiles on the board
-        BoardLogic.clearSelection(out, gameState.board);
+        BoardLogic.clearSelection(out, gameState.getBoard());
 
         // Retrieve player objects
         Player player1 = gameState.getPlayer1();
@@ -53,8 +53,8 @@ public class Initalize implements EventProcessor {
         // Story Card #18 Acceptance Test: Both players and their avatars have initial HP set to 20 [cite: 160]
         // ==========================================
         // TODO consolidate to my linked methods -- Scott---finished zechaowu
-        setupAvatar(avatar1, player1);
-        setupAvatar(avatar2, player2);
+        setupAvatar(out,avatar1, player1);
+        setupAvatar(out,avatar2, player2);
 
         // Initialise avatar stats --Zechao Wu
 
@@ -103,11 +103,12 @@ public class Initalize implements EventProcessor {
         BasicCommands.setUnitHealth(out, avatar, avatar.getHealth());
         BasicCommands.setUnitAttack(out, avatar, avatar.getAttack());
     }
-    private void setupAvatar(BetterUnit avatar, Player owner) {
+    private void setupAvatar(ActorRef out, BetterUnit avatar, Player owner) {
         avatar.setOwner(owner);
         avatar.setMaxHealth(20);
-        avatar.setHealth(20);
+        avatar.setHealth(out, owner, 20);
         avatar.setAttack(2);
     }
+
 
 }
