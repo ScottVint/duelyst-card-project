@@ -2,9 +2,11 @@ package structures.basic;
 
 
 import akka.actor.ActorRef;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import commands.BasicCommands;
 import structures.GameState;
 import structures.basic.players.Player;
+import structures.basic.spells.*;
 import structures.basic.unittypes.Unit;
 import structures.logic.BoardLogic;
 import utils.BasicObjectBuilders;
@@ -36,6 +38,8 @@ public class Card {
 	boolean isCreature;
 	String unitConfig;
 
+	Spell spell = null;
+
 	public Card() {
 	}
 
@@ -50,6 +54,17 @@ public class Card {
 		this.bigCard = bigCard;
 		this.isCreature = isCreature;
 		this.unitConfig = unitConfig;
+
+		Class<? extends Spell> spellClass = findSpell(this.cardname);
+		if (spellClass != null) {
+			try {
+				this.spell = spellClass.newInstance();
+			} catch (InstantiationException e) {
+				System.err.println("Whoops!");
+			} catch (IllegalAccessException e) {
+				System.err.println("Whoops!");
+			}
+		}
 	}
 
 	public int getId() {
@@ -127,7 +142,7 @@ public class Card {
 
 		switch (cardName) {
 			case "Wraithling Swarm":
-				castWraithlingSwarm(out, gameState, clickedTile, cardIndex);
+				spell.cast(out, gameState, clickedTile, cardIndex);
 				break;
 
 			case "Horn of the Forsaken":
@@ -220,12 +235,9 @@ public class Card {
 
 
 		Class<? extends Unit> unitClass = Unit.findUnitClass(unitConfig);
-		Unit summonedUnit = BasicObjectBuilders.loadUnit(
-				this.unitConfig,
-				gameState.getNextUnitId(),
-				unitClass
-		);
+		Unit summonedUnit = BasicObjectBuilders.loadUnit(this.unitConfig, gameState.getNextUnitId(), unitClass);
 		summonedUnit = unitClass.cast(summonedUnit);
+
 		summonedUnit.setOwner(player);
 		summonedUnit.setAttack(card.getBigCard().getAttack());
 		summonedUnit.setMaxHealth(card.getBigCard().getHealth());
@@ -257,78 +269,35 @@ public class Card {
 		}
 	}
 
-	//TODO unify to cast() abstractmethod in its own class
-	public static void castWraithlingSwarm(ActorRef out,
-									 GameState gameState,
-									 Tile clickedTile,
-									 int cardIndex) {
+	/// Method to find the relevant spell's class
+	public Class<? extends Spell> findSpell(String spellName) {
+		Class<? extends Spell> spellClass = null;
+		switch (spellName) {
+			case "Dark Terminus":
+				spellClass = DarkTerminus.class;
+				break;
 
-		Card card = gameState.getPlayer1().getHand().get(cardIndex);
+			case "Wraithling Swarm":
+				spellClass = WraithlingSwarm.class;
+				break;
 
-		if (gameState.getPlayer1().getMana() < card.getManacost()) {
-			BasicCommands.addPlayer1Notification(out, "Not enough mana", 2);
-			return;
+			case "Horn of the Forsaken":
+				spellClass = HornOfTheForsaken.class;
+				break;
+
+			case "Sundrop Elixir":
+				spellClass = SundropElixir.class;
+				break;
+
+			case "True Strike":
+				spellClass = Truestrike.class;
+				break;
+
+			case "Beam Shock":
+				spellClass = Beamshock.class;
+				break;
 		}
-
-		int summoned = 0;
-		Set<String> used = new HashSet<>();
-
-		if (BoardLogic.findValidSummonTiles(gameState.player1, gameState.board).contains(clickedTile)) {
-			gameState.summonWraithling(out, clickedTile, gameState.getPlayer1());
-			used.add(clickedTile.getTilex() + "," + clickedTile.getTiley());
-			summoned++;
-		}
-
-		List<int[]> friendlyPositions = new ArrayList<>();
-		for (int x = 0; x < 9; x++) {
-			for (int y = 0; y < 5; y++) {
-				Tile tile = gameState.getBoard().getTile(x, y);
-				Unit unit = tile.getUnit();
-				if (unit != null && unit.getOwner() == gameState.getPlayer1()) {
-					friendlyPositions.add(new int[]{x, y});
-				}
-			}
-		}
-
-		//TODO see what this does. It's such a mess...
-		for (int[] pos : friendlyPositions) {
-			if (summoned >= 3) break;
-
-			int x = pos[0];
-			int y = pos[1];
-
-			for (int dx = -1; dx <= 1; dx++) {
-				if (summoned >= 3) break;
-
-				for (int dy = -1; dy <= 1; dy++) {
-					if (summoned >= 3) break;
-					if (dx == 0 && dy == 0) continue;
-
-					int nx = x + dx;
-					int ny = y + dy;
-
-					if (nx < 0 || nx >= 9 || ny < 0 || ny >= 5) continue;
-
-					Tile candidate = gameState.getBoard().getTile(nx, ny);
-					String key = nx + "," + ny;
-
-					if (used.contains(key)) continue;
-					if (candidate.getUnit() != null) continue;
-
-					gameState.summonWraithling(out, candidate, gameState.getPlayer1());
-					used.add(key);
-					summoned++;
-				}
-			}
-		}
-
-		if (summoned == 0) {
-			BasicCommands.addPlayer1Notification(out, "No valid space for Wraithling Swarm", 2);
-			return;
-		}
-
-		gameState.player1.useCard(out, gameState, cardIndex, card.getManacost());
-		BasicCommands.addPlayer1Notification(out, "Wraithling Swarm cast", 2);
+		return spellClass;
 	}
 }
 
