@@ -69,16 +69,9 @@ public class TileClicked implements EventProcessor {
         if (clickedTile.getUnit() != null) {
             Unit clickedUnit = clickedTile.getUnit();
 
-            // If a non-creature card is selected, try using it on this unit first
-            if (selectedCard != null && !selectedCard.isCreature()) {
-                Card.useNonCreatureCardOnUnit(out, gameState, selectedCard, clickedUnit, cardIndex); //TODO Refactor into Spell.cast()
-                return;
-            }
-
             // If a friendly unit is already selected and player clicks an enemy -> try attack
-            else if (gameState.selectedUnit != null && clickedUnit.getOwner() != gameState.getPlayer1()) {
+            if (gameState.selectedUnit != null && clickedUnit.getOwner() != gameState.getPlayer1()) {
                 CombatLogic.tryAttackSelectedUnit(out, gameState, clickedTile, board); //TODO rename and refactor into CombatLogic
-                return;
             }
 
             // Select friendly unit for movement / attack
@@ -87,21 +80,20 @@ public class TileClicked implements EventProcessor {
                 gameState.selectedUnit = clickedUnit;
                 BasicCommands.drawTile(out, clickedTile, 1); // white highlight
                 BoardLogic.highlightMovement(out, clickedTile, clickedUnit, board);
-
             }
 
             // Else, enemy unit is clicked
-            else {
-                BasicCommands.addPlayer1Notification(out, "Clicked enemy unit", 2);
-            }
+
         }
 
-        // Empty tile + selected card
-        else if (selectedCard != null) {
-            if (selectedCard.isCreature()) {
-                selectedCard.summon(out, gameState, gameState.player1, clickedTile, board);
-            } else {
-                Card.useNonCreatureCardOnEmptyTile(out, gameState, selectedCard, clickedTile, cardIndex);
+        // If a card is selected and a valid target is clicked, use the card on the target
+        else if (selectedCard != null && gameState.highlightedTiles.contains(clickedTile)) {
+            // Check for mana first
+            if (gameState.player1.enoughMana(out, selectedCard.getManacost())) {
+                gameState.getPlayer1().useCard(out, gameState,
+                                               gameState.player1, cardIndex,
+                                               clickedTile, selectedCard.getManacost()
+                                               );
             }
         }
 
@@ -109,5 +101,8 @@ public class TileClicked implements EventProcessor {
         else if (gameState.getSelectedUnit() != null) {
             BoardLogic.moveSelectedUnit(out, gameState, clickedTile, board);
         }
+
+        // Deselect card
+        gameState.selectedHandPosition = null;
     }
 }

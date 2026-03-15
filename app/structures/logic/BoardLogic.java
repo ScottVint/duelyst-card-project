@@ -20,7 +20,7 @@ public class BoardLogic {
 	/** Creates a small pause.
 	 * This is necessary for the tiles to load without encountering a BufferOverflow.
 	 */
-	private static void blink() {
+	public static void blink() {
 		try {
 			Thread.sleep(1);
 		} catch (InterruptedException e) {

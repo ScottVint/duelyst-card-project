@@ -10,6 +10,9 @@ import structures.basic.players.Player;
 import structures.basic.unittypes.Unit;
 import structures.logic.CombatLogic;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * This class can be used to hold information about the on-going game.
  * Its created with the GameActor.
@@ -19,10 +22,10 @@ public class GameState {
 	public boolean gameInitalised = false;
 	public boolean something = false;
 
-	public HumanPlayer player1;
-	public AIPlayer player2;
-	public Board board;
-	public Unit selectedUnit;
+	public HumanPlayer player1 =  new HumanPlayer();
+	public AIPlayer player2 = new AIPlayer();
+	public Board board = new Board();
+	public Unit selectedUnit = null;
 	public boolean player1Turn = true;
 
 	public int turnCount = 1;
@@ -33,11 +36,8 @@ public class GameState {
 	/** Next unique unit id for summoned units. Avatars already use 1 and 2 */ //TODO make fit with summon method instead
 	private int nextUnitId = 3;
 
-	//TODO Move this
-	/**
-	 * Horn of the Forsaken charges for player 1
-	 */
-	private int player1HornCharges = 0;
+	/** List of currently highlighted tiles. Used for validation.*/
+	public Set<Tile> highlightedTiles = new HashSet<Tile>();
 
 	/** Movement state */
 	public Unit movingUnit = null;

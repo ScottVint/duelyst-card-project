@@ -47,7 +47,6 @@ public class EndTurnClicked implements EventProcessor {
 
 		}
 		gameState.player1.drawHand(out);
-		gameState.clearActedUnits();
 
 	}
 }

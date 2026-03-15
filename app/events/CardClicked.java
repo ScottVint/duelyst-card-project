@@ -59,12 +59,8 @@ public class CardClicked implements EventProcessor {
 		// Preview/highlight should still happen on card-click.
 		// Mana is checked later in TileClicked when the player actually casts/places the card.
 		gameState.selectedHandPosition = handPosition;
-
-		if (card.isCreature()) {
-			BoardLogic.highlightSummonTiles(out, gameState.player1, gameState.board);
-		}
-
-		BoardLogic.showSpellPreview(out, gameState, card);
+		gameState.highlightedTiles = card.getTargets(gameState.player1, gameState.board);
+		card.highlightTargets(out, gameState.player1, gameState.board);
 	}
 }
 

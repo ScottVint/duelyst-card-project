@@ -6,6 +6,7 @@ import structures.basic.Board;
 import structures.basic.Card;
 import structures.basic.Tile;
 import structures.basic.players.*;
+import structures.logic.BoardLogic;
 
 import java.util.Set;
 
@@ -18,7 +19,8 @@ public abstract class Spell {
             BasicCommands.addPlayer1Notification(out, "No valid tiles!", 2);
         };
         for (Tile tile : validTargets) {
-            BasicCommands.drawTile(out, tile, 1);
+            BasicCommands.drawTile(out, tile, 3);
+            BoardLogic.blink();
         }
     }
 

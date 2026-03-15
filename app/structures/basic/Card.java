@@ -11,6 +11,7 @@ import structures.basic.unittypes.Unit;
 import structures.logic.BoardLogic;
 import utils.BasicObjectBuilders;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -58,11 +59,11 @@ public class Card {
 		Class<? extends Spell> spellClass = findSpell(this.cardname);
 		if (spellClass != null) {
 			try {
-				this.spell = spellClass.newInstance();
-			} catch (InstantiationException e) {
+				this.spell = spellClass.getDeclaredConstructor().newInstance();
+			} catch (InstantiationException | InvocationTargetException | IllegalAccessException e) {
 				System.err.println("Whoops!");
-			} catch (IllegalAccessException e) {
-				System.err.println("Whoops!");
+			} catch (NoSuchMethodException e) {
+				System.err.println("No such method found!");
 			}
 		}
 	}
@@ -175,6 +176,25 @@ public class Card {
 			BasicCommands.drawUnit(out, summonedUnit, clickedTile);
 			BasicCommands.setUnitAttack(out, summonedUnit, summonedUnit.getAttack());
 			BasicCommands.setUnitHealth(out, summonedUnit, summonedUnit.getHealth());
+		}
+	}
+
+	/// Auto-decides on whether to use spell highlighting method or summon highlighting based on isCreature attribute.
+	public Set<Tile> getTargets(Player player, Board board) {
+		Set<Tile> targets =  new HashSet<>();
+		if (this.isCreature()) {
+			targets = BoardLogic.findValidSummonTiles(player, board);
+		} else {
+			targets = this.spell.validTargets(player, board);
+		}
+		return targets;
+	}
+
+	public void highlightTargets(ActorRef out, Player player, Board board) {
+		if (this.isCreature()) {
+			BoardLogic.highlightSummonTiles(out, player, board);
+		} else {
+			this.spell.highlightTargets(out, player, board);
 		}
 	}
 

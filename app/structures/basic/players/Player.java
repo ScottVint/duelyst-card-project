@@ -8,6 +8,7 @@ import java.util.Map;
 
 import commands.BasicCommands;
 import structures.GameState;
+import structures.basic.Tile;
 import structures.basic.unittypes.BetterUnit;
 import structures.basic.Card;
 import structures.basic.Deck;
@@ -128,12 +129,20 @@ public class Player {
 
 	public void useCard(ActorRef out,
 											 GameState gameState,
+											 Player player,
 											 int cardIndex,
+											 Tile clickedTile,
 											 int manaCost) {
 
 		int newMana = mana - manaCost;
 		gameState.getPlayer1().setMana(out, newMana);
+		Card card = hand.get(cardIndex);
 
+		if (card.isCreature()) {
+			card.summon(out, gameState, player, clickedTile, gameState.getBoard());
+		} else {
+			card.getSpell().cast(out, gameState, player, clickedTile, gameState.board, cardIndex);
+		}
 
 		BasicCommands.deleteCard(out, cardIndex + 1);
 		gameState.getPlayer1().getHand().remove(cardIndex);
