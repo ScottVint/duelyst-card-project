@@ -2,7 +2,7 @@ package structures.basic.players;
 
 import akka.actor.ActorRef;
 import commands.BasicCommands;
-import structures.basic.BetterUnit;
+import structures.basic.unittypes.BetterUnit;
 import utils.BasicObjectBuilders;
 import utils.StaticConfFiles;
 
@@ -33,6 +33,14 @@ public class HumanPlayer extends Player {
         this.avatar = (BetterUnit) BasicObjectBuilders.loadUnit(StaticConfFiles.humanAvatar, 0, BetterUnit.class); // TODO Replace 0 with dynamic ID function
     }
 
+    @Override
+    public boolean enoughMana(ActorRef out, int manaCost) {
+        boolean hasEnough = manaCost < mana;
+        if (!hasEnough) {
+            BasicCommands.addPlayer1Notification(out, "Not enough mana.", 2);
+        }
+        return hasEnough;
+    }
     @Override
     public String toString() {
         return "Player 1";

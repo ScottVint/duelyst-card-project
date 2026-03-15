@@ -1,9 +1,7 @@
 import org.junit.Test;
-import structures.basic.BetterUnit;
+import structures.basic.unittypes.BetterUnit;
 import structures.basic.players.AIPlayer;
 import structures.basic.players.HumanPlayer;
-
-import static org.junit.Assert.*;
 
 public class PlayerTest {
 

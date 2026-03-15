@@ -2,7 +2,7 @@ package structures.logic;
 
 import akka.actor.ActorRef;
 import structures.GameState;
-import structures.basic.Unit;
+import structures.basic.unittypes.Unit;
 import structures.basic.players.Player;
 
 import java.util.Timer;

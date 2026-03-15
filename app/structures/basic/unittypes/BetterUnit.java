@@ -1,4 +1,4 @@
-package structures.basic;
+package structures.basic.unittypes;
 
 import java.util.HashSet;
 import java.util.Set;

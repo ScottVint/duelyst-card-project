@@ -23,8 +23,8 @@ public class OtherClicked implements EventProcessor {
 
 	@Override
 	public void processEvent(ActorRef out, GameState gameState, JsonNode message) {
-		gameState.setSelectedUnit(null);
-		gameState.setSelectedHandPosition(null);
+		gameState.selectedUnit = null;
+		gameState.selectedHandPosition = null;
 		BoardLogic.clearSelection(out, gameState.board);
 	}
 

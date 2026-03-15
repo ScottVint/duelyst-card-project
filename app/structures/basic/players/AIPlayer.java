@@ -2,7 +2,7 @@ package structures.basic.players;
 
 import akka.actor.ActorRef;
 import commands.BasicCommands;
-import structures.basic.BetterUnit;
+import structures.basic.unittypes.BetterUnit;
 import utils.BasicObjectBuilders;
 import utils.StaticConfFiles;
 

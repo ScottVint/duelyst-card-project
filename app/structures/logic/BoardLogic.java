@@ -6,9 +6,8 @@ import structures.GameState;
 import structures.basic.Board;
 import structures.basic.Card;
 import structures.basic.Tile;
-import structures.basic.Unit;
+import structures.basic.unittypes.Unit;
 import structures.basic.players.Player;
-import utils.BasicObjectBuilders;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -59,13 +58,13 @@ public class BoardLogic {
 		return neighbours;
 	}
 
-	public static Set<Tile> findValidMovement(Tile startingTile, int range, Unit unit, Board board) {
+	public static Set<Tile> findValidMovement(Tile startingTile, Unit unit, Board board) {
 		Set<Tile> result = new HashSet<>();
 		Player unitOwner = unit.getOwner();
 		int startx = startingTile.getTilex();
 		int starty = startingTile.getTiley();
 
-		int maxOffset = range - 1;
+		int maxOffset = 1;
 		for (int x = 0; x < maxOffset; x++) {
 			if (board.getTiles()[startx + x][starty].getUnit().getOwner() != unitOwner) {
 				break;
@@ -81,16 +80,12 @@ public class BoardLogic {
 		return result;
 	}
 
-	public static Set<Tile> findValidMovement(Tile startingTile, Unit unit, Board board) {
-		return findValidMovement(startingTile, 2, unit, board);
-	}
-
 
 	/// Searches for all valid tiles, then highlights them.
 	/// Enemy units block pathfinding.
 	public static void highlightMovement(ActorRef out, Tile startingTile, Unit unit, Board board) {
 		int range = 2; //unit.getMovement(); TODO create separate unit movement stats
-		Set<Tile> targets = findValidMovement(startingTile, range,  unit, board);
+		Set<Tile> targets = findValidMovement(startingTile, unit, board);
 		for (Tile target : targets) {
 			BasicCommands.drawTile(out, target, 1);
 			blink();
@@ -217,5 +212,24 @@ public class BoardLogic {
 	}
 
 // TODO: add spell target highlighting
+
+	public static void moveSelectedUnit(ActorRef out, GameState gameState, Tile destination, Board board) {
+		Unit selectedUnit = gameState.getSelectedUnit();
+		Tile origin = board.getTile(selectedUnit.getPosition().getTilex(), selectedUnit.getPosition().getTiley());
+		if (selectedUnit == null) return;
+
+		if (findValidMovement(origin, selectedUnit, board).contains(destination)) {
+			gameState.movingUnit = selectedUnit;
+			gameState.moveTargetTile = destination;
+			gameState.unitMoving = true;
+		}
+
+		BoardLogic.clearSelection(out, board);
+		gameState.selectedUnit = null;
+		gameState.selectedHandPosition = null;
+
+		BasicCommands.moveUnitToTile(out, selectedUnit, destination);
+
+	}
 }
 

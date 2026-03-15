@@ -1,9 +1,10 @@
-package structures.basic;
+package structures.basic.unittypes;
 
 import akka.actor.ActorRef;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import commands.BasicCommands;
+import structures.basic.*;
 import structures.basic.players.Player;
 
 /**
@@ -31,24 +32,35 @@ public class Unit {
 	Position position;
 	UnitAnimationSet animations;
 	ImageCorrection correction;
-	/** The player who owns this unit. Not serialised to JSON. @author Minghao */
+	/**
+	 * The player who owns this unit. Not serialised to JSON. @author Minghao
+	 */
 	@JsonIgnore
 	Player owner;
-	/** Maximum hit points of this unit. @author Minghao */
+	/**
+	 * Maximum hit points of this unit. @author Minghao
+	 */
 	int maxHealth;
-	/** Current hit points of this unit. @author Minghao */
+	/**
+	 * Current hit points of this unit. @author Minghao
+	 */
 	int health;
-	/** Attack damage this unit deals per strike. @author Minghao */
+	/**
+	 * Attack damage this unit deals per strike. @author Minghao
+	 */
 	int attack;
+	public boolean hasMoved = true;
+	public boolean hasAttacked = true;
 
-	public Unit() {}
+	public Unit() {
+	}
 
 	public Unit(int id, UnitAnimationSet animations, ImageCorrection correction) {
 		super();
 		this.id = id;
 		this.animation = UnitAnimationType.idle;
 
-		position = new Position(0,0,0,0);
+		position = new Position(0, 0, 0, 0);
 		this.correction = correction;
 		this.animations = animations;
 	}
@@ -58,15 +70,14 @@ public class Unit {
 		this.id = id;
 		this.animation = UnitAnimationType.idle;
 
-		position = new Position(currentTile.getXpos(),currentTile.getYpos(),currentTile.getTilex(),currentTile.getTiley());
+		position = new Position(currentTile.getXpos(), currentTile.getYpos(), currentTile.getTilex(), currentTile.getTiley());
 		this.correction = correction;
 		this.animations = animations;
 	}
 
 
-
 	public Unit(int id, UnitAnimationType animation, Position position, UnitAnimationSet animations,
-			ImageCorrection correction) {
+				ImageCorrection correction) {
 		super();
 		this.id = id;
 		this.animation = animation;
@@ -79,12 +90,15 @@ public class Unit {
 	public int getId() {
 		return id;
 	}
+
 	public void setId(int id) {
 		this.id = id;
 	}
+
 	public UnitAnimationType getAnimation() {
 		return animation;
 	}
+
 	public void setAnimation(UnitAnimationType animation) {
 		this.animation = animation;
 	}
@@ -119,12 +133,14 @@ public class Unit {
 		return health;
 	}
 
-	/** Sets health. Ensures health does not go above maximum.
+	/**
+	 * Sets health. Ensures health does not go above maximum.
+	 *
 	 * @param value
 	 * @author Scott
 	 */
-	public void setHealth (ActorRef out, int value) {
-		if(value < 0) {
+	public void setHealth(ActorRef out, int value) {
+		if (value < 0) {
 			health = 0;
 		} else if (value > maxHealth) {
 			health = maxHealth;
@@ -134,18 +150,21 @@ public class Unit {
 	}
 
 	public void setHealth(ActorRef out, Player player, int health) {
-		setHealth(out,health);
+		setHealth(out, health);
 	}
 
 	/**
 	 * Returns the player who owns this unit.
+	 *
 	 * @author Minghao
 	 */
 	public Player getOwner() {
 		return owner;
 	}
+
 	/**
 	 * Sets the owning player of this unit.
+	 *
 	 * @param owner the player to assign as owner
 	 * @author Minghao
 	 */
@@ -172,20 +191,22 @@ public class Unit {
 
 	@JsonIgnore
 	public void setPositionByTile(Tile tile) {
-		position = new Position(tile.getXpos(),tile.getYpos(),tile.getTilex(),tile.getTiley());
+		position = new Position(tile.getXpos(), tile.getYpos(), tile.getTilex(), tile.getTiley());
 	}
+
 
 	/**
 	 * This command automatically calls setUnitHealth to the
 	 * new health value based on the damage taken, and
 	 * displays it to the UI.
+	 *
 	 * @param out
 	 * @param damage
 	 * @author Scott
 	 */
 	@JsonIgnore
 	public void takeDamage(ActorRef out, int damage) {
-		setHealth(out, health-damage);
+		setHealth(out, health - damage);
 		BasicCommands.setUnitHealth(out, this, health);
 	}
 
@@ -193,4 +214,74 @@ public class Unit {
 	public void takeDamage(ActorRef out, Player player, int damage) {
 		takeDamage(out, damage);
 	}
+
+	/// Way to find a unit's related subclass since I can't think of any other way to do this
+	public static Class<? extends Unit> findUnitClass(String configFile) {
+		Class<? extends Unit> unitClass = Unit.class;
+
+		switch (configFile) {
+			case "conf/gameconfs/units/bad_omen.json":
+				unitClass = BadOmen.class;
+				break;
+
+			case "conf/gameconfs/units/bloodmoon_priestess.json":
+				unitClass = BloodmoonPriestess.class;
+				break;
+
+			case "conf/gameconfs/units/gloom_chaser.json":
+				unitClass = GloomChaser.class;
+				break;
+
+			case "conf/gameconfs/units/ironcliff_guardian.json":
+				unitClass = IroncliffGuardian.class;
+				break;
+
+			case "conf/gameconfs/units/nightsorrow_assassin.json":
+				unitClass = NightsorrowAssassin.class;
+				break;
+
+			case "conf/gameconfs/units/rock_pulveriser.json":
+				unitClass = RockPulveriser.class;
+				break;
+
+			case "conf/gameconfs/units/saberspine_tiger.json":
+				unitClass = SaberspineTiger.class;
+				break;
+
+			//This is disgusting and I hate it
+			case "conf/gameconfs/units/shadow_watcher.json":
+				unitClass = ShadowWatcher.class;
+				break;
+
+			case "conf/gameconfs/units/shadowdancer.json":
+				unitClass = Shadowdancer.class;
+				break;
+
+			case "conf/gameconfs/units/silverguard_knight.json":
+				unitClass = SilverguardKnight.class;
+				break;
+
+			case "conf/gameconfs/units/silverguard_squire.json":
+				unitClass = SilverguardSquire.class;
+				break;
+
+			case "conf/gameconfs/units/skyrock_golem.json":
+				unitClass = SkyrockGolem.class;
+				break;
+
+			case "conf/gameconfs/units/swamp_entangler.json":
+				unitClass = SwampEntangler.class;
+				break;
+
+			case "conf/gameconfs/units/wraithling.json":
+				unitClass = Wraithling.class;
+				break;
+
+			case "conf/gameconfs/units/young_flamewing.json":
+				unitClass = YoungFlamewing.class;
+				break;
+		}
+	return unitClass;
+	}
 }
+

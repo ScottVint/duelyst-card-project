@@ -2,12 +2,17 @@ package structures.basic.players;
 import akka.actor.ActorRef;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import commands.BasicCommands;
-import structures.basic.BetterUnit;
+import structures.GameState;
+import structures.basic.unittypes.BetterUnit;
 import structures.basic.Card;
 import structures.basic.Deck;
+import structures.basic.unittypes.Unit;
+import structures.logic.BoardLogic;
 
 /**
  * A basic representation of the Player. A player
@@ -28,7 +33,7 @@ public class Player {
 	protected BetterUnit avatar;
 	protected Deck deck;
 	protected List<Card> hand;
-	// TODO make units hashmap?
+	protected Map<Integer, Unit> unitList = new HashMap<>();
 
 	public Player() {
 		super();
@@ -94,6 +99,10 @@ public class Player {
 
 	public List<Card> getHand() { return hand; }
 
+	public Map<Integer, Unit> getUnitList() { return unitList; }
+
+	public boolean enoughMana(ActorRef out, int manaCost) { return  manaCost < mana; }
+
 	/**
 	 * Draws the top card from the deck into the hand. Does nothing if the deck is empty or full.
 	 * @author Minghao
@@ -115,6 +124,22 @@ public class Player {
 		for (Card card : hand) {
 			BasicCommands.drawCard(out, card, hand.indexOf(card) + 1, 0);
 		}
+	}
+
+	public void useCard(ActorRef out,
+											 GameState gameState,
+											 int cardIndex,
+											 int manaCost) {
+
+		int newMana = mana - manaCost;
+		gameState.getPlayer1().setMana(out, newMana);
+
+
+		BasicCommands.deleteCard(out, cardIndex + 1);
+		gameState.getPlayer1().getHand().remove(cardIndex);
+		drawHand(out);
+
+		BoardLogic.clearSelection(out, gameState.board);
 	}
 
 	/// Gets the current unitId, then increments the count.
