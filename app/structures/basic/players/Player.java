@@ -102,7 +102,7 @@ public class Player {
 
 	public Map<Integer, Unit> getUnitList() { return unitList; }
 
-	public boolean enoughMana(ActorRef out, int manaCost) { return  manaCost < mana; }
+	public boolean enoughMana(ActorRef out, int manaCost) { return  mana >= manaCost; }
 
 	/**
 	 * Draws the top card from the deck into the hand. Does nothing if the deck is empty or full.

@@ -20,13 +20,14 @@ public class DarkTerminus extends Spell {
         Set<Tile> targets = new HashSet<Tile>();
         for (Tile[] row : board.getTiles()) {
             for (Tile tile : row) {
-                if (tile.getUnit().getOwner() != player && !(tile.getUnit() instanceof BetterUnit)) {}
+                if (tile.getUnit() != null &&
+                        tile.getUnit().getOwner() != player && !(tile.getUnit() instanceof BetterUnit)) {
                     targets.add(tile);
+                }
             }
         }
         return targets;
     }
-
     public void cast(ActorRef out, GameState gameState,
                      Player player, Tile clickedTile,
                      Board board, int cardIndex) {

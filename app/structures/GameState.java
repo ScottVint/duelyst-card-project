@@ -8,6 +8,7 @@ import structures.basic.players.AIPlayer;
 import structures.basic.players.HumanPlayer;
 import structures.basic.players.Player;
 import structures.basic.unittypes.Unit;
+import structures.logic.AI;
 import structures.logic.CombatLogic;
 
 import java.util.HashSet;
@@ -117,12 +118,18 @@ public class GameState {
 	}
 
 	public void endTurn(ActorRef out, Player playerEndingTurn, Player playerStartingTurn) {
+		if (!player1Turn) {
+			turnCount++;
+		}
 		player1Turn = !player1Turn;
 		int startingMana = Math.min(turnCount + 1, Player.getMaxMana());
 		playerStartingTurn.setMana(out, startingMana);
 		playerEndingTurn.setMana(out, 0);
 		for (Unit unit : playerEndingTurn.getUnitList().values()) {
 			unit.hasAttacked = false; unit.hasMoved = false;
+		}
+		if (playerEndingTurn instanceof HumanPlayer) {
+			AI.AILogic.runAI(out, this, player1, player2);
 		}
 	}
 }

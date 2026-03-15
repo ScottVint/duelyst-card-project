@@ -48,9 +48,15 @@ public class BoardLogic {
 		Set<Tile> neighbours = new HashSet<>();
 		int[] xoffset = {1, -1 , 0, 0};
 		int[] yoffset = {0, 0, 1, -1};
+
+		int startingx = startingTile.getTilex();
+		int startingy = startingTile.getTiley();
 		for (int i = 0; i < xoffset.length; i++) {
 			try {
-				neighbours.add(board.getTiles()[startingTile.getTilex() + xoffset[i]][startingTile.getTiley() + yoffset[i]]);
+				if (board.getTile(startingx + xoffset[i], startingy + yoffset[i]).getUnit() == null) {
+
+					neighbours.add(board.getTiles()[startingTile.getTilex() + xoffset[i]][startingTile.getTiley() + yoffset[i]]);
+				}
 			} catch (ArrayIndexOutOfBoundsException e) {
 				continue;
 			}
@@ -64,17 +70,18 @@ public class BoardLogic {
 		int startx = startingTile.getTilex();
 		int starty = startingTile.getTiley();
 
-		int maxOffset = 1;
-		for (int x = 0; x < maxOffset; x++) {
-			if (board.getTiles()[startx + x][starty].getUnit().getOwner() != unitOwner) {
-				break;
-			}
-			for (int y = 0; y < maxOffset; y++) {
-				if (board.getTiles()[startx + x][starty + y].getUnit().getOwner() != unitOwner) {
-					break;
+		int[] xoffset = {1, -1 , 0, 0};
+		int[] yoffset = {0, 0, 1, -1};
+
+		for (int i = 0; i < xoffset.length; i++) {
+			try {
+				Tile currTile = board.getTile(startx + xoffset[i], starty + yoffset[i]);
+				if (currTile.getUnit() == null) {
+					result.addAll(findNeighbours(currTile, board));
+					result.add(currTile);
 				}
-				Tile currTile = board.getTiles()[startx + x][starty + y];
-				result.addAll(findNeighbours(currTile, board));
+			} catch (ArrayIndexOutOfBoundsException e) {
+				continue;
 			}
 		}
 		return result;
@@ -96,8 +103,8 @@ public class BoardLogic {
 	/// Searches both cardinal and diagonal directions.
 	public static Set<Tile> findAdjacentTiles(Tile startingTile, Board board) {
 		Set<Tile> result = new HashSet<>();
-		int x = board.getX();
-		int y = board.getY();
+		int x = startingTile.getTilex();
+		int y = startingTile.getTiley();
 
 		int[] xoffset = {1, -1, 0,  0, 1,  1, -1, -1};
 		int[] yoffset = {0,  0, 1, -1, 1, -1,  1, -1};
@@ -115,7 +122,7 @@ public class BoardLogic {
 		Set<Tile> targets = findAdjacentTiles(startingTile, board);
 		Set<Tile> validTargets = new HashSet<>();
 		for (Tile target : targets) {
-			if (target.getUnit().getOwner() != unit.getOwner()) {
+			if (target.getUnit() != null && target.getUnit().getOwner() != unit.getOwner()) {
 				validTargets.add(target);
 			}
 		}
@@ -128,7 +135,7 @@ public class BoardLogic {
 		// Find all allied units on the board
 		for (Tile[] row : boardTiles) {
 			for (Tile tile : row) {
-				if (tile.getUnit().getOwner() == summoner) {
+				if (tile.getUnit() != null && tile.getUnit().getOwner() == summoner) {
 				alliedUnits.add(tile);
 				}
 			}

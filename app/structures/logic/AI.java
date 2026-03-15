@@ -25,9 +25,6 @@ public class AI {
             @Override
             public void run() {
                 hasTime = false;
-                if (timer != null) {
-                    timer.cancel();
-                }
             }
         }
 
@@ -66,13 +63,9 @@ public class AI {
 
             while ((canSummon || canMove || canAttack) && hasTime) {
                 // TODO: implement actual AI later
-                break;
+                continue;
             }
-
-            canSummon = true;
-            canMove = true;
-            canAttack = true;
-            hasTime = true;
+            gs.endTurn(out, p2, p1);
         }
     }
 }

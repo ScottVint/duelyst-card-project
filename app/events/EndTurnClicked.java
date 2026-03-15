@@ -42,7 +42,7 @@ public class EndTurnClicked implements EventProcessor {
 			gameState.endTurn(out, gameState.getPlayer1(), gameState.getPlayer2());
 		} else {
 			// Player 2 ends their turn → Player 1's turn begins (new round)
-			gameState.turnCount++;
+
 			gameState.endTurn(out, gameState.getPlayer2(), gameState.getPlayer1());
 
 		}
