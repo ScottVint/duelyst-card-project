@@ -5,9 +5,7 @@ import commands.BasicCommands;
 
 // Called AIPlayer for our purposes, but more realistically
 // can be used as a player 2.
-//                                      --Scott
 public class AIPlayer extends Player {
-
 
     public AIPlayer() {
         super();
@@ -24,7 +22,6 @@ public class AIPlayer extends Player {
         super.setMana(out, mana);
         BasicCommands.setPlayer2Mana(out, this);
     }
-
 
 
 }

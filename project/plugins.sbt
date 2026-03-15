@@ -5,5 +5,3 @@ libraryDependencySchemes += "org.scala-lang.modules" %% "scala-xml" % VersionSch
 addSbtPlugin("com.typesafe.sbt" % "sbt-less" % "1.1.2")
 
 addSbtPlugin("com.typesafe.sbt" % "sbt-coffeescript" % "1.0.2")
-
-addSbtPlugin("com.typesafe.sbteclipse" % "sbteclipse-plugin" % "5.2.4")

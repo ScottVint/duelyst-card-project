@@ -64,4 +64,15 @@ public class EndTurnClicked implements EventProcessor {
 		}
 	}
 
+	//TODO Merge with proper method
+	private void redrawPlayerHand(ActorRef out, GameState gameState) {
+		for (int i = 1; i <= 6; i++) {
+			BasicCommands.deleteCard(out, i);
+		}
+
+		List<Card> hand = gameState.getPlayer1().getHand();
+		for (int i = 0; i < hand.size() && i < 6; i++) {
+			BasicCommands.drawCard(out, hand.get(i), i + 1, 0);
+		}
+	}
 }
