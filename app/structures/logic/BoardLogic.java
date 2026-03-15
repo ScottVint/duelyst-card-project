@@ -171,47 +171,13 @@ public class BoardLogic {
 		}
 	}
 
-	public static void showSpellPreview(ActorRef out, GameState gameState, Card card) {
-		//TODO implement cards as subclasses
-		final String HORN_OF_THE_FORSAKEN = "Horn of the Forsaken";
-		final String WRAITHLING_SWARM = "Wraithling Swarm";
-		final String TRUESTRIKE = "Truestrike";
-		final String SUNDROP_ELIXIR = "Sundrop Elixir";
-		final String DARK_TERMINUS = "Dark Terminus";
-
-		String cardName = card.getCardname();
-		switch (cardName) {
-			case HORN_OF_THE_FORSAKEN:
-				BasicCommands.addPlayer1Notification(out, "Click your avatar to equip Horn", 2);
-
-				int ax = gameState.getPlayer1().getAvatar().getPosition().getTilex();
-				int ay = gameState.getPlayer1().getAvatar().getPosition().getTiley();
-				Tile avatarTile = gameState.getBoard().getTile(ax, ay);
-				BasicCommands.drawTile(out, avatarTile, 1);
-				break;
-
-			case WRAITHLING_SWARM:
-				BasicCommands.addPlayer1Notification(out, "Click an empty tile to cast Wraithling Swarm", 2);
-				break;
-
-			case TRUESTRIKE:
-				BasicCommands.addPlayer1Notification(out, "Click an enemy unit for Truestrike", 2);
-				break;
-
-			case SUNDROP_ELIXIR:
-				BasicCommands.addPlayer1Notification(out, "Click a unit to heal 5", 2);
-				break;
-
-			case DARK_TERMINUS:
-				BasicCommands.addPlayer1Notification(out, "Click an enemy non-avatar unit", 2);
-				break;
-
-			default:
-				BasicCommands.addPlayer1Notification(out, "Spell/artifact not implemented yet.", 2);
-		}
+	public static void findValidSpellTiles(ActorRef out, Player player, Card selectedCard, Board board) {
+		selectedCard.getSpell().validTargets(player, board);
 	}
 
-// TODO: add spell target highlighting
+	public static void highlightSpellTiles(ActorRef out, Player player, Card selectedCard, Board board) {
+		selectedCard.getSpell().highlightTargets(out, player, board);
+	}
 
 	public static void moveSelectedUnit(ActorRef out, GameState gameState, Tile destination, Board board) {
 		Unit selectedUnit = gameState.getSelectedUnit();

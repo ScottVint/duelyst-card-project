@@ -8,8 +8,7 @@ import structures.basic.players.AIPlayer;
 import structures.basic.players.HumanPlayer;
 import structures.basic.players.Player;
 import structures.basic.unittypes.Unit;
-import utils.BasicObjectBuilders;
-import utils.StaticConfFiles;
+import structures.logic.CombatLogic;
 
 /**
  * This class can be used to hold information about the on-going game.
@@ -55,15 +54,6 @@ public class GameState {
 
 	public int getNextUnitId() { return nextUnitId++; }
 
-	public void equipPlayer1Horn() { player1HornCharges = 3; }
-
-	public boolean player1HasHorn() { return player1HornCharges > 0; }
-
-	public void usePlayer1HornCharge() {
-		if (player1HornCharges > 0) {
-			player1HornCharges--;
-		}
-	}
 
 	//TODO Create CombatLogic class
 	/**
@@ -102,7 +92,7 @@ public class GameState {
 		}
 
 		if (target.getHealth() <= 0) {
-			death(out, target);
+			CombatLogic.death(out, this, target);
 		}
 	}
 
@@ -126,55 +116,12 @@ public class GameState {
 		}
 	}
 
-	/**
-	 * Remove a dead unit from the board and UI.
-	 */
-	public void death(ActorRef out, Unit target) {
-		if (target == null) return;
-
-		if (target.getPosition() != null) {
-			Tile tile = board.getTile(target.getPosition().getTilex(), target.getPosition().getTiley());
-			if (tile != null) {
-				tile.setUnit(null);
-			}
-		}
-		BasicCommands.deleteUnit(out, target);
-	}
-
-	//TODO set to summon method
-	/**
-	 * Summon a 1/1 Wraithling token to a tile.
-	 */
-	public Unit summonWraithling(ActorRef out, Tile tile, Player owner) {
-		if (tile == null || owner == null) return null;
-		if (tile.getUnit() != null) return null;
-
-		Unit wraithling = BasicObjectBuilders.loadUnit(
-				StaticConfFiles.wraithling,
-				getNextUnitId(),
-				Unit.class
-		);
-
-		wraithling.setOwner(owner);
-		wraithling.setAttack(1);
-		wraithling.setMaxHealth(1);
-		wraithling.setHealth(out, 1);
-		wraithling.setPositionByTile(tile);
-		tile.setUnit(wraithling);
-
-		BasicCommands.drawUnit(out, wraithling, tile);
-		BasicCommands.setUnitAttack(out, wraithling, wraithling.getAttack());
-		BasicCommands.setUnitHealth(out, wraithling, wraithling.getHealth());
-
-		return wraithling;
-	}
-
 	public void endTurn(ActorRef out, Player playerEndingTurn, Player playerStartingTurn) {
 		player1Turn = !player1Turn;
 		int startingMana = Math.min(turnCount + 1, Player.getMaxMana());
 		playerStartingTurn.setMana(out, startingMana);
 		playerEndingTurn.setMana(out, 0);
-		for (Unit unit : playerStartingTurn.getUnitList().values()) {
+		for (Unit unit : playerEndingTurn.getUnitList().values()) {
 			unit.hasAttacked = false; unit.hasMoved = false;
 		}
 	}

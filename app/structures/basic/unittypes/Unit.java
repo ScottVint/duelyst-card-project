@@ -4,8 +4,11 @@ import akka.actor.ActorRef;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import commands.BasicCommands;
+import structures.GameState;
 import structures.basic.*;
 import structures.basic.players.Player;
+import structures.logic.BoardLogic;
+import utils.BasicObjectBuilders;
 
 /**
  * This is a representation of a Unit on the game board.
@@ -282,6 +285,32 @@ public class Unit {
 				break;
 		}
 	return unitClass;
+	}
+
+	//Nowhere else to put this...
+	public static Wraithling createWraithling(ActorRef out, Player player, GameState gameState) {
+		Wraithling wraithling = (Wraithling) BasicObjectBuilders.loadUnit("conf/gameconfs/units/wraithling.json", gameState.getNextUnitId(), Wraithling.class);
+
+		wraithling.setOwner(player);
+		wraithling.setHealth(out, 1);
+		wraithling.setAttack(1);
+		wraithling.setMaxHealth(wraithling.getHealth());
+		player.getUnitList().put(wraithling.getId(), wraithling);
+
+		System.out.println("Unit created: " + wraithling.getClass());
+
+		return wraithling;
+	}
+
+	public static void summonWraithling(ActorRef out, Tile clickedTile, Player player, GameState gameState) {
+			Wraithling wraithling = createWraithling(out, player, gameState);
+
+			wraithling.setPositionByTile(clickedTile);
+			clickedTile.setUnit(wraithling);
+
+			BasicCommands.drawUnit(out, wraithling, clickedTile);
+			BasicCommands.setUnitAttack(out, wraithling, wraithling.getAttack());
+			BasicCommands.setUnitHealth(out, wraithling, wraithling.getHealth());
 	}
 }
 

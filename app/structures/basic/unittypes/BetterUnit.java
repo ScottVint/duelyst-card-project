@@ -11,6 +11,8 @@ import utils.StaticConfFiles;
 public class BetterUnit extends Unit {
 
 	Set<String> keywords;
+	int hornCharges = 0;
+	public final int MAX_HORN_CHARGES = 3;
 
 	public BetterUnit() {}
 	
@@ -31,6 +33,19 @@ public class BetterUnit extends Unit {
 	public void setHealth(ActorRef out, Player player, int health) {
 		super.setHealth(out, health);
 		player.setHealth(out, this.health);
+	}
+
+	public int getHornCharges() {return hornCharges;}
+	public void setHornCharges(int charge) {
+		if (charge < 0) {
+			this.hornCharges = 0;
+		}
+		else if (hornCharges > 3) {
+			this.hornCharges = 3;
+		}
+		else {
+			this.hornCharges = charge;
+		}
 	}
 
 	/**

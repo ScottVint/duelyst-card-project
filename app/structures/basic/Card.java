@@ -131,103 +131,13 @@ public class Card {
 		this.unitConfig = unitConfig;
 	}
 
-	//TODO Unify to abstract cast() method
-	public static void useNonCreatureCardOnEmptyTile(ActorRef out,
-													 GameState gameState,
-													 Card card,
-													 Tile clickedTile,
-													 int cardIndex) {
-
-		String cardName = card.getCardname();
-
-		switch (cardName) {
-			case "Wraithling Swarm":
-				spell.cast(out, gameState, clickedTile, cardIndex);
-				break;
-
-			case "Horn of the Forsaken":
-				BasicCommands.addPlayer1Notification(out, "Horn must target your avatar", 2);
-				break;
-
-			default:
-				BasicCommands.addPlayer1Notification(out, "This card must target a unit.", 2);
-				break;
-		}
-	}
-
-	public static void useNonCreatureCardOnUnit(ActorRef out,
-												GameState gameState,
-												Card card,
-												Unit targetUnit,
-												int cardIndex) {
-
-		String cardName = card.getCardname();
-
-		switch (cardName) {
-
-			case "Horn of the Forsaken":
-				if (targetUnit != gameState.getPlayer1().getAvatar()) {
-					BasicCommands.addPlayer1Notification(out, "Horn must target your avatar", 2);
-				} else if (gameState.getPlayer1().getMana() < card.getManacost()) {
-					BasicCommands.addPlayer1Notification(out, "Not enough mana", 2);
-				} else {
-					gameState.equipPlayer1Horn();
-					gameState.player1.useCard(out, gameState, cardIndex, card.getManacost());
-					BasicCommands.addPlayer1Notification(out, "Horn equipped (3)", 2);
-				}
-				break;
-
-			case "Truestrike":
-				if (targetUnit.getOwner() != gameState.getPlayer2()) { //TODO Use subclasses, also delete duplicate code
-					BasicCommands.addPlayer1Notification(out, "Truestrike must target an enemy unit", 2);
-				} else if (gameState.getPlayer1().getMana() < card.getManacost()) {
-					BasicCommands.addPlayer1Notification(out, "Not enough mana", 2);
-				} else {
-					gameState.dealDirectDamage(out, targetUnit, 2); //TODO Create DamageLogic Class
-					gameState.player1.useCard(out, gameState, cardIndex, card.getManacost());
-					BasicCommands.addPlayer1Notification(out, "Truestrike cast", 2);
-				}
-				break;
-
-			case "Sundrop Elixir":
-				if (gameState.getPlayer1().getMana() < card.getManacost()) {
-					BasicCommands.addPlayer1Notification(out, "Not enough mana", 2);
-				} else {
-					gameState.healUnit(out, targetUnit, 5);
-
-					gameState.player1.useCard(out, gameState, cardIndex, card.getManacost());
-					BasicCommands.addPlayer1Notification(out, "Sundrop Elixir cast", 2);
-				}
-				break;
-
-			case "Dark Terminus":
-				if (targetUnit.getOwner() != gameState.getPlayer2()) {
-					BasicCommands.addPlayer1Notification(out, "Dark Terminus must target an enemy unit", 2);
-				} else if (targetUnit == gameState.getPlayer2().getAvatar()) {
-					BasicCommands.addPlayer1Notification(out, "Dark Terminus cannot target enemy avatar", 2);
-				} else if (gameState.getPlayer1().getMana() < card.getManacost()) {
-					BasicCommands.addPlayer1Notification(out, "Not enough mana", 2);
-				} else {
-					Tile deathTile = gameState.getBoard().getTile(
-							targetUnit.getPosition().getTilex(),
-							targetUnit.getPosition().getTiley()
-					);
-
-
-					gameState.death(out, targetUnit);
-					gameState.summonWraithling(out, deathTile, gameState.getPlayer1());
-
-					gameState.player1.useCard(out, gameState, cardIndex, card.getManacost());
-					BasicCommands.addPlayer1Notification(out, "Dark Terminus cast", 2);
-				}
-				break;
-
-			default:
-				BasicCommands.addPlayer1Notification(out, "Spell/artifact not implemented yet.", 2);
-		}
+	public Spell getSpell() {
+		return this.spell;
 	}
 
 
+	///  Creates a unit and casts it to its relevant subclass.
+	///  Takes information from the BigCard to fill in attributes.
 	public Unit createUnit(ActorRef out, GameState gameState, Player player) {
 		int handPosition = gameState.selectedHandPosition;
 		int cardIndex = handPosition - 1;
@@ -248,7 +158,8 @@ public class Card {
 		return summonedUnit;
 	}
 
-
+	/// Summons a unit from a card.
+	/// Needs a card so does not work with Wraithling specifically.
 	public void summon(ActorRef out, GameState gameState, Player player, Tile clickedTile, Board board) {
 		int handPosition = gameState.selectedHandPosition;
 		int cardIndex = handPosition - 1;
@@ -264,8 +175,6 @@ public class Card {
 			BasicCommands.drawUnit(out, summonedUnit, clickedTile);
 			BasicCommands.setUnitAttack(out, summonedUnit, summonedUnit.getAttack());
 			BasicCommands.setUnitHealth(out, summonedUnit, summonedUnit.getHealth());
-
-			player.useCard(out, gameState, cardIndex, card.getManacost());
 		}
 	}
 
