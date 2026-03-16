@@ -17,7 +17,7 @@ public abstract class Spell {
 
     public Set<Tile> validTargets(Player player, Board board) {return null;}
 
-    public void highlightTargets(ActorRef out, Player player, Board board) {
+        if (validTargets == null || validTargets.isEmpty()) {
         Set<Tile> validTargets = validTargets(player, board);
         if  (validTargets.isEmpty()) {
             BasicCommands.addPlayer1Notification(out, "No valid tiles!", 2);
