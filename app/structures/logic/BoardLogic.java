@@ -159,7 +159,7 @@ public class BoardLogic {
 	public static void highlightAttackTiles(ActorRef out, Tile startingTile, Unit unit, Board board) {
 		Set<Tile> targets = findValidAttackUnits(startingTile, unit, board);
 		for  (Tile target : targets) {
-			BasicCommands.drawTile(out, target, 3);
+			BasicCommands.drawTile(out, target, 2);
 			blink();
 		}
 	}
@@ -173,7 +173,7 @@ public class BoardLogic {
 	public static void highlightSummonTiles(ActorRef out, Player summoner, Board board) {
 		Set<Tile> targets = findValidSummonTiles(summoner, board);
 		for  (Tile target : targets) {
-			BasicCommands.drawTile(out, target, 2);
+			BasicCommands.drawTile(out, target, 1);
 			blink();
 		}
 	}

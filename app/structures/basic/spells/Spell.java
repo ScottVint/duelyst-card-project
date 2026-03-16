@@ -13,8 +13,8 @@ import java.util.Set;
 
 public abstract class Spell {
     @JsonIgnore
-    public Spell() {
-    }
+    public Spell() {}
+
     public Set<Tile> validTargets(Player player, Board board) {return null;}
 
     public void highlightTargets(ActorRef out, Player player, Board board) {
@@ -23,14 +23,15 @@ public abstract class Spell {
             BasicCommands.addPlayer1Notification(out, "No valid tiles!", 2);
         };
         for (Tile tile : validTargets) {
-            BasicCommands.drawTile(out, tile, 3);
-            for (int i = 10; i > 0; i--) {
+            BasicCommands.drawTile(out, tile, 2);
+
                 BoardLogic.blink();
             }
         }
-    }
+
 
     public void cast(ActorRef out, GameState gameState,
                      Player player, Tile clickedTile,
                      Board board, int cardIndex) {}
 }
+

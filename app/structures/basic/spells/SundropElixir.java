@@ -33,7 +33,7 @@ public class SundropElixir extends Spell {
         }
         ;
         for (Tile tile : validTargets) {
-            BasicCommands.drawTile(out, tile, 2);
+            BasicCommands.drawTile(out, tile, 1);
             BoardLogic.blink();
         }
     }

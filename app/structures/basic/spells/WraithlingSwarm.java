@@ -29,6 +29,19 @@ public class WraithlingSwarm extends Spell {
     }
 
     @Override
+    public void highlightTargets(ActorRef out, Player player, Board board) {
+        Set<Tile> validTargets = validTargets(player, board);
+        if (validTargets.isEmpty()) {
+            BasicCommands.addPlayer1Notification(out, "No valid tiles!", 2);
+        }
+        ;
+        for (Tile tile : validTargets) {
+            BasicCommands.drawTile(out, tile, 1);
+            BoardLogic.blink();
+        }
+    }
+
+    @Override
     public void cast(ActorRef out,
                      GameState gameState,
                      Player player,
