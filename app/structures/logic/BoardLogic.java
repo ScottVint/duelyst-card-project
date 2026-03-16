@@ -76,9 +76,12 @@ public class BoardLogic {
 		for (int i = 0; i < xoffset.length; i++) {
 			try {
 				Tile currTile = board.getTile(startx + xoffset[i], starty + yoffset[i]);
+				// If adjacent tile is empty or an ally unit, find the spaces around it
 				if (currTile.getUnit() == null) {
 					result.addAll(findNeighbours(currTile, board));
 					result.add(currTile);
+				} else if (currTile.getUnit().getOwner() == unitOwner) {
+					result.addAll(findNeighbours(currTile, board));
 				}
 			} catch (ArrayIndexOutOfBoundsException e) {
 				continue;

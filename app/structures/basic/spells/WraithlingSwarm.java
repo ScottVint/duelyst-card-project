@@ -21,10 +21,6 @@ public class WraithlingSwarm extends Spell {
     @Override
     public Set<Tile> validTargets(Player player, Board board) {
         Set<Tile> targets = BoardLogic.findValidSummonTiles(player, board);
-        System.out.println("Valid Tiles: ");
-        for  (Tile tile : targets) {
-            System.out.println(tile.getTilex() + "," + tile.getTiley());
-        }
         return targets;
     }
 

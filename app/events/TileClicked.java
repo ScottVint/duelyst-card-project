@@ -65,7 +65,20 @@ public class TileClicked implements EventProcessor {
             selectedCard = gameState.getPlayer1().getHand().get(cardIndex);
         }
 
-        // Clicked on a unit
+        // If a card is selected and a valid target is clicked, use the card on the target
+        if (selectedCard != null && gameState.highlightedTiles.contains(clickedTile)) {
+
+            // Check for mana first
+            if (gameState.player1.enoughMana(out, selectedCard.getManacost())) {
+                BasicCommands.deleteCard(out, gameState.selectedHandPosition);
+                gameState.getPlayer1().useCard(out, gameState,
+                        gameState.player1, cardIndex,
+                        clickedTile, selectedCard.getManacost()
+                );
+            }
+        }
+
+        // Clicked on a unit (no card selected)
         if (clickedTile.getUnit() != null) {
             Unit clickedUnit = clickedTile.getUnit();
 
@@ -80,27 +93,16 @@ public class TileClicked implements EventProcessor {
                 gameState.selectedUnit = clickedUnit;
                 BasicCommands.drawTile(out, clickedTile, 1); // white highlight
                 BoardLogic.highlightMovement(out, clickedTile, clickedUnit, board);
+                gameState.highlightedTiles = BoardLogic.findValidMovement(clickedTile, gameState.selectedUnit, board);
             }
 
             // Else, enemy unit is clicked
 
         }
 
-        // If a card is selected and a valid target is clicked, use the card on the target
-        else if (selectedCard != null && gameState.highlightedTiles.contains(clickedTile)) {
-
-            // Check for mana first
-            if (gameState.player1.enoughMana(out, selectedCard.getManacost())) {
-                BasicCommands.deleteCard(out, gameState.selectedHandPosition);
-                gameState.getPlayer1().useCard(out, gameState,
-                                               gameState.player1, cardIndex,
-                                               clickedTile, selectedCard.getManacost()
-                                               );
-            }
-        }
 
         // Empty tile + selected unit => try move
-        else if (gameState.getSelectedUnit() != null) {
+        else if (gameState.getSelectedUnit() != null && gameState.highlightedTiles.contains(clickedTile)) {
             BoardLogic.moveSelectedUnit(out, gameState, clickedTile, board);
         }
 
