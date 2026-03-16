@@ -21,6 +21,10 @@ public class Deck {
         }
         Collections.shuffle(cards);
 
+        for (Card card : cards) {
+            card.setSpell();
+        }
+
     }
 
     public Deck() {

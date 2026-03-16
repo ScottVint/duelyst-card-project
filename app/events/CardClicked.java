@@ -63,11 +63,11 @@ public class CardClicked implements EventProcessor {
 		// Preview/highlight should still happen on card-click.
 		// Mana is checked later in TileClicked when the player actually casts/places the card.
 		gameState.selectedHandPosition = handPosition;
+
 		gameState.highlightedTiles = card.getTargets(gameState.player1, gameState.board);
 		card.highlightTargets(out, gameState.player1, gameState.board);
 
-		System.out.println("Card selected: " + card.getCardname());
-		System.out.println("Card cost: " + card.getManacost());
+
 	}
 }
 

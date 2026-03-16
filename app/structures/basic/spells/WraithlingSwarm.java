@@ -20,7 +20,12 @@ import java.util.Set;
 public class WraithlingSwarm extends Spell {
     @Override
     public Set<Tile> validTargets(Player player, Board board) {
-        return BoardLogic.findValidSummonTiles(player, board);
+        Set<Tile> targets = BoardLogic.findValidSummonTiles(player, board);
+        System.out.println("Valid Tiles: ");
+        for  (Tile tile : targets) {
+            System.out.println(tile.getTilex() + "," + tile.getTiley());
+        }
+        return targets;
     }
 
     @Override
@@ -37,15 +42,14 @@ public class WraithlingSwarm extends Spell {
         List<Tile> validTargets = new ArrayList<>(validTargets(player, board));
         for (int i = 0; i < 3; i++) {
             // Create a new wraithling unit per loop
-            Wraithling summoned = Unit.createWraithling(out, player, gameState);
             int targetIndex = (int) (Math.random() * validTargets.size());
             Tile target = validTargets.get(targetIndex);
 
-            Unit.summonWraithling(out, clickedTile, player, gameState);
+            Unit.summonWraithling(out, target, player, gameState);
             validTargets.remove(target);
         }
 
-        System.out.println( "Wraithling Swarm cast");
+        System.out.println("Wraithling Swarm cast");
     }
 
 }

@@ -1,5 +1,6 @@
 package structures.basic.spells;
 import akka.actor.ActorRef;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import commands.BasicCommands;
 import structures.GameState;
 import structures.basic.Board;
@@ -11,6 +12,9 @@ import structures.logic.BoardLogic;
 import java.util.Set;
 
 public abstract class Spell {
+    @JsonIgnore
+    public Spell() {
+    }
     public Set<Tile> validTargets(Player player, Board board) {return null;}
 
     public void highlightTargets(ActorRef out, Player player, Board board) {
@@ -20,7 +24,9 @@ public abstract class Spell {
         };
         for (Tile tile : validTargets) {
             BasicCommands.drawTile(out, tile, 3);
-            BoardLogic.blink();
+            for (int i = 10; i > 0; i--) {
+                BoardLogic.blink();
+            }
         }
     }
 

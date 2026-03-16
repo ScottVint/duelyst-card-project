@@ -71,7 +71,7 @@ public class TileClicked implements EventProcessor {
 
             // If a friendly unit is already selected and player clicks an enemy -> try attack
             if (gameState.selectedUnit != null && clickedUnit.getOwner() != gameState.getPlayer1()) {
-                CombatLogic.tryAttackSelectedUnit(out, gameState, clickedTile, board); //TODO rename and refactor into CombatLogic
+                CombatLogic.tryAttackSelectedUnit(out, gameState, clickedTile, board); //TODO rename method
             }
 
             // Select friendly unit for movement / attack

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import akka.actor.ActorRef;
 import commands.BasicCommands;
 import structures.GameState;
+import structures.basic.Card;
 import structures.basic.unittypes.BetterUnit;
 import structures.basic.players.Player;
 import structures.basic.unittypes.Unit;

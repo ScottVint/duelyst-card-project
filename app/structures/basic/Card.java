@@ -3,6 +3,7 @@ package structures.basic;
 
 import akka.actor.ActorRef;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import commands.BasicCommands;
 import structures.GameState;
 import structures.basic.players.Player;
@@ -39,13 +40,13 @@ public class Card {
 	boolean isCreature;
 	String unitConfig;
 
+	@JsonIgnore
 	Spell spell = null;
 
 	public Card() {
 	}
 
 	;
-
 	public Card(int id, String cardname, int manacost, MiniCard miniCard, BigCard bigCard, boolean isCreature, String unitConfig) {
 		super();
 		this.id = id;
@@ -55,17 +56,6 @@ public class Card {
 		this.bigCard = bigCard;
 		this.isCreature = isCreature;
 		this.unitConfig = unitConfig;
-
-		Class<? extends Spell> spellClass = findSpell(this.cardname);
-		if (spellClass != null) {
-			try {
-				this.spell = spellClass.getDeclaredConstructor().newInstance();
-			} catch (InstantiationException | InvocationTargetException | IllegalAccessException e) {
-				System.err.println("Whoops!");
-			} catch (NoSuchMethodException e) {
-				System.err.println("No such method found!");
-			}
-		}
 	}
 
 	public int getId() {
@@ -136,6 +126,18 @@ public class Card {
 		return this.spell;
 	}
 
+	public void setSpell() {
+		Class<? extends Spell> spellClass = findSpell(this.cardname);
+		if (spellClass != null) {
+			try {
+				this.spell = spellClass.getDeclaredConstructor().newInstance();
+			} catch (InstantiationException | InvocationTargetException | IllegalAccessException e) {
+				System.err.println("Whoops!");
+			} catch (NoSuchMethodException e) {
+				System.err.println("No such method found!");
+			}
+		}
+	}
 
 	///  Creates a unit and casts it to its relevant subclass.
 	///  Takes information from the BigCard to fill in attributes.
@@ -190,7 +192,7 @@ public class Card {
 
 	/// Auto-decides on whether to use spell highlighting method or summon highlighting based on isCreature attribute.
 	public Set<Tile> getTargets(Player player, Board board) {
-		Set<Tile> targets =  new HashSet<>();
+		Set<Tile> targets;
 		if (this.isCreature()) {
 			targets = BoardLogic.findValidSummonTiles(player, board);
 		} else {

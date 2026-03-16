@@ -178,14 +178,6 @@ public class BoardLogic {
 		}
 	}
 
-	public static void findValidSpellTiles(ActorRef out, Player player, Card selectedCard, Board board) {
-		selectedCard.getSpell().validTargets(player, board);
-	}
-
-	public static void highlightSpellTiles(ActorRef out, Player player, Card selectedCard, Board board) {
-		selectedCard.getSpell().highlightTargets(out, player, board);
-	}
-
 	public static void moveSelectedUnit(ActorRef out, GameState gameState, Tile destination, Board board) {
 		Unit selectedUnit = gameState.getSelectedUnit();
 		Tile origin = board.getTile(selectedUnit.getPosition().getTilex(), selectedUnit.getPosition().getTiley());

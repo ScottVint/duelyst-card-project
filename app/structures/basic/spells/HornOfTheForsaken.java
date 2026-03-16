@@ -21,6 +21,10 @@ public class HornOfTheForsaken extends Spell {
         int y = player.getAvatar().getPosition().getTiley();
         Tile target = board.getTile(x, y);
         targets.add(target);
+        System.out.println("Valid targets: ");
+        for  (Tile tile : targets) {
+            System.out.println("(" + tile.getTilex() + "," + tile.getTiley() + ")");
+        }
         return targets;
     }
 

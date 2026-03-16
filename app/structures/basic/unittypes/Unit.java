@@ -299,7 +299,7 @@ public class Unit {
 		wraithling.setMaxHealth(wraithling.getHealth());
 		player.getUnitList().put(wraithling.getId(), wraithling);
 
-		System.out.println("Unit created: " + wraithling.getClass());
+		System.out.println("Unit created: " + wraithling.getClass().getSimpleName());
 
 		return wraithling;
 	}
@@ -311,6 +311,14 @@ public class Unit {
 			clickedTile.setUnit(wraithling);
 
 			BasicCommands.drawUnit(out, wraithling, clickedTile);
+			for (int i = 0; i < 10; i++) {
+				BoardLogic.blink();
+			}
+			BasicCommands.setUnitHealth(out,wraithling,wraithling.getHealth());
+			for (int i = 0; i < 10; i++) {
+				BoardLogic.blink();
+			}
+			BasicCommands.setUnitAttack(out, wraithling, wraithling.getAttack());
 	}
 }
 
