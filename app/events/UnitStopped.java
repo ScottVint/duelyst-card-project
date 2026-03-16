@@ -44,6 +44,8 @@ public class UnitStopped implements EventProcessor {
 		movingUnit.setPositionByTile(targetTile);
 		targetTile.setUnit(movingUnit);
 
+		movingUnit.hasMoved = true;
+
 		gameState.movingUnit = null;
 		gameState.moveTargetTile = null;
 		gameState.unitMoving = false;

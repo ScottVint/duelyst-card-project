@@ -60,6 +60,13 @@ public class Initalize implements EventProcessor {
 
         // Player 2 avatar starts at [8,3]
         gameState.placeAvatar(out, gameState, aiAvatar, 7, 2);
+
+        // Let the avatars move on turn 1
+        humanAvatar.hasAttacked = false;
+        humanAvatar.hasMoved = false;
+
+        aiAvatar.hasAttacked = false;
+        aiAvatar.hasMoved = false;
 //        // Temporary enemy non-avatar unit for testing Dark Terminus
 //        Unit testEnemy = BasicObjectBuilders.loadUnit(
 //                "conf/gameconfs/units/gloom_chaser.json",

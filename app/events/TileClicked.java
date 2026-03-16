@@ -79,21 +79,26 @@ public class TileClicked implements EventProcessor {
         }
 
         // Clicked on a unit (no card selected)
-        if (clickedTile.getUnit() != null) {
+        else if (clickedTile.getUnit() != null) {
             Unit clickedUnit = clickedTile.getUnit();
 
             // If a friendly unit is already selected and player clicks an enemy -> try attack
-            if (gameState.selectedUnit != null && clickedUnit.getOwner() != gameState.getPlayer1()) {
+            if (gameState.selectedUnit != null && clickedUnit.getOwner() != gameState.getPlayer1() &&
+                !clickedUnit.hasAttacked) {
                 CombatLogic.tryAttackSelectedUnit(out, gameState, clickedTile, board); //TODO rename method
             }
 
-            // Select friendly unit for movement / attack
-            else if (clickedUnit.getOwner() == gameState.getPlayer1()) {
+            // Select friendly unit for movement if unit has not moved
+            else if (clickedUnit.getOwner() == gameState.getPlayer1() && !clickedUnit.hasMoved) {
                 gameState.selectedHandPosition = null;
                 gameState.selectedUnit = clickedUnit;
                 BasicCommands.drawTile(out, clickedTile, 1); // white highlight
                 BoardLogic.highlightMovement(out, clickedTile, clickedUnit, board);
                 gameState.highlightedTiles = BoardLogic.findValidMovement(clickedTile, gameState.selectedUnit, board);
+
+            } else if (clickedUnit.getOwner() == gameState.getPlayer1()  &&
+                        clickedUnit.hasAttacked) {
+                BasicCommands.addPlayer1Notification(out, "Unit has moved.", 1);
             }
 
             // Else, enemy unit is clicked

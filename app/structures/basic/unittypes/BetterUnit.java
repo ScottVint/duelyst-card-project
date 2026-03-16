@@ -14,6 +14,7 @@ public class BetterUnit extends Unit {
 	int hornCharges = 0;
 	public final int MAX_HORN_CHARGES = 3;
 
+
 	public BetterUnit() {}
 	
 	public BetterUnit(Set<String> keywords) {

@@ -129,9 +129,12 @@ public class GameState {
 		playerEndingTurn.drawCardIntoHand();
 
 		// Reset flags
+		playerEndingTurn.getAvatar().hasAttacked = false; playerEndingTurn.getAvatar().hasMoved = false;
 		for (Unit unit : playerEndingTurn.getUnitList().values()) {
 			unit.hasAttacked = false; unit.hasMoved = false;
 		}
+
+		// Run AI on AI turn
 		if (playerEndingTurn instanceof HumanPlayer) {
 			AI.AILogic.runAI(out, this, player1, player2);
 		}
