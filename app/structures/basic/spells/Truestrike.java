@@ -15,9 +15,10 @@ import java.util.Set;
 public class Truestrike extends Spell {
     public Set<Tile> validTargets(Player player, Board board) {
         Set<Tile> validTargets = new HashSet<>();
-                if (tile.getUnit() \!= null && tile.getUnit().getOwner() \!= player) {
+        for (Tile[] row : board.getTiles()) {
             for (Tile tile : row) {
-                if (tile.getUnit().getOwner() != player) {
+                // null-check required: empty tiles return null from getUnit()
+                if (tile.getUnit() != null && tile.getUnit().getOwner() != player) {
                     validTargets.add(tile);
                 }
             }

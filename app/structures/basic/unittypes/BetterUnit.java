@@ -41,7 +41,7 @@ public class BetterUnit extends Unit {
 		if (charge < 0) {
 			this.hornCharges = 0;
 		}
-		else if (charges > 3) {
+		else if (charge > 3) { // must check parameter `charge`, not the field `hornCharges`
 			this.hornCharges = 3;
 		}
 		else {

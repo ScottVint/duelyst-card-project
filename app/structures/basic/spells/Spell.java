@@ -17,17 +17,18 @@ public abstract class Spell {
 
     public Set<Tile> validTargets(Player player, Board board) {return null;}
 
-        if (validTargets == null || validTargets.isEmpty()) {
+    public void highlightTargets(ActorRef out, Player player, Board board) {
         Set<Tile> validTargets = validTargets(player, board);
-        if  (validTargets.isEmpty()) {
+        // base class returns null; subclasses may also return null if no targets exist
+        if (validTargets == null || validTargets.isEmpty()) {
             BasicCommands.addPlayer1Notification(out, "No valid tiles!", 2);
-        };
+            return;
+        }
         for (Tile tile : validTargets) {
             BasicCommands.drawTile(out, tile, 2);
-
-                BoardLogic.blink();
-            }
+            BoardLogic.blink();
         }
+    }
 
 
     public void cast(ActorRef out, GameState gameState,

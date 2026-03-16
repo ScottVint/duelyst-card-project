@@ -47,13 +47,16 @@ public class WraithlingSwarm extends Spell {
 
         Card card = player.getHand().get(cardIndex);
 
-        // Searches for valid tiles, then randomly summons them in those slots
         List<Tile> validTargets = new ArrayList<>(validTargets(player, board));
-        for (int i = 0; i < 3; i++) {
-            // Create a new wraithling unit per loop
+
+        // First Wraithling must be placed on the clicked tile (SC#7)
+        Unit.summonWraithling(out, clickedTile, player, gameState);
+        validTargets.remove(clickedTile);
+
+        // Remaining two Wraithlings are placed on random valid tiles
+        for (int i = 0; i < 2 && !validTargets.isEmpty(); i++) {
             int targetIndex = (int) (Math.random() * validTargets.size());
             Tile target = validTargets.get(targetIndex);
-
             Unit.summonWraithling(out, target, player, gameState);
             validTargets.remove(target);
         }
