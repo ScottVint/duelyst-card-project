@@ -25,6 +25,7 @@ public class OtherClicked implements EventProcessor {
 	public void processEvent(ActorRef out, GameState gameState, JsonNode message) {
 		gameState.selectedUnit = null;
 		gameState.selectedHandPosition = null;
+		gameState.player1.drawHand(out);
 		BoardLogic.clearSelection(out, gameState.board);
 	}
 

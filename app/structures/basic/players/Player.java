@@ -49,7 +49,6 @@ public class Player {
 			this.deck = new Deck();
 		}
 		this.hand = new ArrayList<>();
-		setAvatar();
 	}
 
 	public Player(int health, int mana) {
@@ -90,7 +89,7 @@ public class Player {
 
 	public BetterUnit getAvatar() { return avatar; }
 
-	public void setAvatar() {
+	public void setAvatar(ActorRef out, GameState gameState) {
 		throw new Error("Unknown Player subclass");
 	}
 
@@ -119,6 +118,12 @@ public class Player {
 		}
 	}
 
+	/// Destroys all cards on screen.
+	public void destroyHand(ActorRef out) {
+		for (Card card : hand) {
+			BasicCommands.deleteCard(out, hand.indexOf(card) + 1);
+		}
+	}
 	/// Displays all cards in hand to the screen.
 	/// @author Scott
 	public void drawHand(ActorRef out) {
@@ -144,7 +149,7 @@ public class Player {
 			card.getSpell().cast(out, gameState, player, clickedTile, gameState.board, cardIndex);
 		}
 
-		BasicCommands.deleteCard(out, cardIndex + 1);
+		destroyHand(out);
 		gameState.getPlayer1().getHand().remove(cardIndex);
 		drawHand(out);
 

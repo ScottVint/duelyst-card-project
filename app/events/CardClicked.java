@@ -33,6 +33,9 @@ public class CardClicked implements EventProcessor {
 	@Override
 	public void processEvent(ActorRef out, GameState gameState, JsonNode message) {
 
+		// Reset card drawn
+		gameState.player1.drawHand(out);
+
 		if (!gameState.player1Turn) {
 			BasicCommands.addPlayer1Notification(out, "It is not your turn.", 2);
 			return;
@@ -53,6 +56,7 @@ public class CardClicked implements EventProcessor {
 		int index = handPosition - 1;
 
 		Card card = hand.get(index);
+		BasicCommands.drawCard(out, card, handPosition, 1);
 
 		// Important:
 		// Do NOT block card selection here based on mana.
@@ -61,6 +65,9 @@ public class CardClicked implements EventProcessor {
 		gameState.selectedHandPosition = handPosition;
 		gameState.highlightedTiles = card.getTargets(gameState.player1, gameState.board);
 		card.highlightTargets(out, gameState.player1, gameState.board);
+
+		System.out.println("Card selected: " + card.getCardname());
+		System.out.println("Card cost: " + card.getManacost());
 	}
 }
 

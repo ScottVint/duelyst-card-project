@@ -7,8 +7,10 @@ import structures.basic.Tile;
 import structures.basic.players.AIPlayer;
 import structures.basic.players.HumanPlayer;
 import structures.basic.players.Player;
+import structures.basic.unittypes.BetterUnit;
 import structures.basic.unittypes.Unit;
 import structures.logic.AI;
+import structures.logic.BoardLogic;
 import structures.logic.CombatLogic;
 
 import java.util.HashSet;
@@ -56,6 +58,21 @@ public class GameState {
 	public int getNextUnitId() { return nextUnitId++; }
 
 
+	public void placeAvatar(ActorRef out, GameState gameState, BetterUnit avatar, int x, int y) {
+		Tile tile = gameState.getBoard().getTile(x, y);
+		tile.setUnit(avatar);
+		avatar.setPositionByTile(tile);
+
+		BasicCommands.drawUnit(out, avatar, tile);
+		for (int i = 0; i < 30; i++) {
+			BoardLogic.blink();
+		}
+		BasicCommands.setUnitHealth(out, avatar, avatar.getHealth());
+		for (int i = 0; i < 30; i++) {
+			BoardLogic.blink();
+		}
+		BasicCommands.setUnitAttack(out, avatar, avatar.getAttack());
+	}
 	//TODO Create CombatLogic class
 	/**
 	 * Combat damage based on attacker attack stat.
@@ -97,34 +114,21 @@ public class GameState {
 		}
 	}
 
-	//TODO delete
-	/**
-	 * Heal a unit, capped by maxHealth.
-	 */
-	public void healUnit(ActorRef out, Unit target, int amount) {
-		if (target == null || amount <= 0) return;
-
-		int healed = Math.min(target.getMaxHealth(), target.getHealth() + amount);
-		target.setHealth(out, healed);
-		BasicCommands.setUnitHealth(out, target, target.getHealth());
-
-		if (target == player1.getAvatar()) {
-			player1.setHealth(target.getHealth());
-			BasicCommands.setPlayer1Health(out, player1);
-		} else if (target == player2.getAvatar()) {
-			player2.setHealth(target.getHealth());
-			BasicCommands.setPlayer2Health(out, player2);
-		}
-	}
 
 	public void endTurn(ActorRef out, Player playerEndingTurn, Player playerStartingTurn) {
 		if (!player1Turn) {
 			turnCount++;
 		}
 		player1Turn = !player1Turn;
+		// Refresh mana
 		int startingMana = Math.min(turnCount + 1, Player.getMaxMana());
 		playerStartingTurn.setMana(out, startingMana);
 		playerEndingTurn.setMana(out, 0);
+
+		// Draw card
+		playerEndingTurn.drawCardIntoHand();
+
+		// Reset flags
 		for (Unit unit : playerEndingTurn.getUnitList().values()) {
 			unit.hasAttacked = false; unit.hasMoved = false;
 		}

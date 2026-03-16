@@ -188,8 +188,9 @@ public class Unit {
 		return attack;
 	}
 
-	public void setAttack(int attack) {
+	public void setAttack(ActorRef out, int attack) {
 		this.attack = attack;
+		BasicCommands.setUnitAttack(out, this, this.attack);
 	}
 
 	@JsonIgnore
@@ -212,6 +213,7 @@ public class Unit {
 		setHealth(out, health - damage);
 		BasicCommands.setUnitHealth(out, this, health);
 	}
+
 
 	/// Method for BetterUnit to override
 	public void takeDamage(ActorRef out, Player player, int damage) {
@@ -293,7 +295,7 @@ public class Unit {
 
 		wraithling.setOwner(player);
 		wraithling.setHealth(out, 1);
-		wraithling.setAttack(1);
+		wraithling.setAttack(out, 1);
 		wraithling.setMaxHealth(wraithling.getHealth());
 		player.getUnitList().put(wraithling.getId(), wraithling);
 
@@ -309,8 +311,6 @@ public class Unit {
 			clickedTile.setUnit(wraithling);
 
 			BasicCommands.drawUnit(out, wraithling, clickedTile);
-			BasicCommands.setUnitAttack(out, wraithling, wraithling.getAttack());
-			BasicCommands.setUnitHealth(out, wraithling, wraithling.getHealth());
 	}
 }
 

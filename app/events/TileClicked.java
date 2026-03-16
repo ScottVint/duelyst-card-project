@@ -88,8 +88,10 @@ public class TileClicked implements EventProcessor {
 
         // If a card is selected and a valid target is clicked, use the card on the target
         else if (selectedCard != null && gameState.highlightedTiles.contains(clickedTile)) {
+
             // Check for mana first
             if (gameState.player1.enoughMana(out, selectedCard.getManacost())) {
+                BasicCommands.deleteCard(out, gameState.selectedHandPosition);
                 gameState.getPlayer1().useCard(out, gameState,
                                                gameState.player1, cardIndex,
                                                clickedTile, selectedCard.getManacost()
@@ -104,5 +106,6 @@ public class TileClicked implements EventProcessor {
 
         // Deselect card
         gameState.selectedHandPosition = null;
+        gameState.player1.drawHand(out);
     }
 }
