@@ -115,7 +115,15 @@ public class Player {
 				deck.cards.remove(0);
 			}
 			// TODO Add game lose condition if deck is empty
+	public void drawCardIntoHand() { // Changed the name for less confusion with BasicCommands -- Scott
+		if (deck != null && !deck.cards.isEmpty()) {
+			Card drawn = deck.cards.remove(0); // always remove from deck (SC#21)
+			if (this.hand.size() < 6) {
+				hand.add(drawn);
+			}
+			// if hand is full, drawn is silently discarded — not returned to deck
 		}
+	}
 	}
 
 	/// Destroys all cards on screen.
