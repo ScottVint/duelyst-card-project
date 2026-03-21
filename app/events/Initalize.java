@@ -43,13 +43,13 @@ public class Initalize implements EventProcessor {
 
         // Retrieve player objects (Assuming player1 and player2 are already instantiated within gameState)
         avatar1.setAttack(2);
-        avatar1.setMaxHealth(20);
         avatar1.setHealth(20);
+        avatar1.setMaxHealth(20);
 
         // Retrieve the Avatar units for both players
         avatar2.setAttack(2);
-        avatar2.setMaxHealth(20);
         avatar2.setHealth(20);
+        avatar2.setMaxHealth(20);
 
         // Set avatar ownership so that unit-selection logic (Story Card #3) can
         // correctly identify which units belong to the human player.
@@ -105,8 +105,8 @@ public class Initalize implements EventProcessor {
         BasicCommands.setUnitHealth(out, testEnemy, testEnemy.getHealth());
 
         for (int i = 0; i < 3; i++) {
-            player1.drawCard();
-            player2.drawCard();
+            player1.drawCardIntoHand();
+            player2.drawCardIntoHand();
         }
 
         gameState.player1.drawHand(out);
