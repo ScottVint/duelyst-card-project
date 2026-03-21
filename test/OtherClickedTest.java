@@ -16,8 +16,7 @@ import events.OtherClicked;
 import play.libs.Json;
 import structures.GameState;
 import structures.basic.Card;
-import structures.basic.Tile;
-import structures.basic.Unit;
+import structures.basic.unittypes.Unit;
 
 /**
  * JUnit tests for Story Card #12:
@@ -113,7 +112,7 @@ public class OtherClickedTest {
     public void backgroundClickDeselectsUnit() {
         // Manually simulate a unit being selected
         Unit unit = gameState.getBoard().getTile(2, 3).getUnit(); // P1 avatar
-        gameState.setSelectedUnit(unit);
+        gameState.selectedUnit = unit;
 
         otherClicked.processEvent(null, gameState, otherClickMsg());
 
@@ -134,13 +133,13 @@ public class OtherClickedTest {
     public void backgroundClickDeselectsCard() {
         // Select card at position 1
         cardClicked.processEvent(null, gameState, cardClickMsg(1));
-        assertEquals(1, (int) gameState.getSelectedHandPosition());
+        assertEquals(1, (int) gameState.selectedHandPosition);
 
         recorder.messages.clear();
         otherClicked.processEvent(null, gameState, otherClickMsg());
 
         assertNull("selectedHandPosition must be null after otherClicked",
-                gameState.getSelectedHandPosition());
+                gameState.selectedHandPosition);
     }
 
     // -----------------------------------------------------------------------
@@ -182,7 +181,7 @@ public class OtherClickedTest {
     public void reclickingSameCardDeselectsIt() {
         // First click — selects the card
         cardClicked.processEvent(null, gameState, cardClickMsg(1));
-        assertEquals(1, (int) gameState.getSelectedHandPosition());
+        assertEquals(1, (int) gameState.selectedHandPosition);
 
         recorder.messages.clear();
 
@@ -190,7 +189,7 @@ public class OtherClickedTest {
         cardClicked.processEvent(null, gameState, cardClickMsg(1));
 
         assertNull("Re-clicking same card must set selectedHandPosition to null",
-                gameState.getSelectedHandPosition());
+                gameState.selectedHandPosition);
     }
 
     // -----------------------------------------------------------------------

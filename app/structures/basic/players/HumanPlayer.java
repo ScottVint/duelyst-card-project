@@ -2,7 +2,8 @@ package structures.basic.players;
 
 import akka.actor.ActorRef;
 import commands.BasicCommands;
-import structures.basic.BetterUnit;
+import structures.GameState;
+import structures.basic.unittypes.BetterUnit;
 import utils.BasicObjectBuilders;
 import utils.StaticConfFiles;
 
@@ -29,10 +30,24 @@ public class HumanPlayer extends Player {
     }
 
     @Override
-    public void setAvatar() {
-        this.avatar = (BetterUnit) BasicObjectBuilders.loadUnit(StaticConfFiles.humanAvatar, 0, BetterUnit.class); // TODO Replace 0 with dynamic ID function
+    public void setAvatar(ActorRef out, GameState gameState) {
+        this.avatar = (BetterUnit) BasicObjectBuilders.loadUnit(StaticConfFiles.humanAvatar, gameState.getNextUnitId(), BetterUnit.class);
+        avatar.setOwner(this);
+        avatar.setMaxHealth(20);
+        avatar.setHealth(out, this,20);
+        avatar.setAttack(out,  2);
+
+        System.out.println("Avatar created: HP " + avatar.getHealth() + " ATK " + avatar.getAttack());
     }
 
+    @Override
+    public boolean enoughMana(ActorRef out, int manaCost) {
+        boolean hasEnough =  mana >= manaCost;
+        if (!hasEnough) {
+            BasicCommands.addPlayer1Notification(out, "Not enough mana.", 2);
+        }
+        return hasEnough;
+    }
     @Override
     public String toString() {
         return "Player 1";

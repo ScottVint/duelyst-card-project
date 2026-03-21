@@ -16,7 +16,7 @@ import play.libs.Json;
 import structures.GameState;
 import structures.basic.Card;
 import structures.basic.Tile;
-import structures.basic.Unit;
+import structures.basic.unittypes.Unit;
 
 /**
  * JUnit tests for Story Card #22:
@@ -104,7 +104,7 @@ public class CardClickedTest {
         processor.processEvent(null, gameState, cardClickMsg(1));
 
         assertEquals("selectedHandPosition must be 1 after clicking position 1",
-                1, (int) gameState.getSelectedHandPosition());
+                1, (int) gameState.selectedHandPosition);
     }
 
     // -----------------------------------------------------------------------

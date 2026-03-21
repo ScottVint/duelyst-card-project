@@ -15,7 +15,7 @@ import events.TileClicked;
 import play.libs.Json;
 import structures.GameState;
 import structures.basic.Tile;
-import structures.basic.Unit;
+import structures.basic.unittypes.Unit;
 
 /**
  * JUnit tests for Story Card #3:
