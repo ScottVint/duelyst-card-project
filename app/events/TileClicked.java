@@ -319,7 +319,7 @@ public class TileClicked implements EventProcessor {
                     targetUnit.getPosition().getTiley()
             );
 
-            gameState.death(out, targetUnit);
+            gameState.removeUnit(out, targetUnit);
             gameState.summonWraithling(out, deathTile, gameState.getPlayer1());
 
             spendManaRemoveCardAndClear(out, gameState, cardIndex, card.getManacost());

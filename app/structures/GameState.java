@@ -11,7 +11,6 @@ import structures.basic.players.Player;
 import structures.basic.Unit;
 import structures.basic.players.Player;
 import utils.BasicObjectBuilders;
-import utils.OrderedCardLoader;
 import utils.StaticConfFiles;
 
 /**
@@ -53,8 +52,10 @@ public class GameState {
 		BetterUnit avatar2 = (BetterUnit) BasicObjectBuilders.loadUnit(StaticConfFiles.aiAvatar, 2, BetterUnit.class);
 
 		player1 = new HumanPlayer();
+		player1.setAvatar(avatar1);
 
 		player2 = new AIPlayer();
+		player2.setAvatar(avatar2);
 	}
 
 	public Player getPlayer1() { return player1; }
@@ -209,7 +210,7 @@ public class GameState {
 
 		return wraithling;
 	}
-}
+
 	public void endTurn(ActorRef out, Player playerEndingTurn, Player playerStartingTurn) {
 		player1Turn = !player1Turn;
 		int startingMana = Math.min(turnCount + 1, Player.getMaxMana());

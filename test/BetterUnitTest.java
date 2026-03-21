@@ -31,6 +31,13 @@ public class BetterUnitTest implements DummyTell {
         BetterUnit playerAvatar = (BetterUnit) BasicObjectBuilders.loadUnit(StaticConfFiles.humanAvatar, 0, BetterUnit.class);
         BetterUnit aiAvatar = (BetterUnit) BasicObjectBuilders.loadUnit(StaticConfFiles.aiAvatar, 0, BetterUnit.class);
 
+        player1.setAvatar(playerAvatar);
+        playerAvatar.setOwner(player1);
+        playerAvatar.setMaxHealth(20);
+        player2.setAvatar(aiAvatar);
+        aiAvatar.setOwner(player2);
+        aiAvatar.setMaxHealth(20);
+
         // Test setting health
         playerAvatar.setHealth(null, player1, 20);
         aiAvatar.setHealth(null, player2, 20);
@@ -59,6 +66,13 @@ public class BetterUnitTest implements DummyTell {
         AIPlayer player2 = new AIPlayer();
         BetterUnit playerAvatar = (BetterUnit) BasicObjectBuilders.loadUnit(StaticConfFiles.humanAvatar, 0, BetterUnit.class);
         BetterUnit aiAvatar = (BetterUnit) BasicObjectBuilders.loadUnit(StaticConfFiles.aiAvatar, 0, BetterUnit.class);
+
+        player1.setAvatar(playerAvatar);
+        playerAvatar.setOwner(player1);
+        playerAvatar.setMaxHealth(20);
+        player2.setAvatar(aiAvatar);
+        aiAvatar.setOwner(player2);
+        aiAvatar.setMaxHealth(20);
 
         playerAvatar.setHealth(null, player1, 20);
         aiAvatar.setHealth(null, player2, 20);

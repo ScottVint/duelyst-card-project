@@ -44,6 +44,23 @@ public class EndTurnClicked implements EventProcessor {
 			gameState.incrementTurnCount();
 			gameState.endTurn(out, gameState.getPlayer2(), gameState.getPlayer1());
 
+			// Story Card #21: draw one card for player 1 at the start of their turn
+			gameState.getPlayer1().drawCard();
+			redrawHand(out, gameState.getPlayer1());
+		}
+	}
+
+	/**
+	 * Clears all six hand slots on the front-end, then redraws the current hand.
+	 * @author Minghao
+	 */
+	private void redrawHand(ActorRef out, Player player) {
+		for (int i = 1; i <= Player.MAX_HAND_SIZE; i++) {
+			BasicCommands.deleteCard(out, i);
+		}
+		List<Card> hand = player.getHand();
+		for (int i = 0; i < hand.size(); i++) {
+			BasicCommands.drawCard(out, hand.get(i), i + 1, 0);
 		}
 	}
 
