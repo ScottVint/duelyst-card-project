@@ -55,6 +55,26 @@ public class Unit {
 	public boolean hasMoved = true;
 	public boolean hasAttacked = true;
 
+	// ////////// ABILITY FLAGS ////////////
+	// These abilities share a unified function and have a trigger each.
+	// The flags are to be check in the relevant trigger.
+
+	/// Enemies in range can only attack this unit (or others with provoke), and can't move away.
+	/// Triggers when the attacking/moving unit checks for valid tiles.
+	protected boolean provoke = false;
+
+	/// Unit gains +2 to their attack.
+	/// Triggers when the allied avatar is damaged.
+	protected boolean zeal = false;
+
+	/// Unit can move to any unoccupied space on the board.
+	/// Triggers when this unit checks for valid movement tiles.
+	protected boolean flying = false;
+
+	/// Unit can move and attack on the same turn it's summoned.
+	/// Triggers when the unit is summoned.
+	protected boolean rush = false;
+
 	public Unit() {
 	}
 
@@ -89,7 +109,7 @@ public class Unit {
 		this.correction = correction;
 	}
 
-
+	// ////////// GETTER / SETTERS ////////////
 	public int getId() {
 		return id;
 	}
@@ -129,8 +149,6 @@ public class Unit {
 	public void setAnimations(UnitAnimationSet animations) {
 		this.animations = animations;
 	}
-
-	// Extended getter/setters
 
 	public int getHealth() {
 		return health;
@@ -198,7 +216,7 @@ public class Unit {
 		position = new Position(tile.getXpos(), tile.getYpos(), tile.getTilex(), tile.getTiley());
 	}
 
-
+	// ////////// BASIC METHODS ////////////
 	/**
 	 * This command automatically calls setUnitHealth to the
 	 * new health value based on the damage taken, and
@@ -214,12 +232,39 @@ public class Unit {
 		BasicCommands.setUnitHealth(out, this, health);
 	}
 
-
 	/// Method for BetterUnit to override
 	public void takeDamage(ActorRef out, Player player, int damage) {
 		takeDamage(out, damage);
 	}
 
+	// ////////// ABILITIES //////////
+	// Abstract methods to be implemented by unit subclasses
+
+	/// Triggers when the unit is summoned.
+	public void openingGambit(ActorRef out) {};
+
+	/// Triggers when ANY unit dies.
+	public void deathwatch(ActorRef out) {};
+
+	// Getters for ability flags
+
+	public boolean hasFlying() {
+		return flying;
+	}
+
+	public boolean hasProvoke() {
+		return provoke;
+	}
+
+	public boolean hasRush() {
+		return rush;
+	}
+
+	public boolean hasZeal() {
+		return zeal;
+	}
+
+	// ////////// REFERENCE / MISC ////////////
 	/// Way to find a unit's related subclass since I can't think of any other way to do this
 	public static Class<? extends Unit> findUnitClass(String configFile) {
 		Class<? extends Unit> unitClass = Unit.class;
