@@ -160,7 +160,7 @@ public class EndTurnClickedTest {
      */
     @Test
     public void endTurnClearsSelectedUnit() {
-        gameState.setSelectedUnit(gameState.getPlayer1().getAvatar());
+        gameState.selectedUnit = gameState.getPlayer1().getAvatar();
         assertNotNull("Pre-condition: selectedUnit should be set",
                 gameState.getSelectedUnit());
 
@@ -181,13 +181,13 @@ public class EndTurnClickedTest {
      */
     @Test
     public void endTurnClearsSelectedHandPosition() {
-        gameState.setSelectedHandPosition(2);
+        gameState.selectedHandPosition = 2;
         assertEquals("Pre-condition: selectedHandPosition should be 2",
-                2, (int) gameState.getSelectedHandPosition());
+                2, (int) gameState.selectedHandPosition);
 
         processor.processEvent(null, gameState, Json.newObject());
 
         assertNull("selectedHandPosition must be null after ending the turn",
-                gameState.getSelectedHandPosition());
+                gameState.selectedHandPosition);
     }
 }

@@ -1,4 +1,4 @@
-package structures.basic;
+package structures.basic.unittypes;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -11,6 +11,9 @@ import utils.StaticConfFiles;
 public class BetterUnit extends Unit {
 
 	Set<String> keywords;
+	int hornCharges = 0;
+	public final int MAX_HORN_CHARGES = 3;
+
 
 	public BetterUnit() {}
 	
@@ -27,9 +30,23 @@ public class BetterUnit extends Unit {
 		this.keywords = keywords;
 	};
 
+	@Override
 	public void setHealth(ActorRef out, Player player, int health) {
-		super.setHealth(health);
+		super.setHealth(out, health);
 		player.setHealth(out, this.health);
+	}
+
+	public int getHornCharges() {return hornCharges;}
+	public void setHornCharges(int charge) {
+		if (charge < 0) {
+			this.hornCharges = 0;
+		}
+		else if (charge > 3) { // must check parameter `charge`, not the field `hornCharges`
+			this.hornCharges = 3;
+		}
+		else {
+			this.hornCharges = charge;
+		}
 	}
 
 	/**
@@ -41,6 +58,7 @@ public class BetterUnit extends Unit {
 	 * @param damage
 	 * @author Scott
 	 */
+	@Override
 	public void takeDamage(ActorRef out, Player player, int damage) {
 		super.takeDamage(out, damage);
 		player.setHealth(out, this.health);

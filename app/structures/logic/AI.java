@@ -2,7 +2,7 @@ package structures.logic;
 
 import akka.actor.ActorRef;
 import structures.GameState;
-import structures.basic.Unit;
+import structures.basic.unittypes.Unit;
 import structures.basic.players.Player;
 
 import java.util.Timer;
@@ -13,23 +13,15 @@ public class AI {
     private static boolean canSummon = true;
     private static boolean canMove = true;
     private static boolean canAttack = true;
-    private static boolean hasTime = true;
+    private static int maxTime = 5; //TODO Change to something more reasonable
+    private static int timePassed = 0;
 
+    public static void passTime() {
+        timePassed++;
+    }
     public static class AILogic {
 
         private AILogic() {}
-
-        private static Timer timer;
-
-        public static class CheckTimeTask extends TimerTask {
-            @Override
-            public void run() {
-                hasTime = false;
-                if (timer != null) {
-                    timer.cancel();
-                }
-            }
-        }
 
         public static void summon() {
             // TODO: implement later
@@ -55,24 +47,16 @@ public class AI {
             // TODO: implement later
         }
 
-        public static void time() {
-            int seconds = 5;
-            timer = new Timer();
-            timer.schedule(new CheckTimeTask(), seconds * 1000);
-        }
-
         public static void runAI(ActorRef out, GameState gs, Player p1, Player p2) {
-            time();
 
-            while ((canSummon || canMove || canAttack) && hasTime) {
-                // TODO: implement actual AI later
-                break;
-            }
 
-            canSummon = true;
-            canMove = true;
-            canAttack = true;
-            hasTime = true;
+//            while ((canSummon || canMove || canAttack) && (timePassed < maxTime)) {
+//                // TODO: implement actual AI later
+////                System.out.println(timePassed);
+//                continue;
+//            }
+            timePassed = 0;
+            gs.endTurn(out, p2, p1);
         }
     }
 }
