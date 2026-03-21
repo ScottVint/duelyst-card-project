@@ -29,6 +29,7 @@ public class Player {
 	protected BetterUnit avatar;
 	protected Deck deck;
 	protected List<Card> hand;
+	// TODO make units hashmap?
 
 	public Player() {
 		super();
@@ -43,7 +44,7 @@ public class Player {
 			this.deck = new Deck();
 		}
 		this.hand = new ArrayList<>();
-		// Note: setAvatar(BetterUnit) must be called externally after construction
+		setAvatar();
 	}
 
 	public Player(int health, int mana) {
@@ -84,33 +85,29 @@ public class Player {
 
 	public BetterUnit getAvatar() { return avatar; }
 
-	/** Sets the avatar unit for this player (used by GameState during initialisation). */
-	public void setAvatar(BetterUnit avatar) {
-		this.avatar = avatar;
+	public void setAvatar() {
+		throw new Error("Unknown Player subclass");
 	}
 
-	/** Returns the player's draw pile. */
 	public List<Card> getDeck() { return deck.cards; }
+
+	// setDeck() removed. It never needs to be set after initialisation.
 
 	public List<Card> getHand() { return hand; }
 
-	/** Maximum number of cards a player can hold in hand (Story Card #21). */
-	public static final int MAX_HAND_SIZE = 6;
-
 	/**
-	 * Draws the top card from the deck (Story Card #21).
-	 * Always removes the top card from the deck; adds it to the hand only if
-	 * the hand has fewer than MAX_HAND_SIZE cards. Silently discards if full.
-	 * Does nothing if the deck is empty.
+	 * Draws the top card from the deck into the hand. Does nothing if the deck is empty or full.
 	 * @author Minghao
+	 * @author Scott
 	 */
-	public void drawCard() {
-		if (deck == null || deck.cards.isEmpty()) return;
-		Card drawn = deck.cards.remove(0);
-		if (hand.size() < MAX_HAND_SIZE) {
-			hand.add(drawn);
+	public void drawCardIntoHand() { // Changed the name for less confusion with BasicCommands -- Scott
+		if (deck != null && !deck.cards.isEmpty()) {
+			if (this.hand.size() < 6) {
+				hand.add(deck.cards.get(0));
+				deck.cards.remove(0);
+			}
+			// TODO Add game lose condition if deck is empty
 		}
-		// drawn card is silently discarded when hand is full
 	}
 
 	/// Displays all cards in hand to the screen.
@@ -120,6 +117,15 @@ public class Player {
 			BasicCommands.drawCard(out, card, hand.indexOf(card) + 1, 0);
 		}
 	}
+
+	/// Gets the current unitId, then increments the count.
+	/// @author Scott
+	// TODO See if this should be put in GameState or if there's already a function for that
+//	protected int useUnitId() {
+//		int id = unitId;
+//		unitId++;
+//		return id;
+//	}
 
 	public String toString() {
 		return "Unknown Player";
