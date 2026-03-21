@@ -2,18 +2,13 @@ package structures.basic.players;
 import akka.actor.ActorRef;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import commands.BasicCommands;
-import structures.GameState;
-import structures.basic.Tile;
-import structures.basic.unittypes.BetterUnit;
+import structures.basic.BetterUnit;
 import structures.basic.Card;
 import structures.basic.Deck;
-import structures.basic.unittypes.Unit;
-import structures.logic.BoardLogic;
+import structures.basic.Unit;
 
 /**
  * A basic representation of the Player. A player
@@ -34,7 +29,7 @@ public class Player {
 	protected BetterUnit avatar;
 	protected Deck deck;
 	protected List<Card> hand;
-	protected Map<Integer, Unit> unitList = new HashMap<>();
+	// TODO make units hashmap?
 
 	public Player() {
 		super();
@@ -49,6 +44,7 @@ public class Player {
 			this.deck = new Deck();
 		}
 		this.hand = new ArrayList<>();
+		setAvatar();
 	}
 
 	public Player(int health, int mana) {
@@ -89,7 +85,7 @@ public class Player {
 
 	public BetterUnit getAvatar() { return avatar; }
 
-	public void setAvatar(ActorRef out, GameState gameState) {
+	public void setAvatar() {
 		throw new Error("Unknown Player subclass");
 	}
 
@@ -99,10 +95,6 @@ public class Player {
 
 	public List<Card> getHand() { return hand; }
 
-	public Map<Integer, Unit> getUnitList() { return unitList; }
-
-	public boolean enoughMana(ActorRef out, int manaCost) { return  mana >= manaCost; }
-
 	/**
 	 * Draws the top card from the deck into the hand. Does nothing if the deck is empty or full.
 	 * @author Minghao
@@ -110,50 +102,20 @@ public class Player {
 	 */
 	public void drawCardIntoHand() { // Changed the name for less confusion with BasicCommands -- Scott
 		if (deck != null && !deck.cards.isEmpty()) {
-			Card drawn = deck.cards.remove(0); // always remove from deck regardless of hand size (SC#21)
 			if (this.hand.size() < 6) {
-				hand.add(drawn);
+				hand.add(deck.cards.get(0));
+				deck.cards.remove(0);
 			}
-			// if hand is full, drawn is silently discarded — not returned to deck
+			// TODO Add game lose condition if deck is empty
 		}
 	}
 
-	/// Destroys all cards on screen.
-	public void destroyHand(ActorRef out) {
-		for (Card card : hand) {
-			BasicCommands.deleteCard(out, hand.indexOf(card) + 1);
-		}
-	}
 	/// Displays all cards in hand to the screen.
 	/// @author Scott
 	public void drawHand(ActorRef out) {
 		for (Card card : hand) {
 			BasicCommands.drawCard(out, card, hand.indexOf(card) + 1, 0);
 		}
-	}
-
-	public void useCard(ActorRef out,
-											 GameState gameState,
-											 Player player,
-											 int cardIndex,
-											 Tile clickedTile,
-											 int manaCost) {
-
-		int newMana = mana - manaCost;
-		gameState.getPlayer1().setMana(out, newMana);
-		Card card = hand.get(cardIndex);
-
-		if (card.isCreature()) {
-			card.summon(out, gameState, player, clickedTile, gameState.getBoard());
-		} else {
-			card.getSpell().cast(out, gameState, player, clickedTile, gameState.board, cardIndex);
-		}
-
-		destroyHand(out);
-		gameState.getPlayer1().getHand().remove(cardIndex);
-		drawHand(out);
-
-		BoardLogic.clearSelection(out, gameState.board);
 	}
 
 	/// Gets the current unitId, then increments the count.

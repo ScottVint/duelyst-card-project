@@ -4,9 +4,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 import akka.actor.ActorRef;
 import structures.GameState;
-import structures.logic.BoardLogic;
 import structures.basic.Tile;
-import structures.basic.unittypes.Unit;
+import structures.basic.Unit;
 
 /**
  * Indicates that a unit instance has stopped moving.
@@ -14,19 +13,16 @@ import structures.basic.unittypes.Unit;
  */
 public class UnitStopped implements EventProcessor {
 
-    @Override
-    public void processEvent(ActorRef out, GameState gameState, JsonNode message) {
-        // Clear all highlights and selection after unit finishes moving
-        BoardLogic.clearSelection(out, gameState.board);
-        gameState.selectedUnit = null;
+	@Override
+	public void processEvent(ActorRef out, GameState gameState, JsonNode message) {
 
 		int unitid = message.get("id").asInt();
 
-		if (!gameState.unitMoving) return;
-		if (gameState.movingUnit == null) return;
-		if (gameState.moveTargetTile == null) return;
+		if (!gameState.isUnitMoving()) return;
+		if (gameState.getMovingUnit() == null) return;
+		if (gameState.getMoveTargetTile() == null) return;
 
-		Unit movingUnit = gameState.movingUnit;
+		Unit movingUnit = gameState.getMovingUnit();
 
 		if (movingUnit.getId() != unitid) return;
 
@@ -35,7 +31,7 @@ public class UnitStopped implements EventProcessor {
 				movingUnit.getPosition().getTiley()
 		);
 
-		Tile targetTile = gameState.moveTargetTile;
+		Tile targetTile = gameState.getMoveTargetTile();
 
 		if (oldTile != null) {
 			oldTile.setUnit(null);
@@ -44,10 +40,8 @@ public class UnitStopped implements EventProcessor {
 		movingUnit.setPositionByTile(targetTile);
 		targetTile.setUnit(movingUnit);
 
-		movingUnit.hasMoved = true;
-
-		gameState.movingUnit = null;
-		gameState.moveTargetTile = null;
-		gameState.unitMoving = false;
+		gameState.setMovingUnit(null);
+		gameState.setMoveTargetTile(null);
+		gameState.setUnitMoving(false);
 	}
 }
