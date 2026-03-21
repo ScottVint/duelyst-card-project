@@ -3,7 +3,7 @@ import org.junit.Before;
 import org.junit.Test;
 import commands.BasicCommands;
 import commands.DummyTell;
-import structures.basic.unittypes.BetterUnit;
+import structures.basic.BetterUnit;
 import structures.basic.players.*;
 import utils.BasicObjectBuilders;
 import utils.StaticConfFiles;

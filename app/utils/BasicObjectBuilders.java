@@ -9,7 +9,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import structures.basic.Card;
 import structures.basic.EffectAnimation;
 import structures.basic.Tile;
-import structures.basic.unittypes.Unit;
+import structures.basic.Unit;
 
 /**
  * This class contains methods for producing basic objects from configuration files
