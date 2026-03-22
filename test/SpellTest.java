@@ -1,14 +1,7 @@
-import akka.actor.ActorPath;
 import akka.actor.ActorRef;
-import commands.BasicCommands;
-import events.CardClicked;
-import events.Initalize;
-import events.OtherClicked;
 import org.junit.Before;
 import org.junit.Test;
-import play.libs.Json;
 import structures.GameState;
-import structures.basic.Card;
 import structures.basic.Tile;
 import structures.basic.players.HumanPlayer;
 import structures.basic.unittypes.BetterUnit;
@@ -49,6 +42,7 @@ public class SpellTest {
         assert hasWraithling;
     }
 
+    @Test
     public void TestHornNoValidSummon() {
         BetterUnit avatar = player.getAvatar();
         avatar.setHornCharges(3);
