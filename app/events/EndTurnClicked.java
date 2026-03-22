@@ -42,11 +42,25 @@ public class EndTurnClicked implements EventProcessor {
 			gameState.endTurn(out, gameState.getPlayer1(), gameState.getPlayer2());
 		} else {
 			// Player 2 ends their turn → Player 1's turn begins (new round)
-
 			gameState.endTurn(out, gameState.getPlayer2(), gameState.getPlayer1());
-
 		}
-		gameState.player1.drawHand(out);
 
+		// Story Card #21: redraw player 1's hand after all turns resolve
+		// (covers the case where the AI auto-ends player 2's turn)
+		redrawHand(out, gameState.getPlayer1());
+	}
+
+	/**
+	 * Clears all six hand slots on the front-end, then redraws the current hand.
+	 * @author Minghao
+	 */
+	private void redrawHand(ActorRef out, Player player) {
+		List<Card> hand = player.getHand();
+		for (int i = 1; i <= 6; i++) {
+			BasicCommands.deleteCard(out, i);
+		}
+		for (int i = 0; i < hand.size(); i++) {
+			BasicCommands.drawCard(out, hand.get(i), i + 1, 0);
+		}
 	}
 }

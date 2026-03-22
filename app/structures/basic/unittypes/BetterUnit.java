@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import akka.actor.ActorRef;
+import commands.BasicCommands;
 import structures.basic.players.Player;
 import utils.BasicObjectBuilders;
 import utils.StaticConfFiles;
@@ -30,9 +31,15 @@ public class BetterUnit extends Unit {
 		this.keywords = keywords;
 	};
 
+	/**
+	 * Story Card #2: sets unit health, updates the HP badge on the front-end,
+	 * and syncs the owning player's health bar.
+	 * @author Minghao
+	 */
 	@Override
 	public void setHealth(ActorRef out, Player player, int health) {
 		super.setHealth(out, health);
+		BasicCommands.setUnitHealth(out, this, this.health);
 		player.setHealth(out, this.health);
 	}
 

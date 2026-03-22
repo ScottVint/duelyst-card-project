@@ -192,20 +192,21 @@ public class Card {
 
 	/// Auto-decides on whether to use spell highlighting method or summon highlighting based on isCreature attribute.
 	public Set<Tile> getTargets(Player player, Board board) {
-		Set<Tile> targets;
 		if (this.isCreature()) {
-			targets = BoardLogic.findValidSummonTiles(player, board);
+			return BoardLogic.findValidSummonTiles(player, board);
 		} else {
-			targets = this.spell.validTargets(player, board);
+			getSpell(); // ensure spell is initialised from cardname
+			if (this.spell == null) return new HashSet<>();
+			return this.spell.validTargets(player, board);
 		}
-		return targets;
 	}
 
 	public void highlightTargets(ActorRef out, Player player, Board board) {
 		if (this.isCreature()) {
 			BoardLogic.highlightSummonTiles(out, player, board);
 		} else {
-			this.spell.highlightTargets(out, player, board);
+			getSpell(); // ensure spell is initialised from cardname
+			if (this.spell != null) this.spell.highlightTargets(out, player, board);
 		}
 	}
 

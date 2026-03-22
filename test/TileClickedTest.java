@@ -168,9 +168,11 @@ public class TileClickedTest {
      */
     @Test
     public void reClickingDifferentUnitUpdatesSelection() {
-        // Place a second P1 unit at [3, 2]
+        // Place a second P1 unit at [3, 2] with actions remaining
         Unit extra = new Unit();
         extra.setOwner(gameState.getPlayer1());
+        extra.hasMoved = false;
+        extra.hasAttacked = false;
         Tile t = gameState.getBoard().getTile(3, 2);
         t.setUnit(extra);
         extra.setPositionByTile(t);
