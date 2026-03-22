@@ -52,6 +52,7 @@ public class Unit {
 	 * Attack damage this unit deals per strike. @author Minghao
 	 */
 	int attack;
+	Tile tileOccupied;
 	public boolean hasMoved = true;
 	public boolean hasAttacked = true;
 
@@ -214,6 +215,11 @@ public class Unit {
 	@JsonIgnore
 	public void setPositionByTile(Tile tile) {
 		position = new Position(tile.getXpos(), tile.getYpos(), tile.getTilex(), tile.getTiley());
+		tileOccupied = tile;
+	}
+
+	public Tile getTileOccupied() {
+		return tileOccupied;
 	}
 
 	// ////////// BASIC METHODS ////////////
@@ -233,7 +239,7 @@ public class Unit {
 	}
 
 	/// Method for BetterUnit to override
-	public void takeDamage(ActorRef out, Player player, int damage) {
+	public void takeDamage(ActorRef out, GameState gameState, Player player, int damage) {
 		takeDamage(out, damage);
 	}
 
@@ -241,7 +247,7 @@ public class Unit {
 	// Abstract methods to be implemented by unit subclasses
 
 	/// Triggers when the unit is summoned.
-	public void openingGambit(ActorRef out) {};
+	public void openingGambit(ActorRef out, GameState gameState) {};
 
 	/// Triggers when ANY unit dies.
 	public void deathwatch(ActorRef out) {};

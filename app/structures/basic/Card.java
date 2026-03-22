@@ -176,17 +176,18 @@ public class Card {
 			clickedTile.setUnit(summonedUnit);
 
 			BasicCommands.drawUnit(out, summonedUnit, clickedTile);
-			for (int i = 0; i < 30; i++) {
+			for (int i = 0; i < 30; i++)
 				BoardLogic.blink();
-			}
 			BasicCommands.setUnitAttack(out, summonedUnit, summonedUnit.getAttack());
-			for (int i = 0; i < 10; i++) {
+			for (int i = 0; i < 10; i++)
 				BoardLogic.blink();
-			}
 			BasicCommands.setUnitHealth(out, summonedUnit, summonedUnit.getHealth());
 
 			System.out.println("Unit summoned: " + summonedUnit.getClass());
 			System.out.println("HP: " + summonedUnit.getHealth() + " ATK " + summonedUnit.getAttack());
+
+			// Opening gambit usage
+			summonedUnit.openingGambit(out, gameState);
 		}
 	}
 
