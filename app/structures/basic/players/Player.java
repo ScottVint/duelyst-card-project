@@ -134,23 +134,22 @@ public class Player {
 
 	public void useCard(ActorRef out,
 											 GameState gameState,
-											 Player player,
 											 int cardIndex,
 											 Tile clickedTile,
 											 int manaCost) {
 
 		int newMana = mana - manaCost;
-		gameState.getPlayer1().setMana(out, newMana);
+		this.setMana(out, newMana);
 		Card card = hand.get(cardIndex);
 
 		if (card.isCreature()) {
-			card.summon(out, gameState, player, clickedTile, gameState.getBoard());
+			card.summon(out, gameState, this, clickedTile);
 		} else {
-			card.getSpell().cast(out, gameState, player, clickedTile, gameState.board, cardIndex);
+			card.getSpell().cast(out, gameState, this, clickedTile);
 		}
 
 		destroyHand(out);
-		gameState.getPlayer1().getHand().remove(cardIndex);
+		this.getHand().remove(cardIndex);
 		drawHand(out);
 
 		BoardLogic.clearSelection(out, gameState.board);

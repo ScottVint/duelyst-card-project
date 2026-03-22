@@ -40,8 +40,7 @@ public class SundropElixir extends Spell {
 
     @Override
     public void cast(ActorRef out, GameState gameState,
-                     Player player, Tile clickedTile,
-                     Board board, int cardIndex) {
+                     Player player, Tile clickedTile) {
         Unit target = clickedTile.getUnit();
         target.takeDamage(out, -4);
     }

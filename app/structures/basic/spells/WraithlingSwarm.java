@@ -8,12 +8,9 @@ import structures.basic.Card;
 import structures.basic.Tile;
 import structures.basic.players.Player;
 import structures.basic.unittypes.Unit;
-import structures.basic.unittypes.Wraithling;
 import structures.logic.BoardLogic;
-import utils.BasicObjectBuilders;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -41,13 +38,11 @@ public class WraithlingSwarm extends Spell {
     public void cast(ActorRef out,
                      GameState gameState,
                      Player player,
-                     Tile clickedTile,
-                     Board board,
-                     int cardIndex) {
+                     Tile clickedTile) {
 
-        Card card = player.getHand().get(cardIndex);
 
-        List<Tile> validTargets = new ArrayList<>(validTargets(player, board));
+
+        List<Tile> validTargets = new ArrayList<>(validTargets(player, gameState.getBoard()));
 
         // First Wraithling must be placed on the clicked tile (SC#7)
         Unit.summonWraithling(out, clickedTile, player, gameState);

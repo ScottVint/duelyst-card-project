@@ -57,12 +57,11 @@ public class BetterUnit extends Unit {
 	 * Sets the health of the unit and displays it, then sets the corresponding
 	 * player's health to the same value. <br />
 	 * The display is currently unimplemented.
-	 * @param player
 	 * @param damage
 	 * @author Scott
 	 */
 	@Override
-	public void takeDamage(ActorRef out, GameState gameState, Player player, int damage) {
+	public void takeDamage(ActorRef out, GameState gameState, int damage) {
 		// Summon a wraithling in a random adjacent tile if unit has horn charges
 		if (hornCharges > 0 ) {
 			hornCharges--;
@@ -76,7 +75,7 @@ public class BetterUnit extends Unit {
 			}
 		}
 		super.takeDamage(out, damage);
-		player.setHealth(out, this.health);
+		setHealth(out, this.health);
 	}
 	
 	

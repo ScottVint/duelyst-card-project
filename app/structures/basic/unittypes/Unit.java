@@ -239,7 +239,7 @@ public class Unit {
 	}
 
 	/// Method for BetterUnit to override
-	public void takeDamage(ActorRef out, GameState gameState, Player player, int damage) {
+	public void takeDamage(ActorRef out, GameState gameState, int damage) {
 		takeDamage(out, damage);
 	}
 
@@ -345,6 +345,7 @@ public class Unit {
 		Wraithling wraithling = (Wraithling) BasicObjectBuilders.loadUnit("conf/gameconfs/units/wraithling.json", gameState.getNextUnitId(), Wraithling.class);
 
 		wraithling.setOwner(player);
+		wraithling.setMaxHealth(1);
 		wraithling.setHealth(out, 1);
 		wraithling.setAttack(out, 1);
 		wraithling.setMaxHealth(wraithling.getHealth());
@@ -361,14 +362,15 @@ public class Unit {
 			wraithling.setPositionByTile(clickedTile);
 			clickedTile.setUnit(wraithling);
 
+			System.out.println("Wraithling summoned: HP " + wraithling.getHealth() + " ATK " + wraithling.getAttack() + " at (" +
+					clickedTile.getTilex() + "," + clickedTile.getTiley() + ")");
+
 			BasicCommands.drawUnit(out, wraithling, clickedTile);
-			for (int i = 0; i < 10; i++) {
+			for (int i = 0; i < 15; i++)
 				BoardLogic.blink();
-			}
 			BasicCommands.setUnitHealth(out,wraithling,wraithling.getHealth());
-			for (int i = 0; i < 10; i++) {
+			for (int i = 0; i < 15; i++)
 				BoardLogic.blink();
-			}
 			BasicCommands.setUnitAttack(out, wraithling, wraithling.getAttack());
 	}
 }

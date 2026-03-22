@@ -13,7 +13,19 @@ import java.util.Set;
 
 public abstract class Spell {
     @JsonIgnore
+    Card card = null;
+
+    @JsonIgnore
     public Spell() {}
+
+
+    public Card getCard() {
+        return this.card;
+    }
+
+    public void setCard(Card card) {
+        this.card = card;
+    }
 
     public Set<Tile> validTargets(Player player, Board board) {return null;}
 
@@ -32,7 +44,6 @@ public abstract class Spell {
 
 
     public void cast(ActorRef out, GameState gameState,
-                     Player player, Tile clickedTile,
-                     Board board, int cardIndex) {}
+                     Player player, Tile clickedTile) {}
 }
 

@@ -36,8 +36,8 @@ public class GameState {
 	/** 1-indexed hand position of the selected card, or null if none selected */
 	public Integer selectedHandPosition = null;
 
-	/** Next unique unit id for summoned units. Avatars already use 1 and 2 */ //TODO make fit with summon method instead
-	private int nextUnitId = 3;
+	/** Next unique unit id for summoned units. */
+	private int nextUnitId = 0;
 
 	/** List of currently highlighted tiles. Used for validation.*/
 	public Set<Tile> highlightedTiles = new HashSet<Tile>();
@@ -58,8 +58,8 @@ public class GameState {
 	public int getNextUnitId() { return nextUnitId++; }
 
 
-	public void placeAvatar(ActorRef out, GameState gameState, BetterUnit avatar, int x, int y) {
-		Tile tile = gameState.getBoard().getTile(x, y);
+	public void placeAvatar(ActorRef out, BetterUnit avatar, int x, int y) {
+		Tile tile = this.board.getTile(x, y);
 		tile.setUnit(avatar);
 		avatar.setPositionByTile(tile);
 

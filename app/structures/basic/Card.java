@@ -56,6 +56,9 @@ public class Card {
 		this.bigCard = bigCard;
 		this.isCreature = isCreature;
 		this.unitConfig = unitConfig;
+		setSpell();
+		if (spell != null)
+			spell.setCard(this);
 	}
 
 	public int getId() {
@@ -142,53 +145,44 @@ public class Card {
 	///  Creates a unit and casts it to its relevant subclass.
 	///  Takes information from the BigCard to fill in attributes.
 	public Unit createUnit(ActorRef out, GameState gameState, Player player) {
-		int handPosition = gameState.selectedHandPosition;
-		int cardIndex = handPosition - 1;
-		Card card = player.getHand().get(cardIndex);
-
-
 		Class<? extends Unit> unitClass = Unit.findUnitClass(unitConfig);
 		Unit summonedUnit = BasicObjectBuilders.loadUnit(this.unitConfig, gameState.getNextUnitId(), unitClass);
 		summonedUnit = unitClass.cast(summonedUnit);
 
 		summonedUnit.setOwner(player);
-		summonedUnit.setAttack(out, card.getBigCard().getAttack());
-		summonedUnit.setMaxHealth(card.getBigCard().getHealth());
-		summonedUnit.setHealth(out, card.getBigCard().getHealth());
+		player.getUnitList().put(summonedUnit.getId(), summonedUnit);
+		summonedUnit.setAttack(out, this.bigCard.attack);
+		summonedUnit.setMaxHealth(this.bigCard.health);
+		summonedUnit.setHealth(out, this.bigCard.health);
 
 		System.out.println("Unit created: " + summonedUnit.getClass());
+		System.out.println("Owner: " + player);
 
 		return summonedUnit;
 	}
 
 	/// Summons a unit from a card.
 	/// Needs a card so does not work with Wraithling specifically.
-	public void summon(ActorRef out, GameState gameState, Player player, Tile clickedTile, Board board) {
-		int handPosition = gameState.selectedHandPosition;
-		int cardIndex = handPosition - 1;
-		Card card = player.getHand().get(cardIndex);
+	public void summon(ActorRef out, GameState gameState, Player player, Tile clickedTile) {
+		Unit summonedUnit = createUnit(out, gameState, player);
 
-		if (BoardLogic.findValidSummonTiles(player, board).contains(clickedTile)) {
+		summonedUnit.setPositionByTile(clickedTile);
+		clickedTile.setUnit(summonedUnit);
 
-			Unit summonedUnit = createUnit(out, gameState, player);
+		BasicCommands.drawUnit(out, summonedUnit, clickedTile);
+		for (int i = 0; i < 30; i++)
+			BoardLogic.blink();
+		BasicCommands.setUnitAttack(out, summonedUnit, summonedUnit.getAttack());
+		for (int i = 0; i < 10; i++)
+			BoardLogic.blink();
+		BasicCommands.setUnitHealth(out, summonedUnit, summonedUnit.getHealth());
 
-			summonedUnit.setPositionByTile(clickedTile);
-			clickedTile.setUnit(summonedUnit);
+		System.out.println("Unit summoned: " + summonedUnit.getClass());
+		System.out.println("HP: " + summonedUnit.getHealth() + " ATK " + summonedUnit.getAttack() + " at (" +
+				clickedTile.getTilex() + "," + clickedTile.getTiley() + ")");
 
-			BasicCommands.drawUnit(out, summonedUnit, clickedTile);
-			for (int i = 0; i < 30; i++)
-				BoardLogic.blink();
-			BasicCommands.setUnitAttack(out, summonedUnit, summonedUnit.getAttack());
-			for (int i = 0; i < 10; i++)
-				BoardLogic.blink();
-			BasicCommands.setUnitHealth(out, summonedUnit, summonedUnit.getHealth());
-
-			System.out.println("Unit summoned: " + summonedUnit.getClass());
-			System.out.println("HP: " + summonedUnit.getHealth() + " ATK " + summonedUnit.getAttack());
-
-			// Opening gambit usage
-			summonedUnit.openingGambit(out, gameState);
-		}
+		// Opening gambit usage
+		summonedUnit.openingGambit(out, gameState);
 	}
 
 	/// Auto-decides on whether to use spell highlighting method or summon highlighting based on isCreature attribute.

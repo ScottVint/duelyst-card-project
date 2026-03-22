@@ -11,13 +11,11 @@ import java.util.Set;
 public class SilverguardSquire extends Unit {
     public void openingGambit(ActorRef out, GameState gameState) {
         BetterUnit avatar = this.owner.getAvatar();
-        int avatarx = avatar.getPosition().getTilex(), avatary = avatar.getPosition().getTiley();
-        int[] tileFrontxy = {avatarx - 1, avatary}, tileBackxy = {avatarx + 1, avatary};
-        Set<Tile> validTargets = new HashSet<>(BoardLogic.findAdjacentTiles(avatar.tileOccupied, gameState.getBoard()));
-        validTargets.removeIf(tile -> tile.getUnit() == null || tile.getUnit().getOwner() != this.owner ||
-                tile != gameState.getBoard().getTile(tileFrontxy[0], tileFrontxy[1]) ||
-                tile != gameState.getBoard().getTile(tileBackxy[0], tileBackxy[1])
-        );
+        int coordx = avatar.getPosition().getTilex(), coordy = avatar.getPosition().getTiley();
+        Set<Tile> validTargets = new HashSet<>();
+        try {validTargets.add(gameState.getBoard().getTile(coordx - 1,coordy));} catch (IndexOutOfBoundsException ignored) {}
+        try {validTargets.add(gameState.getBoard().getTile(coordx + 1,coordy));} catch (IndexOutOfBoundsException ignored) {}
+        validTargets.removeIf(tile -> tile.getUnit() == null || tile.getUnit().getOwner() != this.owner);
 
         for (Tile tile : validTargets) {
             Unit unit = tile.getUnit();

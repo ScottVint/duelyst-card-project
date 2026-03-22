@@ -1,4 +1,6 @@
 import akka.actor.ActorRef;
+import commands.BasicCommands;
+import commands.CheckMessageIsNotNullOnTell;
 import org.junit.Before;
 import org.junit.Test;
 import structures.GameState;
@@ -11,15 +13,19 @@ import structures.basic.unittypes.Wraithling;
 import structures.logic.BoardLogic;
 import utils.BasicObjectBuilders;
 
+import static org.junit.Assert.*;
+
 public class SpellTest {
 
-    ActorRef out;
     GameState gs = new GameState();
     HumanPlayer player = new HumanPlayer();
+    CheckMessageIsNotNullOnTell altTell;
 
     @Before
     public void setUp() {
-        player.setAvatar(out, gs);
+        CheckMessageIsNotNullOnTell altTell = new CheckMessageIsNotNullOnTell(); // create an alternative tell
+        BasicCommands.altTell = altTell; // specify that the alternative tell should be used
+        player.setAvatar(null, gs);
         player.getAvatar().setPositionByTile(gs.getBoard().getTile(3,2));
     }
 
@@ -27,10 +33,10 @@ public class SpellTest {
     public void TestHornOfTheForsaken() {
         BetterUnit avatar = player.getAvatar();
         avatar.setHornCharges(3);
-        avatar.takeDamage(out, gs, player, 2);
+        avatar.takeDamage(null, gs, 2);
 
-        assert avatar.getHornCharges() == 2;
-        assert avatar.getHealth() == 18;
+        assertEquals("Horn charges should go down on hit.", 2, avatar.getHornCharges());
+        assertEquals("Unit should take normal damage.", 18, avatar.getHealth());
 
         boolean hasWraithling = false;
         for (Tile tile : BoardLogic.findAdjacentTiles(avatar.getTileOccupied(), gs.getBoard())) {
@@ -39,7 +45,7 @@ public class SpellTest {
                 break;
             }
         }
-        assert hasWraithling;
+        assertTrue(hasWraithling);
     }
 
     @Test
@@ -48,7 +54,7 @@ public class SpellTest {
         avatar.setHornCharges(3);
         Unit fillerUnit = BasicObjectBuilders.loadUnit("conf/gameconfs/units/skyrock_golem.json", 2, SkyrockGolem.class);
 
-        avatar.takeDamage(out, gs, player, 2);
+        avatar.takeDamage(null, gs,  2);
 
 
         boolean hasWraithling = false;
@@ -59,6 +65,6 @@ public class SpellTest {
                 hasWraithling = true;
                 break;
             }
-        assert !hasWraithling;
+        assertFalse(hasWraithling);
     }
 }
