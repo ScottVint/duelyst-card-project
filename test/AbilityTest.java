@@ -35,7 +35,7 @@ public class AbilityTest {
         player.getHand().clear();
         opponent.getHand().clear();
         opponent.setAvatar(null, gs);
-        opponent.getAvatar().setPositionByTile(gs.getBoard().getTile(7,2));
+        gs.placeAvatar(null, opponent.getAvatar(), 7, 2);
 
     }
 
@@ -146,6 +146,7 @@ public class AbilityTest {
         summonTile.setUnit(null);
     }
 
+    @Test
     public void NightsorrowAssassinGambitNoAvatarKillTest() {
         Card testCard = BasicObjectBuilders.loadCard("conf/gameconfs/cards/1_6_c_u_nightsorrow_assassin.json", 1, Card.class);
 

@@ -4,8 +4,6 @@ import akka.actor.ActorRef;
 import structures.GameState;
 import structures.basic.Tile;
 import structures.logic.BoardLogic;
-import structures.logic.CombatLogic;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,7 +18,7 @@ public class NightsorrowAssassin extends Unit {
 
         if (!enemies.isEmpty()) {
             Unit enemy = enemies.get(idx).getUnit();
-            die(out);
+            enemy.die(out);
         }
     }
 }

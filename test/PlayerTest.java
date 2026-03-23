@@ -45,6 +45,7 @@ public class PlayerTest {
         AIPlayer player2 = new AIPlayer();
         GameState gameState = new GameState();
         player1.setAvatar(null, gameState);
+        player2.setAvatar(null, gameState);
         assertEquals(0, player1.getAvatar().getId());
         assertEquals(1, player2.getAvatar().getId());
     }
