@@ -55,10 +55,10 @@ public class Initalize implements EventProcessor {
         // Player starts their first turn with 2 mana
         player1.setMana(out, 2);
 
-        // Player 1 avatar starts at [2,3]
-        gameState.placeAvatar(out, gameState, humanAvatar, 1, 2); //It's 0-indexed
+        // Player 1 avatar starts at [1,2] (0-indexed)
+        gameState.placeAvatar(out, gameState, humanAvatar, 1, 2);
 
-        // Player 2 avatar starts at [8,3]
+        // Player 2 avatar starts at [7,2] (0-indexed)
         gameState.placeAvatar(out, gameState, aiAvatar, 7, 2);
 
         // Let the avatars move on turn 1

@@ -43,9 +43,12 @@ public class CardClicked implements EventProcessor {
 
 		int handPosition = message.get("position").asInt(); // 1-indexed
 
-		// Re-click same card -> deselect
+		// Re-click same card -> deselect and stop
 		if (Integer.valueOf(handPosition).equals(gameState.selectedHandPosition)) {
 			gameState.selectedHandPosition = null;
+			gameState.selectedUnit = null;
+			BoardLogic.clearSelection(out, gameState.board);
+			return;
 		}
 
 		// Clear previous selections

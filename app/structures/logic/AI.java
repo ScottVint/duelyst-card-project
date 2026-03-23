@@ -48,7 +48,8 @@ public class AI {
         }
 
         public static void runAI(ActorRef out, GameState gs, Player p1, Player p2) {
-
+            // AI requires a live WebSocket connection; skip during unit tests
+            if (out == null) return;
 
 //            while ((canSummon || canMove || canAttack) && (timePassed < maxTime)) {
 //                // TODO: implement actual AI later
