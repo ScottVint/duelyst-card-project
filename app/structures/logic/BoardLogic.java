@@ -176,7 +176,7 @@ public class BoardLogic {
 	public static void highlightSummonTiles(ActorRef out, Player summoner, Board board) {
 		Set<Tile> targets = findValidSummonTiles(summoner, board);
 		for  (Tile target : targets) {
-			BasicCommands.drawTile(out, target, 2);
+			BasicCommands.drawTile(out, target, 1);
 			blink();
 		}
 	}
