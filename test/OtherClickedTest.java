@@ -111,7 +111,7 @@ public class OtherClickedTest {
     @Test
     public void backgroundClickDeselectsUnit() {
         // Manually simulate a unit being selected
-        Unit unit = gameState.getBoard().getTile(2, 3).getUnit(); // P1 avatar
+        Unit unit = gameState.getBoard().getTile(1, 2).getUnit(); // P1 avatar
         gameState.selectedUnit = unit;
 
         otherClicked.processEvent(null, gameState, otherClickMsg());

@@ -195,7 +195,6 @@ public class Card {
 		if (this.isCreature()) {
 			return BoardLogic.findValidSummonTiles(player, board);
 		} else {
-			getSpell(); // ensure spell is initialised from cardname
 			if (this.spell == null) return new HashSet<>();
 			return this.spell.validTargets(player, board);
 		}
@@ -205,7 +204,6 @@ public class Card {
 		if (this.isCreature()) {
 			BoardLogic.highlightSummonTiles(out, player, board);
 		} else {
-			getSpell(); // ensure spell is initialised from cardname
 			if (this.spell != null) this.spell.highlightTargets(out, player, board);
 		}
 	}

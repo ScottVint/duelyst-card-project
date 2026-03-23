@@ -1,14 +1,9 @@
 package events;
 
-import java.util.List;
-
 import com.fasterxml.jackson.databind.JsonNode;
 
 import akka.actor.ActorRef;
-import commands.BasicCommands;
 import structures.GameState;
-import structures.basic.Card;
-import structures.basic.players.Player;
 import structures.logic.BoardLogic;
 
 /**
@@ -47,20 +42,7 @@ public class EndTurnClicked implements EventProcessor {
 
 		// Story Card #21: redraw player 1's hand after all turns resolve
 		// (covers the case where the AI auto-ends player 2's turn)
-		redrawHand(out, gameState.getPlayer1());
-	}
-
-	/**
-	 * Clears all six hand slots on the front-end, then redraws the current hand.
-	 * @author Minghao
-	 */
-	private void redrawHand(ActorRef out, Player player) {
-		List<Card> hand = player.getHand();
-		for (int i = 1; i <= 6; i++) {
-			BasicCommands.deleteCard(out, i);
-		}
-		for (int i = 0; i < hand.size(); i++) {
-			BasicCommands.drawCard(out, hand.get(i), i + 1, 0);
-		}
+		gameState.getPlayer1().destroyHand(out);
+		gameState.getPlayer1().drawHand(out);
 	}
 }

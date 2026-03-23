@@ -27,13 +27,5 @@ public class CombatLogic {
         }
     }
 
-    /**
-     * Remove a dead unit from the board and UI.
-     */
-    public static void death(ActorRef out, GameState gameState, Unit target) {
-        Tile tile = gameState.board.getTile(target.getPosition().getTilex(), target.getPosition().getTiley());
 
-        tile.setUnit(null);
-        BasicCommands.deleteUnit(out, target);
-    }
 }

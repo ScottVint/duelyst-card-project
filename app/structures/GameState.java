@@ -125,8 +125,8 @@ public class GameState {
 		playerStartingTurn.setMana(out, startingMana);
 		playerEndingTurn.setMana(out, 0);
 
-		// Draw card: the starting player draws 1 card at the start of their turn
-		playerStartingTurn.drawCardIntoHand();
+		// Draw card: the ending player draws 1 card at the end of their turn (for next turn)
+		playerEndingTurn.drawCardIntoHand();
 
 		// Reset flags
 		playerEndingTurn.getAvatar().hasAttacked = false; playerEndingTurn.getAvatar().hasMoved = false;

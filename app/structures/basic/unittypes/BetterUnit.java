@@ -39,6 +39,8 @@ public class BetterUnit extends Unit {
 	@Override
 	public void setHealth(ActorRef out, Player player, int health) {
 		super.setHealth(out, health);
+		// setUnitHealth is NOT called in super (Unit.setHealth only updates the field),
+		// so we must emit it here to keep the front-end HP badge up-to-date (SC#2).
 		BasicCommands.setUnitHealth(out, this, this.health);
 		player.setHealth(out, this.health);
 	}

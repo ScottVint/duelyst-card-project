@@ -228,6 +228,9 @@ public class Unit {
 			currentTile.setUnit(null);
 			currentTile = null;
 		}
+		if (owner != null) {
+			owner.getUnitList().remove(this.id);
+		}
 		BasicCommands.deleteUnit(out, this);
 	}
 
