@@ -109,8 +109,8 @@ public class GameState {
 			BasicCommands.setPlayer2Health(out, player2);
 		}
 
-		if (target.getHealth() <= 0) {
-			CombatLogic.death(out, this, target);
+		if (target.isDead()) {
+			target.die(out);
 		}
 	}
 
@@ -125,7 +125,7 @@ public class GameState {
 		playerStartingTurn.setMana(out, startingMana);
 		playerEndingTurn.setMana(out, 0);
 
-		// Draw card
+		// Draw card: the ending player draws 1 card at the end of their turn (for next turn)
 		playerEndingTurn.drawCardIntoHand();
 
 		// Reset flags

@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Set;
 
 import akka.actor.ActorRef;
+import commands.BasicCommands;
 import structures.GameState;
 import structures.basic.Tile;
 import structures.basic.players.Player;
@@ -36,9 +37,17 @@ public class BetterUnit extends Unit {
 		this.keywords = keywords;
 	};
 
+	/**
+	 * Story Card #2: sets unit health, updates the HP badge on the front-end,
+	 * and syncs the owning player's health bar.
+	 * @author Minghao
+	 */
 	@Override
 	public void setHealth(ActorRef out, Player player, int health) {
 		super.setHealth(out, health);
+		// setUnitHealth is NOT called in super (Unit.setHealth only updates the field),
+		// so we must emit it here to keep the front-end HP badge up-to-date (SC#2).
+		BasicCommands.setUnitHealth(out, this, this.health); //TODO we probably *should* call it in super? It's in the signature.
 		player.setHealth(out, this.health);
 	}
 
@@ -50,7 +59,7 @@ public class BetterUnit extends Unit {
 			this.hornCharges = 3;
 		else
 			this.hornCharges = charge;
-	}
+		}
 
 	/**
 	 * Avatar damage taking method.

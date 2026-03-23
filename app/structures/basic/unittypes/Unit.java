@@ -40,6 +40,9 @@ public class Unit {
 	 */
 	@JsonIgnore
 	Player owner;
+	/** The tile this unit currently occupies. Not serialised to JSON. @author Minghao */
+	@JsonIgnore
+	Tile currentTile;
 	/**
 	 * Maximum hit points of this unit. @author Minghao
 	 */
@@ -52,7 +55,6 @@ public class Unit {
 	 * Attack damage this unit deals per strike. @author Minghao
 	 */
 	int attack;
-	Tile tileOccupied;
 	public boolean hasMoved = true;
 	public boolean hasAttacked = true;
 
@@ -215,11 +217,39 @@ public class Unit {
 	@JsonIgnore
 	public void setPositionByTile(Tile tile) {
 		position = new Position(tile.getXpos(), tile.getYpos(), tile.getTilex(), tile.getTiley());
-		tileOccupied = tile;
+		this.currentTile = tile;
 	}
 
-	public Tile getTileOccupied() {
-		return tileOccupied;
+	/** Returns the tile this unit currently occupies. @author Minghao */
+	public Tile getCurrentTile() {
+		return currentTile;
+	}
+
+	/**
+	 * Returns true if this unit's health is at or below zero.
+	 * @author Minghao
+	 */
+	public boolean isDead() {
+		return health <= 0;
+	}
+
+	/**
+	 * Story Card #35: plays the death animation, removes the unit from its tile,
+	 * and sends the delete command to the front-end.
+	 * @param out
+	 * @author Minghao
+	 */
+	@JsonIgnore
+	public void die(ActorRef out) {
+		BasicCommands.playUnitAnimation(out, this, UnitAnimationType.death);
+		if (currentTile != null) {
+			currentTile.setUnit(null);
+			currentTile = null;
+		}
+		if (owner != null) {
+			owner.getUnitList().remove(this.id);
+		}
+		BasicCommands.deleteUnit(out, this);
 	}
 
 	// ////////// BASIC METHODS ////////////
@@ -236,6 +266,9 @@ public class Unit {
 	public void takeDamage(ActorRef out, int damage) {
 		setHealth(out, health - damage);
 		BasicCommands.setUnitHealth(out, this, health);
+		if (isDead()) {
+			die(out);
+		}
 	}
 
 	/// Method for BetterUnit to override
@@ -361,9 +394,6 @@ public class Unit {
 
 			wraithling.setPositionByTile(clickedTile);
 			clickedTile.setUnit(wraithling);
-
-			System.out.println("Wraithling summoned: HP " + wraithling.getHealth() + " ATK " + wraithling.getAttack() + " at (" +
-					clickedTile.getTilex() + "," + clickedTile.getTiley() + ")");
 
 			BasicCommands.drawUnit(out, wraithling, clickedTile);
 			for (int i = 0; i < 15; i++)

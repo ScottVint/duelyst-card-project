@@ -8,8 +8,6 @@ import structures.basic.players.Player;
 import structures.basic.unittypes.BetterUnit;
 import structures.basic.unittypes.Unit;
 import structures.basic.unittypes.Wraithling;
-import structures.logic.CombatLogic;
-
 import java.util.HashSet;
 import java.util.Set;
 
@@ -32,7 +30,7 @@ public class DarkTerminus extends Spell {
     public void cast(ActorRef out, GameState gameState,
                      Player player, Tile clickedTile) {
         Unit enemy = clickedTile.getUnit();
-        CombatLogic.death(out, gameState, enemy);
+        enemy.die(out);
         Wraithling summon = Unit.createWraithling(out, player, gameState);
         Unit.summonWraithling(out, clickedTile, player, gameState);
     }
