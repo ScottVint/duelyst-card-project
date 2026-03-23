@@ -1,7 +1,6 @@
 package structures.basic.spells;
 
 import akka.actor.ActorRef;
-import commands.BasicCommands;
 import structures.GameState;
 import structures.basic.Board;
 import structures.basic.Tile;
@@ -26,9 +25,10 @@ public class DarkTerminus extends Spell {
         }
         return targets;
     }
+
+    @Override
     public void cast(ActorRef out, GameState gameState,
-                     Player player, Tile clickedTile,
-                     Board board, int cardIndex) {
+                     Player player, Tile clickedTile) {
         Unit enemy = clickedTile.getUnit();
         enemy.die(out);
         Wraithling summon = Unit.createWraithling(out, player, gameState);

@@ -1,7 +1,10 @@
 import org.junit.Test;
+import structures.GameState;
 import structures.basic.unittypes.BetterUnit;
 import structures.basic.players.AIPlayer;
 import structures.basic.players.HumanPlayer;
+
+import static org.junit.Assert.assertEquals;
 
 public class PlayerTest {
 
@@ -17,9 +20,10 @@ public class PlayerTest {
     public void testAvatars() {
         HumanPlayer player1 = new HumanPlayer();
         AIPlayer player2 = new AIPlayer();
+        GameState gameState = new GameState();
 
-        // If someone knows how to check for
-        // specific images loaded, that'd be great
+        player1.setAvatar(null, gameState);
+
         assert player1.getAvatar().getClass() == BetterUnit.class;
         assert player2.getAvatar().getClass() == BetterUnit.class;
     }
@@ -38,6 +42,11 @@ public class PlayerTest {
     @Test
     public void testUnitID() {
         HumanPlayer player1 = new HumanPlayer();
-        assert player1.getAvatar().getId() == 0;
+        AIPlayer player2 = new AIPlayer();
+        GameState gameState = new GameState();
+        player1.setAvatar(null, gameState);
+        player2.setAvatar(null, gameState);
+        assertEquals(0, player1.getAvatar().getId());
+        assertEquals(1, player2.getAvatar().getId());
     }
 }

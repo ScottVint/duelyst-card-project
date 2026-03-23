@@ -23,6 +23,8 @@ public class Deck {
 
         for (Card card : cards) {
             card.setSpell();
+            if (card.getSpell() != null)
+                    card.getSpell().setCard(card);
         }
 
     }

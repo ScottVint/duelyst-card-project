@@ -272,7 +272,7 @@ public class Unit {
 	}
 
 	/// Method for BetterUnit to override
-	public void takeDamage(ActorRef out, Player player, int damage) {
+	public void takeDamage(ActorRef out, GameState gameState, int damage) {
 		takeDamage(out, damage);
 	}
 
@@ -280,7 +280,7 @@ public class Unit {
 	// Abstract methods to be implemented by unit subclasses
 
 	/// Triggers when the unit is summoned.
-	public void openingGambit(ActorRef out) {};
+	public void openingGambit(ActorRef out, GameState gameState) {};
 
 	/// Triggers when ANY unit dies.
 	public void deathwatch(ActorRef out) {};
@@ -378,6 +378,7 @@ public class Unit {
 		Wraithling wraithling = (Wraithling) BasicObjectBuilders.loadUnit("conf/gameconfs/units/wraithling.json", gameState.getNextUnitId(), Wraithling.class);
 
 		wraithling.setOwner(player);
+		wraithling.setMaxHealth(1);
 		wraithling.setHealth(out, 1);
 		wraithling.setAttack(out, 1);
 		wraithling.setMaxHealth(wraithling.getHealth());
@@ -395,13 +396,11 @@ public class Unit {
 			clickedTile.setUnit(wraithling);
 
 			BasicCommands.drawUnit(out, wraithling, clickedTile);
-			for (int i = 0; i < 10; i++) {
+			for (int i = 0; i < 15; i++)
 				BoardLogic.blink();
-			}
 			BasicCommands.setUnitHealth(out,wraithling,wraithling.getHealth());
-			for (int i = 0; i < 10; i++) {
+			for (int i = 0; i < 15; i++)
 				BoardLogic.blink();
-			}
 			BasicCommands.setUnitAttack(out, wraithling, wraithling.getAttack());
 	}
 }

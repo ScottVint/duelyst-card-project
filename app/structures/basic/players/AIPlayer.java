@@ -36,7 +36,11 @@ public class AIPlayer extends Player {
         avatar.setAttack(out, 2);
         System.out.println("Avatar created: HP " + avatar.getHealth() + " ATK " + avatar.getAttack());
     }
-
+    
+    @Override
+    public String toString() {
+        return "Player 2";
+    }
 
 }
 

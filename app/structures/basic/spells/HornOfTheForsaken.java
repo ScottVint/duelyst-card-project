@@ -6,7 +6,6 @@ import structures.GameState;
 import structures.basic.Board;
 import structures.basic.Tile;
 import structures.basic.players.Player;
-import structures.basic.unittypes.BetterUnit;
 import structures.logic.BoardLogic;
 
 import java.util.HashSet;
@@ -40,8 +39,7 @@ public class HornOfTheForsaken extends Spell {
 
     @Override
     public void cast(ActorRef out, GameState gameState,
-                     Player player, Tile clickedTile,
-                     Board board, int cardIndex) {
+                     Player player, Tile clickedTile) {
         player.getAvatar().setHornCharges(player.getAvatar().MAX_HORN_CHARGES);
         BasicCommands.addPlayer1Notification(out, "Horn equipped", 1);
     }

@@ -25,9 +25,9 @@ public class Beamshock extends Spell {
         return targets;
     }
 
+    @Override
     public void cast(ActorRef out, GameState gameState,
-                     Player player, Tile clickedTile,
-                     Board board, int cardIndex) {
+                     Player player, Tile clickedTile) {
         Unit enemy = clickedTile.getUnit();
         enemy.hasAttacked = true;
         enemy.hasMoved = true;
