@@ -73,7 +73,7 @@ public class GameState {
 		}
 		BasicCommands.setUnitAttack(out, avatar, avatar.getAttack());
 	}
-	//TODO Create CombatLogic class
+
 	/**
 	 * Combat damage based on attacker attack stat.
 	 */

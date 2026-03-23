@@ -39,7 +39,7 @@ public class SpellTest {
         assertEquals("Unit should take normal damage.", 18, avatar.getHealth());
 
         boolean hasWraithling = false;
-        for (Tile tile : BoardLogic.findAdjacentTiles(avatar.getTileOccupied(), gs.getBoard())) {
+        for (Tile tile : BoardLogic.findAdjacentTiles(avatar.getCurrentTile(), gs.getBoard())) {
             if (tile.getUnit() != null && tile.getUnit() instanceof Wraithling) {
                 hasWraithling = true;
                 break;
@@ -58,9 +58,9 @@ public class SpellTest {
 
 
         boolean hasWraithling = false;
-        for (Tile tile : BoardLogic.findAdjacentTiles(avatar.getTileOccupied(), gs.getBoard()))
+        for (Tile tile : BoardLogic.findAdjacentTiles(avatar.getCurrentTile(), gs.getBoard()))
             tile.setUnit(fillerUnit);
-        for (Tile tile : BoardLogic.findAdjacentTiles(avatar.getTileOccupied(), gs.getBoard()))
+        for (Tile tile : BoardLogic.findAdjacentTiles(avatar.getCurrentTile(), gs.getBoard()))
             if (tile.getUnit() != null && tile.getUnit() instanceof Wraithling) {
                 hasWraithling = true;
                 break;

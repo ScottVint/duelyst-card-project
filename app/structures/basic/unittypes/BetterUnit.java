@@ -74,7 +74,7 @@ public class BetterUnit extends Unit {
 		// Summon a wraithling in a random adjacent tile if unit has horn charges
 		if (hornCharges > 0 ) {
 			hornCharges--;
-			List<Tile> summonable = new ArrayList<>(BoardLogic.findAdjacentTiles(this.tileOccupied, gameState.getBoard()));
+			List<Tile> summonable = new ArrayList<>(BoardLogic.findAdjacentTiles(this.currentTile, gameState.getBoard()));
 			// Remove occupied tiles
             summonable.removeIf(tile -> tile.getUnit() != null);
 			if (!summonable.isEmpty()) {
