@@ -38,7 +38,10 @@ public class TileClicked implements EventProcessor {
     public void processEvent(ActorRef out, GameState gameState, JsonNode message) {
         // Give nothing if clicked outside of turn
         // or if a unit is moving
-        if (!gameState.player1Turn) {
+        if (gameState.gameOver) {
+            BasicCommands.addPlayer1Notification(out, "The game is over.", 2);
+            return;
+        } else if (!gameState.player1Turn) {
             BasicCommands.addPlayer1Notification(out, "It is not your turn.", 2);
             return;
         } else if (gameState.unitMoving) {
@@ -73,7 +76,20 @@ public class TileClicked implements EventProcessor {
                 BasicCommands.deleteCard(out, gameState.selectedHandPosition);
                 gameState.getPlayer1().useCard(out, gameState,
                         cardIndex, clickedTile, selectedCard.getManacost());
+                gameState.selectedHandPosition = null;
+                return;
+            } else {
+                BasicCommands.addPlayer1Notification(out, "Not enough mana to play this card.", 2);
+                selectedCard.highlightTargets(out, gameState.player1, gameState.board);
+                return;
             }
+        }
+
+        // Invalid tile clicked while a card is selected
+        if (selectedCard != null) {
+            BasicCommands.addPlayer1Notification(out, "That is not a valid target for this card.", 2);
+            selectedCard.highlightTargets(out, gameState.player1, gameState.board);
+            return;
         }
 
         // Clicked on a unit (no card selected)
@@ -107,6 +123,20 @@ public class TileClicked implements EventProcessor {
         // Empty tile + selected unit => try move
         else if (gameState.getSelectedUnit() != null && gameState.highlightedTiles.contains(clickedTile)) {
             BoardLogic.moveSelectedUnit(out, gameState, clickedTile, board);
+            gameState.selectedUnit = null;
+            return;
+        }
+
+        // Invalid move tile for selected unit
+         else if (gameState.getSelectedUnit() != null) {
+            BasicCommands.addPlayer1Notification(out, "That is not a valid move destination.", 2);
+            Tile selectedTile = board.getTile(
+        gameState.getSelectedUnit().getPosition().getTilex(),
+        gameState.getSelectedUnit().getPosition().getTiley()
+);
+            BasicCommands.drawTile(out, selectedTile, 1);
+            BoardLogic.highlightMovement(out, selectedTile, gameState.getSelectedUnit(), board);
+            return;
         }
 
         // Deselect card

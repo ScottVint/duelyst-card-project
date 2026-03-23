@@ -10,9 +10,12 @@ import structures.basic.unittypes.BetterUnit;
 import structures.basic.players.Player;
 import structures.basic.unittypes.Unit;
 import structures.basic.Tile;
+import structures.logic.AI;
 import structures.logic.BoardLogic;
 
 import utils.BasicObjectBuilders;
+
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * Indicates that both the core game loop in the browser is starting, meaning
@@ -43,6 +46,10 @@ public class Initalize implements EventProcessor {
         Player player1 = gameState.getPlayer1();
         Player player2 = gameState.getPlayer2();
 
+        // Player 1 starts first
+        boolean humanStarts = true;
+        gameState.player1Turn = true;
+
         System.out.println("Players: " + player1.getClass() + "," + player2.getClass());
 
         // Create avatars
@@ -52,8 +59,16 @@ public class Initalize implements EventProcessor {
         BetterUnit humanAvatar = player1.getAvatar();
         BetterUnit aiAvatar = player2.getAvatar();
 
-        // Player starts their first turn with 2 mana
-        player1.setMana(out, 2);
+        // Starting player begins with 2 mana, the other with 0
+        if (humanStarts) {
+            player1.setMana(out, 2);
+            player2.setMana(out, 0);
+            BasicCommands.addPlayer1Notification(out, "You go first!", 2);
+        } else {
+            player1.setMana(out, 0);
+            player2.setMana(out, 2);
+            BasicCommands.addPlayer1Notification(out, "AI goes first!", 2);
+        }
 
         // Player 1 avatar starts at [1,2] (0-indexed)
         gameState.placeAvatar(out, humanAvatar, 1, 2);
@@ -61,12 +76,21 @@ public class Initalize implements EventProcessor {
         // Player 2 avatar starts at [7,2] (0-indexed)
         gameState.placeAvatar(out, aiAvatar, 7, 2);
 
-        // Let the avatars move on turn 1
-        humanAvatar.hasAttacked = false;
-        humanAvatar.hasMoved = false;
+        // Only the starting player's avatar may act on turn 1
+        if (humanStarts) {
+            humanAvatar.hasAttacked = false;
+            humanAvatar.hasMoved = false;
 
-        aiAvatar.hasAttacked = false;
-        aiAvatar.hasMoved = false;
+            aiAvatar.hasAttacked = true;
+            aiAvatar.hasMoved = true;
+        } else {
+            humanAvatar.hasAttacked = true;
+            humanAvatar.hasMoved = true;
+
+            aiAvatar.hasAttacked = false;
+            aiAvatar.hasMoved = false;
+        }
+
 //        // Temporary enemy non-avatar unit for testing Dark Terminus
 //        Unit testEnemy = BasicObjectBuilders.loadUnit(
 //                "conf/gameconfs/units/gloom_chaser.json",
@@ -87,13 +111,14 @@ public class Initalize implements EventProcessor {
 //        BasicCommands.setUnitHealth(out, testEnemy, testEnemy.getHealth());
 
         // Each player starts with 3 cards drawn from the deck
-
         for (int i = 0; i < 3; i++) {
             player1.drawCardIntoHand();
             player2.drawCardIntoHand();
         }
 
         gameState.player1.drawHand(out);
+
+        
 
         // Note: As per the template's instructions, comment out the demo execution when implementing your own solution
         // CommandDemo.executeDemo(out);

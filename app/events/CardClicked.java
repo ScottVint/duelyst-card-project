@@ -36,6 +36,11 @@ public class CardClicked implements EventProcessor {
 		// Reset card drawn
 		gameState.player1.drawHand(out);
 
+		if (gameState.gameOver) {
+			BasicCommands.addPlayer1Notification(out, "The game is over.", 2);
+			return;
+		}
+
 		if (!gameState.player1Turn) {
 			BasicCommands.addPlayer1Notification(out, "It is not your turn.", 2);
 			return;
@@ -61,16 +66,18 @@ public class CardClicked implements EventProcessor {
 		Card card = hand.get(index);
 		BasicCommands.drawCard(out, card, handPosition, 1);
 
-		// Important:
-		// Do NOT block card selection here based on mana.
 		// Preview/highlight should still happen on card-click.
-		// Mana is checked later in TileClicked when the player actually casts/places the card.
 		gameState.selectedHandPosition = handPosition;
+
+		if (!gameState.player1.enoughMana(out, card.getManacost())) {
+			BasicCommands.addPlayer1Notification(out, "Not enough mana to play this card.", 2);
+		}
 
 		gameState.highlightedTiles = card.getTargets(gameState.player1, gameState.board);
 		card.highlightTargets(out, gameState.player1, gameState.board);
 
-
+		if (gameState.highlightedTiles == null || gameState.highlightedTiles.isEmpty()) {
+			BasicCommands.addPlayer1Notification(out, "This card has no valid targets.", 2);
+		}
 	}
 }
-
