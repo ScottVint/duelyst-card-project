@@ -223,11 +223,11 @@ public class Card {
 				spellClass = SundropElixir.class;
 				break;
 
-			case "True Strike":
+			case "Truestrike":
 				spellClass = Truestrike.class;
 				break;
 
-			case "Beam Shock":
+			case "Beamshock":
 				spellClass = Beamshock.class;
 				break;
 		}
