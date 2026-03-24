@@ -145,4 +145,70 @@ public class CombatLogicTest {
         assertFalse("Unit attack flag should refresh on new turn.", unit.hasAttacked);
         assertFalse("Unit counterattack flag should refresh on new turn.", unit.hasCounterattacked);
     }
+
+    // ── SP30: Move-then-Attack ────────────────────────────────────────────────
+
+    @Test
+    public void findAutoAttackDestinationReturnsNearestTileForReachableEnemy() {
+        // Human unit at (4,2), AI avatar is at (7,2); target = (7,2).
+        // The attacker can reach (6,2) in one turn (2 cardinal steps right) and
+        // (6,2) is adjacent to (7,2) -> valid destination exists.
+        Unit attacker = summonHumanUnit("conf/gameconfs/cards/2_4_c_u_saberspine_tiger.json", 4, 2);
+        Tile enemyTile = gs.getBoard().getTile(7, 2); // AI avatar tile
+
+        Tile result = CombatLogic.findAutoAttackDestination(attacker, enemyTile, gs.getBoard());
+
+        assertNotNull("Should find a move tile from which the enemy is attackable.", result);
+        // (6,2) is the closest reachable tile adjacent to (7,2)
+        assertEquals(6, result.getTilex());
+        assertEquals(2, result.getTiley());
+    }
+
+    @Test
+    public void findAutoAttackDestinationReturnsNullWhenEnemyOutOfRange() {
+        // Human unit at (4,2); place AI unit at (8,4) (far corner).
+        // Max movement reaches x=6, but no tile within reach is adjacent to (8,4).
+        Unit attacker = summonHumanUnit("conf/gameconfs/cards/2_4_c_u_saberspine_tiger.json", 4, 2);
+        Unit farEnemy = summonAIUnit("conf/gameconfs/cards/1_1_c_u_bad_omen.json", 8, 4);
+        Tile enemyTile = gs.getBoard().getTile(8, 4);
+
+        Tile result = CombatLogic.findAutoAttackDestination(attacker, enemyTile, gs.getBoard());
+
+        assertNull("Should return null when enemy cannot be reached even after moving.", result);
+    }
+
+    @Test
+    public void findAutoAttackDestinationReturnsNullForEmptyTile() {
+        Unit attacker = summonHumanUnit("conf/gameconfs/cards/2_4_c_u_saberspine_tiger.json", 4, 2);
+        Tile emptyTile = gs.getBoard().getTile(6, 2); // no unit here
+
+        Tile result = CombatLogic.findAutoAttackDestination(attacker, emptyTile, gs.getBoard());
+
+        assertNull("Should return null when the target tile has no unit.", result);
+    }
+
+    @Test
+    public void startPendingAttackAfterMoveSetsState() {
+        Unit attacker = summonHumanUnit("conf/gameconfs/cards/2_4_c_u_saberspine_tiger.json", 4, 2);
+        Tile targetTile = gs.getBoard().getTile(7, 2);
+
+        gs.startPendingAttackAfterMove(attacker, targetTile);
+
+        assertTrue("pendingAttackAfterMove should be true.", gs.pendingAttackAfterMove);
+        assertEquals("pendingAttackAttacker should reference the attacker.", attacker, gs.pendingAttackAttacker);
+        assertEquals("pendingAttackTargetTile should reference the target.", targetTile, gs.pendingAttackTargetTile);
+    }
+
+    @Test
+    public void clearPendingAttackAfterMoveClearsState() {
+        Unit attacker = summonHumanUnit("conf/gameconfs/cards/2_4_c_u_saberspine_tiger.json", 4, 2);
+        Tile targetTile = gs.getBoard().getTile(7, 2);
+
+        gs.startPendingAttackAfterMove(attacker, targetTile);
+        gs.clearPendingAttackAfterMove();
+
+        assertFalse("pendingAttackAfterMove should be cleared.", gs.pendingAttackAfterMove);
+        assertNull("pendingAttackAttacker should be null after clear.", gs.pendingAttackAttacker);
+        assertNull("pendingAttackTargetTile should be null after clear.", gs.pendingAttackTargetTile);
+    }
 }
