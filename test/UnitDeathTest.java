@@ -72,8 +72,8 @@ public class UnitDeathTest implements DummyTell {
         assertNotNull("Pre-condition: currentTile should be set", unit.getCurrentTile());
         assertEquals("Pre-condition: tile should contain the unit", unit, tile.getUnit());
 
-//        unit.die(null);
-        unit.die(null, null);
+        unit.die(null);
+
         assertNull("currentTile must be null after die()", unit.getCurrentTile());
         assertNull("tile.getUnit() must be null after die()", tile.getUnit());
     }

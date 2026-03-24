@@ -1,7 +1,6 @@
 package structures.logic;
 
 import akka.actor.ActorRef;
-import commands.BasicCommands;
 import structures.GameState;
 import structures.basic.unittypes.Unit;
 import structures.basic.players.Player;
@@ -51,13 +50,7 @@ public class AI {
         public static void runAI(ActorRef out, GameState gs, Player p1, Player p2) {
             // AI requires a live WebSocket connection; skip during unit tests
             if (out == null) return;
-            BasicCommands.addPlayer1Notification(out, "AI's Turn", 2);
-            // 2. 让后端线程暂停 2000 毫秒（2秒），模拟 AI 在思考
-            try {
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+
 //            while ((canSummon || canMove || canAttack) && (timePassed < maxTime)) {
 //                // TODO: implement actual AI later
 ////                System.out.println(timePassed);
@@ -65,8 +58,6 @@ public class AI {
 //            }
             timePassed = 0;
             gs.endTurn(out, p2, p1);
-
-            BasicCommands.addPlayer1Notification(out, "Your Turn", 2);
         }
     }
 }
