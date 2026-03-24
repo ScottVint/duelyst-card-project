@@ -25,7 +25,7 @@ public class GameState {
 	public boolean gameInitalised = false;
 
 
-	public HumanPlayer player1 =  new HumanPlayer();
+	public HumanPlayer player1 = new HumanPlayer();
 	public AIPlayer player2 = new AIPlayer();
 	public Board board = new Board();
 	public Unit selectedUnit = null;
@@ -33,40 +33,62 @@ public class GameState {
 
 	public int turnCount = 1;
 
-	/** 1-indexed hand position of the selected card, or null if none selected */
+	/**
+	 * 1-indexed hand position of the selected card, or null if none selected
+	 */
 	public Integer selectedHandPosition = null;
 
-	/** Next unique unit id for summoned units. */
+	/**
+	 * Next unique unit id for summoned units.
+	 */
 	private int nextUnitId = 0;
 
-	/** List of currently highlighted tiles. Used for validation.*/
+	/**
+	 * List of currently highlighted tiles. Used for validation.
+	 */
 	public Set<Tile> highlightedTiles = new HashSet<Tile>();
 
-	/** Movement state */
+	/**
+	 * Movement state
+	 */
 	public Unit movingUnit = null;
 	public Tile moveTargetTile = null;
 	public boolean unitMoving = false;
 
-	/** Pending move-then-attack state for story #30 */
+	/**
+	 * Pending move-then-attack state for story #30
+	 */
 	public boolean pendingAttackAfterMove = false;
 	public Unit pendingAttackAttacker = null;
 	public Tile pendingAttackTargetTile = null;
 
-	/** Optional turn timer state for story #34 */
+	/**
+	 * Optional turn timer state for story #34
+	 */
 	public boolean turnTimerEnabled = true;
 	public int turnTimeLimitSeconds = 60;
 	public long currentTurnDeadlineMillis = -1L;
 	public boolean timerExpiredThisTurn = false;
 
-	public Player getPlayer1() { return player1; }
+	public Player getPlayer1() {
+		return player1;
+	}
 
-	public Player getPlayer2() { return player2; }
+	public Player getPlayer2() {
+		return player2;
+	}
 
-	public Board getBoard() { return board; }
+	public Board getBoard() {
+		return board;
+	}
 
-	public Unit getSelectedUnit() { return selectedUnit; }
+	public Unit getSelectedUnit() {
+		return selectedUnit;
+	}
 
-	public int getNextUnitId() { return nextUnitId++; }
+	public int getNextUnitId() {
+		return nextUnitId++;
+	}
 
 	public void startPendingAttackAfterMove(Unit attacker, Tile targetTile) {
 		this.pendingAttackAfterMove = true;
@@ -201,7 +223,6 @@ public class GameState {
 		clearPendingAttackAfterMove();
 
 
-
 		// Mana transfer
 		int startingMana = Math.min(turnCount + 1, Player.getMaxMana());
 		playerEndingTurn.setMana(out, 0);
@@ -214,14 +235,6 @@ public class GameState {
 		resetTurnFlags(playerStartingTurn);
 
 // Optional turn ownership feedback
-<<<<<<< HEAD
-		if (playerStartingTurn instanceof HumanPlayer) {
-			BasicCommands.addPlayer1Notification(out, "Player Turn", 2);
-			startTurnTimer();
-			BasicCommands.startTurnTimer(out, currentTurnDeadlineMillis);
-=======
-
-
 		if (playerStartingTurn instanceof HumanPlayer) {
 			BasicCommands.addPlayer1Notification(out, "Player Turn", 2);
 
@@ -232,19 +245,16 @@ public class GameState {
 				stopTurnTimer();
 				BasicCommands.stopTurnTimer(out);
 			}
->>>>>>> 0349b5b (Complete SP29 SP30 SP34: counterattack, move-then-attack, turn timer)
 		} else {
 			BasicCommands.addPlayer1Notification(out, "AI Turn", 2);
 			stopTurnTimer();
 			BasicCommands.stopTurnTimer(out);
 		}
-<<<<<<< HEAD
 
-=======
->>>>>>> 0349b5b (Complete SP29 SP30 SP34: counterattack, move-then-attack, turn timer)
 // Trigger AI after control has passed to AI
 		if (playerStartingTurn instanceof AIPlayer) {
 			AI.AILogic.runAI(out, this, player1, player2);
+			}
 		}
 	}
-}
+
