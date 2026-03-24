@@ -6,6 +6,8 @@ import structures.GameState;
 import structures.basic.Tile;
 import structures.basic.UnitAnimationType;
 import structures.basic.unittypes.Unit;
+import structures.basic.Board;
+import java.util.Set;
 
 public class CombatLogic {
 
@@ -75,5 +77,48 @@ public class CombatLogic {
 
             defender.hasCounterattacked = true;
         }
+    }
+    public static Tile findAutoAttackDestination(Unit attacker, Tile enemyTile, Board board) {
+        if (attacker == null || enemyTile == null || enemyTile.getUnit() == null || board == null) {
+            return null;
+        }
+
+        Tile origin = board.getTile(
+                attacker.getPosition().getTilex(),
+                attacker.getPosition().getTiley()
+        );
+
+        if (origin == null) {
+            return null;
+        }
+
+        Set<Tile> moveTiles = BoardLogic.findValidMovement(origin, attacker, board);
+
+        Tile bestTile = null;
+        int bestDistance = Integer.MAX_VALUE;
+
+        int enemyX = enemyTile.getTilex();
+        int enemyY = enemyTile.getTiley();
+
+        for (Tile moveTile : moveTiles) {
+            Set<Tile> attackTilesFromMoveTile = BoardLogic.findValidAttackUnits(moveTile, attacker, board);
+
+            if (attackTilesFromMoveTile.contains(enemyTile)) {
+                int distance = Math.abs(moveTile.getTilex() - enemyX)
+                        + Math.abs(moveTile.getTiley() - enemyY);
+
+                if (bestTile == null
+                        || distance < bestDistance
+                        || (distance == bestDistance && moveTile.getTilex() < bestTile.getTilex())
+                        || (distance == bestDistance
+                        && moveTile.getTilex() == bestTile.getTilex()
+                        && moveTile.getTiley() < bestTile.getTiley())) {
+                    bestTile = moveTile;
+                    bestDistance = distance;
+                }
+            }
+        }
+
+        return bestTile;
     }
 }

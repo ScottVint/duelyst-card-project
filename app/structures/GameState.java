@@ -214,16 +214,34 @@ public class GameState {
 		resetTurnFlags(playerStartingTurn);
 
 // Optional turn ownership feedback
+<<<<<<< HEAD
 		if (playerStartingTurn instanceof HumanPlayer) {
 			BasicCommands.addPlayer1Notification(out, "Player Turn", 2);
 			startTurnTimer();
 			BasicCommands.startTurnTimer(out, currentTurnDeadlineMillis);
+=======
+
+
+		if (playerStartingTurn instanceof HumanPlayer) {
+			BasicCommands.addPlayer1Notification(out, "Player Turn", 2);
+
+			if (turnTimerEnabled) {
+				startTurnTimer();
+				BasicCommands.startTurnTimer(out, currentTurnDeadlineMillis);
+			} else {
+				stopTurnTimer();
+				BasicCommands.stopTurnTimer(out);
+			}
+>>>>>>> 0349b5b (Complete SP29 SP30 SP34: counterattack, move-then-attack, turn timer)
 		} else {
 			BasicCommands.addPlayer1Notification(out, "AI Turn", 2);
 			stopTurnTimer();
 			BasicCommands.stopTurnTimer(out);
 		}
+<<<<<<< HEAD
 
+=======
+>>>>>>> 0349b5b (Complete SP29 SP30 SP34: counterattack, move-then-attack, turn timer)
 // Trigger AI after control has passed to AI
 		if (playerStartingTurn instanceof AIPlayer) {
 			AI.AILogic.runAI(out, this, player1, player2);

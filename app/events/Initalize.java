@@ -96,8 +96,16 @@ public class Initalize implements EventProcessor {
         gameState.player1.drawHand(out);
 
         BasicCommands.addPlayer1Notification(out, "Player Turn", 2);
+<<<<<<< HEAD
         gameState.startTurnTimer();
         BasicCommands.startTurnTimer(out, gameState.currentTurnDeadlineMillis);
+=======
+        if (gameState.turnTimerEnabled) {
+            gameState.startTurnTimer();
+            BasicCommands.startTurnTimer(out, gameState.currentTurnDeadlineMillis);
+        }
+
+>>>>>>> 0349b5b (Complete SP29 SP30 SP34: counterattack, move-then-attack, turn timer)
         // Note: As per the template's instructions, comment out the demo execution when implementing your own solution
         // CommandDemo.executeDemo(out);
     }

@@ -159,7 +159,11 @@ public class TileClicked implements EventProcessor {
 
                 // Case B: not in range, but can move to a tile from which the target becomes attackable
                 if (!attacker.hasMoved) {
+<<<<<<< HEAD
                     Tile autoAttackDestination = findAutoAttackDestination(attacker, clickedTile, board);
+=======
+                    Tile autoAttackDestination = CombatLogic.findAutoAttackDestination(attacker, clickedTile, board);
+>>>>>>> 0349b5b (Complete SP29 SP30 SP34: counterattack, move-then-attack, turn timer)
 
                     if (autoAttackDestination != null) {
                         gameState.startPendingAttackAfterMove(attacker, clickedTile);
@@ -193,6 +197,7 @@ public class TileClicked implements EventProcessor {
         gameState.highlightedTiles.clear();
         gameState.player1.drawHand(out);
     }
+<<<<<<< HEAD
         private Tile findAutoAttackDestination(Unit attacker, Tile enemyTile, Board board) {
             if (attacker == null || enemyTile == null || enemyTile.getUnit() == null) {
                 return null;
@@ -217,5 +222,8 @@ public class TileClicked implements EventProcessor {
 
             return null;
         }
+=======
+
+>>>>>>> 0349b5b (Complete SP29 SP30 SP34: counterattack, move-then-attack, turn timer)
     }
 
