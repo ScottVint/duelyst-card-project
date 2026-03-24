@@ -126,7 +126,7 @@ public class GameState {
 
 
 	public void endTurn(ActorRef out, Player playerEndingTurn, Player playerStartingTurn) {
-		if (gameOver) return;
+		
 
 		if (!player1Turn) {
 			turnCount++;
