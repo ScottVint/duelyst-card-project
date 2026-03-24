@@ -125,12 +125,11 @@ public class TileClicked implements EventProcessor {
                     gameState.highlightedTiles.addAll(moveTiles);
                 }
 
+
                 // highlight valid enemy targets if attack is still available
                 if (canAttack) {
                     Set<Tile> attackTiles = BoardLogic.findValidAttackUnits(origin, clickedUnit, board);
-                    for (Tile tile : attackTiles) {
-                        BasicCommands.drawTile(out, tile, 2);
-                    }
+                    BoardLogic.highlightAttackTiles(out, origin, clickedUnit, board);
                     gameState.highlightedTiles.addAll(attackTiles);
                 }
 
@@ -138,38 +137,35 @@ public class TileClicked implements EventProcessor {
                 return;
             }
 
+
 // 2) Click enemy while a friendly unit is selected
             if (gameState.selectedUnit != null
                     && gameState.selectedUnit.getOwner() == gameState.getPlayer1()
                     && !gameState.selectedUnit.hasAttacked) {
 
                 Unit attacker = gameState.selectedUnit;
-                Tile attackerTile = board.getTile(
-                        attacker.getPosition().getTilex(),
-                        attacker.getPosition().getTiley());
+
+                // Use the Unit helper if it exists in your codebase; otherwise keep the board lookup version.
+
+                Tile attackerTile = attacker.getCurrentTile();
 
                 // Case A: already in direct attack range -> attack immediately
                 if (attackerTile != null
                         && BoardLogic.findValidAttackUnits(attackerTile, attacker, board).contains(clickedTile)) {
                     CombatLogic.tryAttackSelectedUnit(out, gameState, clickedTile);
-                    gameState.highlightedTiles.clear();
-                    gameState.player1.drawHand(out);
-                    return;
-                }
 
-                // Case B: not in range, but can move to a tile from which the target becomes attackable
-                if (!attacker.hasMoved) {
+                    // Case B: not in range, but can move to a tile from which the target becomes attackable
+                } else if (!attacker.hasMoved) {
                     Tile autoAttackDestination = CombatLogic.findAutoAttackDestination(attacker, clickedTile, board);
 
                     if (autoAttackDestination != null) {
                         gameState.startPendingAttackAfterMove(attacker, clickedTile);
                         BoardLogic.moveSelectedUnit(out, gameState, autoAttackDestination, board);
-                        gameState.player1.drawHand(out);
-                        return;
                     }
                 }
 
-                // Case C: enemy clicked, but neither direct attack nor legal move-then-attack exists
+                // Common cleanup for all enemy-click outcomes
+                gameState.highlightedTiles.clear();
                 gameState.player1.drawHand(out);
                 return;
             }

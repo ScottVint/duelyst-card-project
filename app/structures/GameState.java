@@ -228,8 +228,8 @@ public class GameState {
 		playerEndingTurn.setMana(out, 0);
 		playerStartingTurn.setMana(out, startingMana);
 
-		// New turn draw belongs to the player whose turn is starting
-		playerStartingTurn.drawCardIntoHand();
+		// Keep existing behaviour until the team resolves the spec conflict around card draw timing
+		playerEndingTurn.drawCardIntoHand();
 
 		// Refresh actions for the player whose turn is starting
 		resetTurnFlags(playerStartingTurn);
