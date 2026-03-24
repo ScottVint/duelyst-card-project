@@ -11,7 +11,7 @@ import structures.basic.unittypes.BetterUnit;
 import structures.basic.unittypes.Unit;
 import structures.logic.AI;
 import structures.logic.BoardLogic;
-import structures.logic.CombatLogic;
+
 
 import java.util.HashSet;
 import java.util.Set;
@@ -23,7 +23,7 @@ import java.util.Set;
 public class GameState {
 
 	public boolean gameInitalised = false;
-	public boolean something = false;
+
 
 	public HumanPlayer player1 =  new HumanPlayer();
 	public AIPlayer player2 = new AIPlayer();
@@ -47,6 +47,17 @@ public class GameState {
 	public Tile moveTargetTile = null;
 	public boolean unitMoving = false;
 
+	/** Pending move-then-attack state for story #30 */
+	public boolean pendingAttackAfterMove = false;
+	public Unit pendingAttackAttacker = null;
+	public Tile pendingAttackTargetTile = null;
+
+	/** Optional turn timer state for story #34 */
+	public boolean turnTimerEnabled = true;
+	public int turnTimeLimitSeconds = 60;
+	public long currentTurnDeadlineMillis = -1L;
+	public boolean timerExpiredThisTurn = false;
+
 	public Player getPlayer1() { return player1; }
 
 	public Player getPlayer2() { return player2; }
@@ -57,6 +68,58 @@ public class GameState {
 
 	public int getNextUnitId() { return nextUnitId++; }
 
+	public void startPendingAttackAfterMove(Unit attacker, Tile targetTile) {
+		this.pendingAttackAfterMove = true;
+		this.pendingAttackAttacker = attacker;
+		this.pendingAttackTargetTile = targetTile;
+	}
+
+	public void clearPendingAttackAfterMove() {
+		this.pendingAttackAfterMove = false;
+		this.pendingAttackAttacker = null;
+		this.pendingAttackTargetTile = null;
+	}
+
+
+	public void startTurnTimer() {
+		if (!turnTimerEnabled) {
+			currentTurnDeadlineMillis = -1L;
+			timerExpiredThisTurn = false;
+			return;
+		}
+
+		currentTurnDeadlineMillis = System.currentTimeMillis() + (turnTimeLimitSeconds * 1000L);
+		timerExpiredThisTurn = false;
+	}
+
+	public void stopTurnTimer() {
+		currentTurnDeadlineMillis = -1L;
+		timerExpiredThisTurn = false;
+	}
+
+	public boolean isTurnTimerRunning() {
+		return turnTimerEnabled && currentTurnDeadlineMillis > 0;
+	}
+
+	public boolean hasTurnTimerExpired() {
+		return isTurnTimerRunning() && System.currentTimeMillis() >= currentTurnDeadlineMillis;
+	}
+
+	public void resetTurnFlags(Player player) {
+		if (player == null) return;
+
+		if (player.getAvatar() != null) {
+			player.getAvatar().hasAttacked = false;
+			player.getAvatar().hasMoved = false;
+			player.getAvatar().hasCounterattacked = false;
+		}
+
+		for (Unit unit : player.getUnitList().values()) {
+			unit.hasAttacked = false;
+			unit.hasMoved = false;
+			unit.hasCounterattacked = false;
+		}
+	}
 
 	public void placeAvatar(ActorRef out, BetterUnit avatar, int x, int y) {
 		Tile tile = this.board.getTile(x, y);
@@ -114,28 +177,55 @@ public class GameState {
 		}
 	}
 
-
 	public void endTurn(ActorRef out, Player playerEndingTurn, Player playerStartingTurn) {
+		// Stop the previous turn timer first
+		stopTurnTimer();
+
+		// A full round increments when AI ends and control returns to human
 		if (!player1Turn) {
 			turnCount++;
 		}
+
+		// Swap active side
 		player1Turn = !player1Turn;
-		// Refresh mana
+
+		// End-turn board/input cleanup
+		selectedUnit = null;
+		selectedHandPosition = null;
+		highlightedTiles.clear();
+
+		movingUnit = null;
+		moveTargetTile = null;
+		unitMoving = false;
+
+		clearPendingAttackAfterMove();
+
+
+
+		// Mana transfer
 		int startingMana = Math.min(turnCount + 1, Player.getMaxMana());
-		playerStartingTurn.setMana(out, startingMana);
 		playerEndingTurn.setMana(out, 0);
+		playerStartingTurn.setMana(out, startingMana);
 
-		// Draw card: the ending player draws 1 card at the end of their turn (for next turn)
-		playerEndingTurn.drawCardIntoHand();
+		// New turn draw belongs to the player whose turn is starting
+		playerStartingTurn.drawCardIntoHand();
 
-		// Reset flags
-		playerEndingTurn.getAvatar().hasAttacked = false; playerEndingTurn.getAvatar().hasMoved = false;
-		for (Unit unit : playerEndingTurn.getUnitList().values()) {
-			unit.hasAttacked = false; unit.hasMoved = false;
+		// Refresh actions for the player whose turn is starting
+		resetTurnFlags(playerStartingTurn);
+
+// Optional turn ownership feedback
+		if (playerStartingTurn instanceof HumanPlayer) {
+			BasicCommands.addPlayer1Notification(out, "Player Turn", 2);
+			startTurnTimer();
+			BasicCommands.startTurnTimer(out, currentTurnDeadlineMillis);
+		} else {
+			BasicCommands.addPlayer1Notification(out, "AI Turn", 2);
+			stopTurnTimer();
+			BasicCommands.stopTurnTimer(out);
 		}
 
-		// Run AI on AI turn
-		if (playerEndingTurn instanceof HumanPlayer) {
+// Trigger AI after control has passed to AI
+		if (playerStartingTurn instanceof AIPlayer) {
 			AI.AILogic.runAI(out, this, player1, player2);
 		}
 	}

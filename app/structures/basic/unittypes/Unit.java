@@ -57,6 +57,7 @@ public class Unit {
 	int attack;
 	public boolean hasMoved = true;
 	public boolean hasAttacked = true;
+	public boolean hasCounterattacked = false;
 
 	// ////////// ABILITY FLAGS ////////////
 	// These abilities share a unified function and have a trigger each.
@@ -232,6 +233,64 @@ public class Unit {
 	public boolean isDead() {
 		return health <= 0;
 	}
+
+
+	/**
+	 * Returns true if this unit can still counterattack this turn.
+	 * Counterattack legality beyond this flag is handled by CombatLogic.
+	 */
+	@JsonIgnore
+	public boolean canCounterattack() {
+		return !isDead() && !hasCounterattacked;
+	}
+
+	/**
+	 * Marks that this unit has used its movement this turn.
+	 */
+	@JsonIgnore
+	public void markMoved() {
+		this.hasMoved = true;
+	}
+
+	/**
+	 * Marks that this unit has used its normal attack this turn.
+	 */
+	@JsonIgnore
+	public void markAttacked() {
+		this.hasAttacked = true;
+	}
+
+	/**
+	 * Marks that this unit has already counterattacked this turn.
+	 */
+	@JsonIgnore
+	public void markCounterattacked() {
+		this.hasCounterattacked = true;
+	}
+
+	/**
+	 * Resets per-turn action flags at the start of this unit's owner's turn.
+	 * Counterattack is also refreshed each new turn.
+	 */
+	@JsonIgnore
+	public void refreshForNewTurn() {
+		this.hasMoved = false;
+		this.hasAttacked = false;
+		this.hasCounterattacked = false;
+	}
+
+	/**
+	 * Applies the default "summoning sickness" style state:
+	 * newly summoned units cannot move or attack this turn unless handled elsewhere
+	 * (e.g. Rush in summon logic / GameTracker).
+	 */
+	@JsonIgnore
+	public void exhaustOnSummon() {
+		this.hasMoved = true;
+		this.hasAttacked = true;
+		this.hasCounterattacked = false;
+	}
+
 
 	/**
 	 * Story Card #35: plays the death animation, removes the unit from its tile,

@@ -95,6 +95,9 @@ public class Initalize implements EventProcessor {
 
         gameState.player1.drawHand(out);
 
+        BasicCommands.addPlayer1Notification(out, "Player Turn", 2);
+        gameState.startTurnTimer();
+        BasicCommands.startTurnTimer(out, gameState.currentTurnDeadlineMillis);
         // Note: As per the template's instructions, comment out the demo execution when implementing your own solution
         // CommandDemo.executeDemo(out);
     }

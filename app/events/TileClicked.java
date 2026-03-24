@@ -1,8 +1,7 @@
 package events;
 
-import java.util.ArrayList;
+
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -58,6 +57,13 @@ public class TileClicked implements EventProcessor {
         // Clear board selection
         BoardLogic.clearSelection(out, board);
 
+// Ensure highlighted tile cache exists.
+// Do NOT clear it here, because card targeting relies on the previously
+// highlighted valid targets from cardClicked / unit selection.
+        if (gameState.highlightedTiles == null) {
+            gameState.highlightedTiles = new HashSet<>();
+        }
+
         // Check if a card is selected in hand
         if (gameState.selectedHandPosition != null) {
             int handPosition = gameState.selectedHandPosition;
@@ -65,52 +71,151 @@ public class TileClicked implements EventProcessor {
             selectedCard = gameState.getPlayer1().getHand().get(cardIndex);
         }
 
-        // If a card is selected and a valid target is clicked, use the card on the target
-        if (selectedCard != null && gameState.highlightedTiles.contains(clickedTile)) {
-
-            // Check for mana first
-            if (gameState.player1.enoughMana(out, selectedCard.getManacost())) {
-                BasicCommands.deleteCard(out, gameState.selectedHandPosition);
-                gameState.getPlayer1().useCard(out, gameState,
-                        cardIndex, clickedTile, selectedCard.getManacost());
+        // Card click flow
+        if (selectedCard != null) {
+            if (gameState.highlightedTiles.contains(clickedTile)) {
+                if (gameState.player1.enoughMana(out, selectedCard.getManacost())) {
+                    BasicCommands.deleteCard(out, gameState.selectedHandPosition);
+                    gameState.getPlayer1().useCard(out, gameState,
+                            cardIndex, clickedTile, selectedCard.getManacost());
+                }
             }
+
+            // Do not fall through into unit logic after a card click attempt
+            gameState.selectedHandPosition = null;
+            gameState.highlightedTiles.clear();
+            gameState.player1.drawHand(out);
+            return;
         }
 
         // Clicked on a unit (no card selected)
         else if (clickedTile.getUnit() != null) {
             Unit clickedUnit = clickedTile.getUnit();
 
-            // If a friendly unit is already selected and player clicks an enemy -> try attack
-            if (gameState.selectedUnit != null && clickedUnit.getOwner() != gameState.getPlayer1() &&
-                !clickedUnit.hasAttacked) {
-                CombatLogic.tryAttackSelectedUnit(out, gameState, clickedTile); //TODO rename method
-            }
+            // 1) Click own unit: allow selection if the unit still has any action left
+            if (clickedUnit.getOwner() == gameState.getPlayer1()) {
+                boolean canMove = !clickedUnit.hasMoved;
+                boolean canAttack = !clickedUnit.hasAttacked;
 
-            // Select friendly unit for movement if unit has not moved
-            else if (clickedUnit.getOwner() == gameState.getPlayer1() && !clickedUnit.hasMoved) {
+                if (!canMove && !canAttack) {
+                    gameState.selectedUnit = null;
+                    gameState.selectedHandPosition = null;
+                    BasicCommands.addPlayer1Notification(out, "Unit has no actions left.", 1);
+                    gameState.player1.drawHand(out);
+                    return;
+                }
+
                 gameState.selectedHandPosition = null;
                 gameState.selectedUnit = clickedUnit;
-                BasicCommands.drawTile(out, clickedTile, 1); // white highlight
-                BoardLogic.highlightMovement(out, clickedTile, clickedUnit, board);
-                gameState.highlightedTiles = BoardLogic.findValidMovement(clickedTile, gameState.selectedUnit, board);
+                gameState.highlightedTiles.clear();
 
-            } else if (clickedUnit.getOwner() == gameState.getPlayer1()  &&
-                        clickedUnit.hasAttacked) {
-                BasicCommands.addPlayer1Notification(out, "Unit has moved.", 1);
+                // highlight selected unit tile
+                BasicCommands.drawTile(out, clickedTile, 1);
+
+                Tile origin = board.getTile(
+                        clickedUnit.getPosition().getTilex(),
+                        clickedUnit.getPosition().getTiley());
+
+                // highlight movement range if movement is still available
+                if (canMove) {
+                    Set<Tile> moveTiles = BoardLogic.findValidMovement(origin, clickedUnit, board);
+                    for (Tile tile : moveTiles) {
+                        BasicCommands.drawTile(out, tile, 1);
+                    }
+                    gameState.highlightedTiles.addAll(moveTiles);
+                }
+
+                // highlight valid enemy targets if attack is still available
+                if (canAttack) {
+                    Set<Tile> attackTiles = BoardLogic.findValidAttackUnits(origin, clickedUnit, board);
+                    for (Tile tile : attackTiles) {
+                        BasicCommands.drawTile(out, tile, 2);
+                    }
+                    gameState.highlightedTiles.addAll(attackTiles);
+                }
+
+                gameState.player1.drawHand(out);
+                return;
             }
 
-            // Else, enemy unit is clicked
+// 2) Click enemy while a friendly unit is selected
+            if (gameState.selectedUnit != null
+                    && gameState.selectedUnit.getOwner() == gameState.getPlayer1()
+                    && !gameState.selectedUnit.hasAttacked) {
 
+                Unit attacker = gameState.selectedUnit;
+                Tile attackerTile = board.getTile(
+                        attacker.getPosition().getTilex(),
+                        attacker.getPosition().getTiley());
+
+                // Case A: already in direct attack range -> attack immediately
+                if (attackerTile != null
+                        && BoardLogic.findValidAttackUnits(attackerTile, attacker, board).contains(clickedTile)) {
+                    CombatLogic.tryAttackSelectedUnit(out, gameState, clickedTile);
+                    gameState.highlightedTiles.clear();
+                    gameState.player1.drawHand(out);
+                    return;
+                }
+
+                // Case B: not in range, but can move to a tile from which the target becomes attackable
+                if (!attacker.hasMoved) {
+                    Tile autoAttackDestination = findAutoAttackDestination(attacker, clickedTile, board);
+
+                    if (autoAttackDestination != null) {
+                        gameState.startPendingAttackAfterMove(attacker, clickedTile);
+                        BoardLogic.moveSelectedUnit(out, gameState, autoAttackDestination, board);
+                        gameState.player1.drawHand(out);
+                        return;
+                    }
+                }
+
+                // Case C: enemy clicked, but neither direct attack nor legal move-then-attack exists
+                gameState.player1.drawHand(out);
+                return;
+            }
+
+            // 3) Enemy click with no usable selection: do nothing
+            gameState.player1.drawHand(out);
+            return;
         }
 
 
         // Empty tile + selected unit => try move
         else if (gameState.getSelectedUnit() != null && gameState.highlightedTiles.contains(clickedTile)) {
             BoardLogic.moveSelectedUnit(out, gameState, clickedTile, board);
+            gameState.player1.drawHand(out);
+            return;
         }
 
         // Deselect card
         gameState.selectedHandPosition = null;
+        gameState.selectedUnit = null;
+        gameState.highlightedTiles.clear();
         gameState.player1.drawHand(out);
     }
-}
+        private Tile findAutoAttackDestination(Unit attacker, Tile enemyTile, Board board) {
+            if (attacker == null || enemyTile == null || enemyTile.getUnit() == null) {
+                return null;
+            }
+
+            Tile origin = board.getTile(
+                    attacker.getPosition().getTilex(),
+                    attacker.getPosition().getTiley());
+
+            if (origin == null) {
+                return null;
+            }
+
+            Set<Tile> moveTiles = BoardLogic.findValidMovement(origin, attacker, board);
+
+            for (Tile moveTile : moveTiles) {
+                Set<Tile> attackTilesFromMoveTile = BoardLogic.findValidAttackUnits(moveTile, attacker, board);
+                if (attackTilesFromMoveTile.contains(enemyTile)) {
+                    return moveTile;
+                }
+            }
+
+            return null;
+        }
+    }
+
