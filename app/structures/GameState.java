@@ -88,7 +88,8 @@ public class GameState {
 		}
 
 		dealDirectDamage(out, target, damage);
-	}
+	} // These will need to be moved into takeDamage;
+	// we have 3 nigh-identical damage-dealing functions right now
 
 	/**
 	 * Direct spell / combat damage.
