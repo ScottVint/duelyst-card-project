@@ -34,6 +34,10 @@ public class CardClicked implements EventProcessor {
 	public void processEvent(ActorRef out, GameState gameState, JsonNode message) {
 
 		// Reset card drawn
+		if (!gameState.player1Turn) {
+			BasicCommands.addPlayer1Notification(out, "Not your turn!", 2);
+			return; // 直接终止，后面的选牌逻辑全都不执行
+		}
 		gameState.player1.drawHand(out);
 
 		if (!gameState.player1Turn) {
