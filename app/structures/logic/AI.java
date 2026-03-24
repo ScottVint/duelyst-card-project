@@ -106,7 +106,7 @@ public class AI {
                 unit.setPositionByTile(bestMove);
 
                 BasicCommands.moveUnitToTile(out, unit, bestMove);
-                for (int i = 0; i < 60; i++) BoardLogic.blink();
+                for (int i = 0; i < 30; i++) BoardLogic.blink();
 
                 unit.hasMoved = true;
             }
@@ -169,14 +169,14 @@ public class AI {
         /** Returns the tile of the nearest enemy unit (or null if none exists). */
         private static Tile findNearestEnemy(Tile from, Unit unit, GameState gs) {
             Tile nearest = null;
-            double minDist = Double.MAX_VALUE;
+            int minDist = Integer.MAX_VALUE;
             Player owner = unit.getOwner();
 
             for (Tile[] row : gs.getBoard().getTiles()) {
                 for (Tile tile : row) {
                     Unit occupant = tile.getUnit();
                     if (occupant != null && occupant.getOwner() != owner) {
-                        double dist = tileDistance(from, tile);
+                        int dist = tileDistance(from, tile);
                         if (dist < minDist) {
                             minDist = dist;
                             nearest = tile;
@@ -190,9 +190,9 @@ public class AI {
         /** Returns the tile in candidates that is closest to the target tile. */
         private static Tile findClosestTileToTarget(Set<Tile> candidates, Tile target) {
             Tile best = null;
-            double minDist = Double.MAX_VALUE;
+            int minDist = Integer.MAX_VALUE;
             for (Tile tile : candidates) {
-                double dist = tileDistance(tile, target);
+                int dist = tileDistance(tile, target);
                 if (dist < minDist) {
                     minDist = dist;
                     best = tile;
@@ -201,11 +201,9 @@ public class AI {
             return best;
         }
 
-        /** Euclidean distance between two tiles by grid coordinates. */
-        private static double tileDistance(Tile a, Tile b) {
-            int dx = a.getTilex() - b.getTilex();
-            int dy = a.getTiley() - b.getTiley();
-            return Math.sqrt(dx * dx + dy * dy);
+        /** Manhattan distance between two tiles — reflects actual grid movement cost. */
+        private static int tileDistance(Tile a, Tile b) {
+            return Math.abs(a.getTilex() - b.getTilex()) + Math.abs(a.getTiley() - b.getTiley());
         }
     }
 }
