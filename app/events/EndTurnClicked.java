@@ -25,9 +25,7 @@ public class EndTurnClicked implements EventProcessor {
 
 	@Override
 	public void processEvent(ActorRef out, GameState gameState, JsonNode message) {
-		if (!gameState.player1Turn) {
-			return; // 直接忽略点击
-		}
+
 		// Clear any active unit/card selection
 		gameState.selectedUnit = null;
 		gameState.selectedHandPosition = null;

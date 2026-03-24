@@ -171,10 +171,6 @@ public class Unit {
 		} else {
 			health = value;
 		}
-
-		if (out != null) {
-			BasicCommands.setUnitHealth(out, this, this.health);
-		}
 	}
 
 	public void setHealth(ActorRef out, Player player, int health) {
@@ -243,31 +239,9 @@ public class Unit {
 	 * @param out
 	 * @author Minghao
 	 */
-//	@JsonIgnore
-//	public void die(ActorRef out) {
-//		BasicCommands.playUnitAnimation(out, this, UnitAnimationType.death);
-//		if (currentTile != null) {
-//			currentTile.setUnit(null);
-//			currentTile = null;
-//		}
-//		if (owner != null) {
-//			owner.getUnitList().remove(this.id);
-//		}
-//		BasicCommands.deleteUnit(out, this);
-//	}
 	@JsonIgnore
 	public void die(ActorRef out) {
-		// 让旧代码默认传 null 给 gameState，这样就不会报错了！
-		this.die(out, null);
-	}
-	@JsonIgnore
-	public void die(ActorRef out, GameState gameState) {
 		BasicCommands.playUnitAnimation(out, this, UnitAnimationType.death);
-		try {
-			Thread.sleep(1000);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
 		if (currentTile != null) {
 			currentTile.setUnit(null);
 			currentTile = null;
@@ -276,11 +250,6 @@ public class Unit {
 			owner.getUnitList().remove(this.id);
 		}
 		BasicCommands.deleteUnit(out, this);
-
-		// 【新增】：通知全场“我死了”，触发其他单位的 Deathwatch
-		if (gameState != null) {
-			gameState.triggerDeathwatch(out, this);
-		}
 	}
 
 	// ////////// BASIC METHODS ////////////
@@ -314,7 +283,7 @@ public class Unit {
 	public void openingGambit(ActorRef out, GameState gameState) {};
 
 	/// Triggers when ANY unit dies.
-	public void deathwatch(ActorRef out, GameState gameState) {};
+	public void deathwatch(ActorRef out) {};
 
 	// Getters for ability flags
 
