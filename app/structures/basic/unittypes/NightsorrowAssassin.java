@@ -18,7 +18,8 @@ public class NightsorrowAssassin extends Unit {
 
         if (!enemies.isEmpty()) {
             Unit enemy = enemies.get(idx).getUnit();
-            enemy.die(out);
+//            enemy.die(out);
+            enemy.die(out, gameState);
         }
     }
 }

@@ -30,7 +30,8 @@ public class DarkTerminus extends Spell {
     public void cast(ActorRef out, GameState gameState,
                      Player player, Tile clickedTile) {
         Unit enemy = clickedTile.getUnit();
-        enemy.die(out);
+//        enemy.die(out);
+        enemy.die(out, gameState);
         Wraithling summon = Unit.createWraithling(out, player, gameState);
         Unit.summonWraithling(out, clickedTile, player, gameState);
     }
