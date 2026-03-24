@@ -20,7 +20,6 @@ public class Initalize implements EventProcessor {
         // Mark the game state as initialized
         gameState.gameInitalised = true;
 
-        // Clear board highlights
         BoardLogic.clearSelection(out, gameState.board);
 
         // Retrieve players
@@ -61,8 +60,8 @@ public class Initalize implements EventProcessor {
         aiAvatar.hasAttacked = false;
         aiAvatar.hasMoved = false;
 
-        // Draw starting cards
-        for (int i = 0; i < 3; i++) {
+        // Draw starting cards (ensure total = 3)
+        for (int i = 0; i < 2; i++) {
             player1.drawCardIntoHand();
             player2.drawCardIntoHand();
         }
