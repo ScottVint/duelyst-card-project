@@ -5,8 +5,11 @@ import commands.BasicCommands;
 import structures.GameState;
 import structures.basic.Board;
 import structures.basic.Tile;
+import structures.basic.players.Player;
 import structures.basic.unittypes.Unit;
 import structures.basic.UnitAnimationType;
+
+import java.util.Set;
 
 public class CombatLogic {
     public static void tryAttackSelectedUnit(ActorRef out, GameState gameState, Tile target) {
@@ -25,6 +28,14 @@ public class CombatLogic {
             gameState.selectedUnit = null;
             gameState.selectedHandPosition = null;
         }
+    }
+
+    public static Set<Tile> findUnitsWithProvokeAdjacent(Board board, Unit startingUnit) {
+        Set<Tile> targets = BoardLogic.findAdjacentTiles(startingUnit.getCurrentTile(), board);
+        Player unitOwner = startingUnit.getOwner();
+        targets.removeIf(tile -> tile.getUnit() == null || !tile.getUnit().hasProvoke() || tile.getUnit().getOwner().equals(unitOwner));
+
+        return targets;
     }
 
 

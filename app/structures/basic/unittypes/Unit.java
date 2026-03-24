@@ -322,7 +322,7 @@ public class Unit {
 				break;
 
 			case "conf/gameconfs/units/ironcliff_guardian.json":
-				unitClass = IroncliffGuardian.class;
+				unitClass = IroncliffeGuardian.class;
 				break;
 
 			case "conf/gameconfs/units/nightsorrow_assassin.json":

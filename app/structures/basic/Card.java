@@ -183,6 +183,12 @@ public class Card {
 
 		// Opening gambit usage
 		summonedUnit.openingGambit(out, gameState);
+
+		// Rush check
+		if (summonedUnit.hasRush()) {
+			summonedUnit.hasMoved = false;
+			summonedUnit.hasAttacked = false;
+		}
 	}
 
 	/// Auto-decides on whether to use spell highlighting method or summon highlighting based on isCreature attribute.

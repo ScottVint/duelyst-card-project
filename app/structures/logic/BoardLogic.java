@@ -70,22 +70,34 @@ public class BoardLogic {
 		int startx = startingTile.getTilex();
 		int starty = startingTile.getTiley();
 
-		int[] xoffset = {1, -1 , 0, 0};
-		int[] yoffset = {0, 0, 1, -1};
+		// Check if unit has moved or if units adjacent have Provoke first
+		if (unit.hasMoved || !CombatLogic.findUnitsWithProvokeAdjacent(board, unit).isEmpty()) {
+			return result;
+		} else if (!unit.hasFlying()) {
+			int[] xoffset = {1, -1, 0, 0};
+			int[] yoffset = {0, 0, 1, -1};
 
-		for (int i = 0; i < xoffset.length; i++) {
-			try {
-				Tile currTile = board.getTile(startx + xoffset[i], starty + yoffset[i]);
-				// If adjacent tile is empty or an ally unit, find the spaces around it
-				if (currTile.getUnit() == null) {
-					result.addAll(findNeighbours(currTile, board));
-					result.add(currTile);
-				} else if (currTile.getUnit().getOwner() == unitOwner) {
-					result.addAll(findNeighbours(currTile, board));
+			for (int i = 0; i < xoffset.length; i++) {
+				try {
+					Tile currTile = board.getTile(startx + xoffset[i], starty + yoffset[i]);
+					// If adjacent tile is empty or an ally unit, find the spaces around it
+					if (currTile.getUnit() == null) {
+						result.addAll(findNeighbours(currTile, board));
+						result.add(currTile);
+					} else if (currTile.getUnit().getOwner() == unitOwner) {
+						result.addAll(findNeighbours(currTile, board));
+					}
+				} catch (ArrayIndexOutOfBoundsException e) {
+					continue;
 				}
-			} catch (ArrayIndexOutOfBoundsException e) {
-				continue;
 			}
+			return result;
+		} else {
+			for (Tile[] row : board.getTiles())
+				for (Tile tile : row)
+					if (tile.getUnit() == null)
+						result.add(tile);
+
 		}
 		return result;
 	}
@@ -122,11 +134,18 @@ public class BoardLogic {
 	}
 
 	public static Set<Tile> findValidAttackUnits(Tile startingTile, Unit unit, Board board) {
-		Set<Tile> targets = findAdjacentTiles(startingTile, board);
 		Set<Tile> validTargets = new HashSet<>();
-		for (Tile target : targets) {
-			if (target.getUnit() != null && target.getUnit().getOwner() != unit.getOwner()) {
-				validTargets.add(target);
+		if (!unit.hasAttacked) {
+			Set<Tile> provokeTargets = CombatLogic.findUnitsWithProvokeAdjacent(board, unit);
+			if (!provokeTargets.isEmpty()) {
+				validTargets = provokeTargets;
+			} else {
+				Set<Tile> targets = findAdjacentTiles(startingTile, board);
+				for (Tile target : targets) {
+					if (target.getUnit() != null && target.getUnit().getOwner() != unit.getOwner()) {
+						validTargets.add(target);
+					}
+				}
 			}
 		}
 		return validTargets;
@@ -197,7 +216,6 @@ public class BoardLogic {
 		gameState.selectedHandPosition = null;
 
 		BasicCommands.moveUnitToTile(out, selectedUnit, destination);
-
 	}
 }
 
