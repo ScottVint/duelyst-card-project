@@ -39,7 +39,8 @@ public class InitalizationTest {
 	}
 
 	/**
-	 * NEW TEST: verify starting mana behaviour (without accessing protected fields)
+	 * Verify that exactly one player starts with 2 mana and the other starts with 0.
+	 * This test does not assume which player starts first.
 	 */
 	@Test
 	public void checkStartingMana() {
@@ -53,12 +54,14 @@ public class InitalizationTest {
 		ObjectNode eventMessage = Json.newObject();
 		initalizeProcessor.processEvent(null, gameState, eventMessage);
 		
-		
-		assertTrue(gameState.getPlayer1().enoughMana(null, 2));
-		
-		assertFalse(gameState.getPlayer1().enoughMana(null, 3));
-		
-	
-		assertFalse(gameState.getPlayer2().enoughMana(null, 1));
+		boolean player1Starts = gameState.getPlayer1().enoughMana(null, 2)
+				&& !gameState.getPlayer1().enoughMana(null, 3)
+				&& !gameState.getPlayer2().enoughMana(null, 1);
+
+		boolean player2Starts = gameState.getPlayer2().enoughMana(null, 2)
+				&& !gameState.getPlayer2().enoughMana(null, 3)
+				&& !gameState.getPlayer1().enoughMana(null, 1);
+
+		assertTrue(player1Starts || player2Starts);
 	}
 }

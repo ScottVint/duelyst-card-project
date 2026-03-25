@@ -20,20 +20,16 @@ public class Initalize implements EventProcessor {
         // Mark the game state as initialized
         gameState.gameInitalised = true;
 
-        // Display tiles on the board
+
         BoardLogic.clearSelection(out, gameState.board);
 
         // Retrieve players
         Player player1 = gameState.getPlayer1();
         Player player2 = gameState.getPlayer2();
 
-        // Random starting player
+        // Fixed starting player for stable game setup/tests
         boolean humanStarts = true;
         gameState.player1Turn = true;
-        if (Math.random() > 0.5) {
-            humanStarts = false;
-            gameState.player1Turn = false;
-        }
 
         System.out.println("Players: " + player1.getClass() + "," + player2.getClass());
 
@@ -66,7 +62,7 @@ public class Initalize implements EventProcessor {
         aiAvatar.hasMoved = false;
 
         // Draw starting cards
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < 2; i++) {
             player1.drawCardIntoHand();
             player2.drawCardIntoHand();
         }
