@@ -36,8 +36,8 @@ The human player (Player 1) competes against an AI opponent (Player 2) on a 9×5
 
 1. **Clone the repository**
    ```bash
-   git clone <repository-url>
-   cd ITSD-DT2025-26-Template
+   git clone https://github.com/uog-cose/MSc-IT-plus-2026-LB02-AL.git
+   cd MSc-IT-plus-2026-LB02-AL
    ```
 
 2. **Place frontend assets** — copy the `app/assets/` sprite and JS files into the repo (gitignored; obtain from the project template assets package).
