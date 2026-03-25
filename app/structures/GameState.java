@@ -26,9 +26,9 @@ import java.util.Set;
 public class GameState {
 
 	public boolean gameInitalised = false;
-	public boolean something = false;
 
-	public HumanPlayer player1 =  new HumanPlayer();
+
+	public HumanPlayer player1 = new HumanPlayer();
 	public AIPlayer player2 = new AIPlayer();
 	public Board board = new Board();
 	public Unit selectedUnit = null;
@@ -37,30 +37,113 @@ public class GameState {
 	public int turnCount = 1;
 	public boolean gameOver = false;
 
-	/** 1-indexed hand position of the selected card, or null if none selected */
+	/**
+	 * 1-indexed hand position of the selected card, or null if none selected
+	 */
 	public Integer selectedHandPosition = null;
 
-	/** Next unique unit id for summoned units. */
+	/**
+	 * Next unique unit id for summoned units.
+	 */
 	private int nextUnitId = 0;
 
-	/** List of currently highlighted tiles. Used for validation.*/
+	/**
+	 * List of currently highlighted tiles. Used for validation.
+	 */
 	public Set<Tile> highlightedTiles = new HashSet<Tile>();
 
-	/** Movement state */
+	/**
+	 * Movement state
+	 */
 	public Unit movingUnit = null;
 	public Tile moveTargetTile = null;
 	public boolean unitMoving = false;
 
-	public Player getPlayer1() { return player1; }
+	/**
+	 * Pending move-then-attack state for story #30
+	 */
+	public boolean pendingAttackAfterMove = false;
+	public Unit pendingAttackAttacker = null;
+	public Tile pendingAttackTargetTile = null;
 
-	public Player getPlayer2() { return player2; }
+	/**
+	 * Optional turn timer state for story #34
+	 */
+	public boolean turnTimerEnabled = true;
+	public int turnTimeLimitSeconds = 60;
+	public long currentTurnDeadlineMillis = -1L;
+	public boolean timerExpiredThisTurn = false;
 
-	public Board getBoard() { return board; }
+	public Player getPlayer1() {
+		return player1;
+	}
 
-	public Unit getSelectedUnit() { return selectedUnit; }
+	public Player getPlayer2() {
+		return player2;
+	}
 
-	public int getNextUnitId() { return nextUnitId++; }
+	public Board getBoard() {
+		return board;
+	}
 
+	public Unit getSelectedUnit() {
+		return selectedUnit;
+	}
+
+	public int getNextUnitId() {
+		return nextUnitId++;
+	}
+
+	public void startPendingAttackAfterMove(Unit attacker, Tile targetTile) {
+		this.pendingAttackAfterMove = true;
+		this.pendingAttackAttacker = attacker;
+		this.pendingAttackTargetTile = targetTile;
+	}
+
+	public void clearPendingAttackAfterMove() {
+		this.pendingAttackAfterMove = false;
+		this.pendingAttackAttacker = null;
+		this.pendingAttackTargetTile = null;
+	}
+
+
+	public void startTurnTimer() {
+		if (!turnTimerEnabled) {
+			currentTurnDeadlineMillis = -1L;
+			timerExpiredThisTurn = false;
+			return;
+		}
+
+		currentTurnDeadlineMillis = System.currentTimeMillis() + (turnTimeLimitSeconds * 1000L);
+		timerExpiredThisTurn = false;
+	}
+
+	public void stopTurnTimer() {
+		currentTurnDeadlineMillis = -1L;
+		timerExpiredThisTurn = false;
+	}
+
+	public boolean isTurnTimerRunning() {
+		return turnTimerEnabled && currentTurnDeadlineMillis > 0;
+	}
+
+	public boolean hasTurnTimerExpired() {
+		return isTurnTimerRunning() && System.currentTimeMillis() >= currentTurnDeadlineMillis;
+	}
+
+	public void resetTurnFlags(Player player) {
+		if (player.getAvatar() != null) {
+			player.getAvatar().hasAttacked = false;
+			player.getAvatar().hasMoved = false;
+			player.getAvatar().hasCounterattacked = false;
+		}
+
+		for (Unit unit : player.getUnitList().values()) {
+			unit.hasAttacked = false;
+			unit.hasMoved = false;
+			unit.hasCounterattacked = false;
+		}
+	}
 
 	public void placeAvatar(ActorRef out, BetterUnit avatar, int x, int y) {
 		Tile tile = this.board.getTile(x, y);
@@ -92,8 +175,7 @@ public class GameState {
 		}
 
 		dealDirectDamage(out, target, damage);
-	} // These will need to be moved into takeDamage;
-	// we have 3 nigh-identical damage-dealing functions right now
+	}
 
 	/**
 	 * Direct spell / combat damage.
@@ -128,33 +210,54 @@ public class GameState {
 		}
 	}
 
-
 	public void endTurn(ActorRef out, Player playerEndingTurn, Player playerStartingTurn) {
-		
+		// Stop the previous turn timer
+		stopTurnTimer();
 
+		// Increment turn count once per full round (when P2's turn ends)
 		if (!player1Turn) {
 			turnCount++;
 		}
 		player1Turn = !player1Turn;
 
-		// Refresh mana
-		int startingMana = Math.min(turnCount + 1, Player.getMaxMana());
-		playerStartingTurn.setMana(out, startingMana);
-		playerEndingTurn.setMana(out, 0);
+		// End-turn board/input cleanup
+		selectedUnit = null;
+		selectedHandPosition = null;
+		highlightedTiles.clear();
+		movingUnit = null;
+		moveTargetTile = null;
+		unitMoving = false;
 
-		// Draw card: the ending player draws 1 card at the end of their turn (for next turn)
+		// Mana transfer
+		int startingMana = Math.min(turnCount + 1, Player.getMaxMana());
+		playerEndingTurn.setMana(out, 0);
+		playerStartingTurn.setMana(out, startingMana);
+
+		// Draw card for the player ending their turn
 		playerEndingTurn.drawCardIntoHand();
 
-		// Reset flags
-		playerEndingTurn.getAvatar().hasAttacked = false;
-		playerEndingTurn.getAvatar().hasMoved = false;
-		for (Unit unit : playerEndingTurn.getUnitList().values()) {
-			unit.hasAttacked = false;
-			unit.hasMoved = false;
+		// Reset action flags for the player whose turn is starting
+		resetTurnFlags(playerStartingTurn);
+
+		// Turn ownership feedback + timer
+		if (playerStartingTurn instanceof HumanPlayer) {
+			BasicCommands.addPlayer1Notification(out, "Player Turn", 2);
+
+			if (turnTimerEnabled) {
+				startTurnTimer();
+				BasicCommands.startTurnTimer(out, currentTurnDeadlineMillis);
+			} else {
+				stopTurnTimer();
+				BasicCommands.stopTurnTimer(out);
+			}
+		} else {
+			BasicCommands.addPlayer1Notification(out, "AI Turn", 2);
+			stopTurnTimer();
+			BasicCommands.stopTurnTimer(out);
 		}
 
-		// Run AI on AI turn
-		if (playerEndingTurn instanceof HumanPlayer) {
+		// Trigger AI after control has passed to AI
+		if (playerStartingTurn instanceof AIPlayer) {
 			AI.AILogic.runAI(out, this, player1, player2);
 		}
 	}

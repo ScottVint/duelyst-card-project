@@ -149,6 +149,14 @@
 				case "drawProjectile":
 					drawProjectile(message);
 					break;
+
+                case "startTurnTimer":
+                    startTurnTimer(message.deadlineMillis);
+                    break;
+
+                case "stopTurnTimer":
+                    stopTurnTimer();
+                    break;
                 default:
                     return console.log(message);
             }

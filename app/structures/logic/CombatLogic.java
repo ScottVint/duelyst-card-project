@@ -5,43 +5,102 @@ import commands.BasicCommands;
 import structures.GameState;
 import structures.basic.Board;
 import structures.basic.Tile;
+import structures.basic.UnitAnimationType;
 import structures.basic.players.Player;
 import structures.basic.unittypes.Unit;
-import structures.basic.UnitAnimationType;
 
 import java.util.Set;
 
 public class CombatLogic {
-    public static void tryAttackSelectedUnit(ActorRef out, GameState gameState, Tile target) {
-        Unit attacker = gameState.getSelectedUnit();
-        int[] attackerPosition = {attacker.getPosition().getTilex(), attacker.getPosition().getTiley()};
-        Tile origin = gameState.getBoard().getTile(attackerPosition[0], attackerPosition[1]);
 
-        if (BoardLogic.findValidAttackUnits(origin, attacker, gameState.getBoard()).contains(target)) {
+    /**
+     * Resolves the full combat sequence:
+     * 1) attacker hits defender
+     * 2) defender dies -> stop, no counterattack
+     * 3) otherwise defender may counterattack once per turn
+     */
+    public static void resolveCombat(ActorRef out, GameState gameState, Unit attacker, Unit defender) {
 
-            Unit defender = target.getUnit();
-            BasicCommands.playUnitAnimation(out, attacker, UnitAnimationType.attack);
-            BasicCommands.playUnitAnimation(out, defender, UnitAnimationType.hit);
-            gameState.dealDamage(out, attacker, defender);
+        // Active attack
+        BasicCommands.playUnitAnimation(out, attacker, UnitAnimationType.attack);
+        BasicCommands.playUnitAnimation(out, defender, UnitAnimationType.hit);
+        defender.takeDamage(out, attacker.getAttack());
 
-            BasicCommands.playUnitAnimation(out, attacker, UnitAnimationType.idle);
-            if (defender.getHealth() > 0) {
-                BasicCommands.playUnitAnimation(out, defender, UnitAnimationType.idle);
-            }
+        // After an attack the unit cannot attack again this turn; per Moodle FAQ
+        // ("If a unit attacks and has not moved it loses its move action that turn")
+        // attacking also consumes the move action.
+        attacker.hasAttacked = true;
+        attacker.hasMoved = true;
 
-            BoardLogic.clearSelection(out, gameState.getBoard());
-            gameState.selectedUnit = null;
-            gameState.selectedHandPosition = null;
+        // Counterattack: allowed once per turn if defender survived
+        if (!defender.isDead() && !defender.hasCounterattacked) {
+            BasicCommands.playUnitAnimation(out, defender, UnitAnimationType.attack);
+            BasicCommands.playUnitAnimation(out, attacker, UnitAnimationType.hit);
+            attacker.takeDamage(out, gameState, defender.getAttack());
+
+            defender.hasCounterattacked = true;
         }
+    }
+
+    public static void death(ActorRef out, GameState gameState, Unit unit) {
+        if (unit == null) return;
+        unit.die(out);
+        Player owner = unit.getOwner();
+        if (owner != null) {
+            owner.getUnitList().remove(unit.getId());
+        }
+    }
+
+    /**
+     * Finds the best tile to move to in order to attack the given enemy tile.
+     * Returns null if no reachable attack position exists.
+     */
+    public static Tile findAutoAttackDestination(Unit attacker, Tile enemyTile, Board board) {
+        if (attacker == null || enemyTile == null || enemyTile.getUnit() == null || board == null) {
+            return null;
+        }
+
+        Tile origin = attacker.getCurrentTile();
+        if (origin == null) {
+            return null;
+        }
+
+        Set<Tile> moveTiles = BoardLogic.findValidMovement(origin, attacker, board);
+
+        Tile bestTile = null;
+        int bestDistance = Integer.MAX_VALUE;
+
+        int enemyX = enemyTile.getTilex();
+        int enemyY = enemyTile.getTiley();
+
+        for (Tile moveTile : moveTiles) {
+            Set<Tile> attackTilesFromMoveTile = BoardLogic.findValidAttackUnits(moveTile, attacker, board);
+
+            if (attackTilesFromMoveTile.contains(enemyTile)) {
+                int distance = Math.abs(moveTile.getTilex() - enemyX)
+                        + Math.abs(moveTile.getTiley() - enemyY);
+
+                if (bestTile == null
+                        || distance < bestDistance
+                        || (distance == bestDistance && moveTile.getTilex() < bestTile.getTilex())
+                        || (distance == bestDistance
+                            && moveTile.getTilex() == bestTile.getTilex()
+                            && moveTile.getTiley() < bestTile.getTiley())) {
+                    bestTile = moveTile;
+                    bestDistance = distance;
+                }
+            }
+        }
+
+        return bestTile;
     }
 
     public static Set<Tile> findUnitsWithProvokeAdjacent(Board board, Unit startingUnit) {
         Set<Tile> targets = BoardLogic.findAdjacentTiles(startingUnit.getCurrentTile(), board);
         Player unitOwner = startingUnit.getOwner();
-        targets.removeIf(tile -> tile.getUnit() == null || !tile.getUnit().hasProvoke() || tile.getUnit().getOwner().equals(unitOwner));
-
+        targets.removeIf(tile -> tile.getUnit() == null
+                || !tile.getUnit().hasProvoke()
+                || tile.getUnit().getOwner().equals(unitOwner));
         return targets;
     }
-
-
 }

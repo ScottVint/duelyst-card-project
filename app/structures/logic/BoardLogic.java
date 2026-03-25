@@ -203,8 +203,7 @@ public class BoardLogic {
 
 	public static void moveSelectedUnit(ActorRef out, GameState gameState, Tile destination, Board board) {
 		Unit selectedUnit = gameState.getSelectedUnit();
-		Tile origin = board.getTile(selectedUnit.getPosition().getTilex(), selectedUnit.getPosition().getTiley());
-		if (selectedUnit == null) return;
+		Tile origin = selectedUnit.getCurrentTile();
 
 		if (findValidMovement(origin, selectedUnit, board).contains(destination)) {
 			gameState.movingUnit = selectedUnit;
