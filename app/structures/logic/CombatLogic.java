@@ -19,10 +19,15 @@ public class CombatLogic {
 
         if (BoardLogic.findValidAttackUnits(origin, attacker, gameState.getBoard()).contains(target)) {
 
+            Unit defender = target.getUnit();
             BasicCommands.playUnitAnimation(out, attacker, UnitAnimationType.attack);
-            BasicCommands.playUnitAnimation(out, target.getUnit(), UnitAnimationType.hit);
+            BasicCommands.playUnitAnimation(out, defender, UnitAnimationType.hit);
+            gameState.dealDamage(out, attacker, defender);
 
-            gameState.dealDamage(out, attacker, target.getUnit());
+            BasicCommands.playUnitAnimation(out, attacker, UnitAnimationType.idle);
+            if (defender.getHealth() > 0) {
+                BasicCommands.playUnitAnimation(out, defender, UnitAnimationType.idle);
+            }
 
             BoardLogic.clearSelection(out, gameState.getBoard());
             gameState.selectedUnit = null;

@@ -4,10 +4,14 @@ import akka.actor.ActorRef;
 import commands.BasicCommands;
 import structures.GameState;
 import structures.basic.Board;
+import structures.basic.EffectAnimation;
 import structures.basic.Tile;
+import structures.basic.UnitAnimationType;
 import structures.basic.players.Player;
 import structures.basic.unittypes.Unit;
 import structures.logic.BoardLogic;
+import utils.BasicObjectBuilders;
+import utils.StaticConfFiles;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -31,7 +35,6 @@ public class SundropElixir extends Spell {
         if (validTargets.isEmpty()) {
             BasicCommands.addPlayer1Notification(out, "No valid tiles!", 2);
         }
-        ;
         for (Tile tile : validTargets) {
             BasicCommands.drawTile(out, tile, 1);
             BoardLogic.blink();
@@ -40,9 +43,18 @@ public class SundropElixir extends Spell {
 
     @Override
     public void cast(ActorRef out, GameState gameState,
-                     Player player, Tile clickedTile) {
+                     Player player, Tile clickedTile,
+                     Board board, int cardIndex) {
         Unit target = clickedTile.getUnit();
+        BasicCommands.playUnitAnimation(out, player.getAvatar(), UnitAnimationType.channel);
+        EffectAnimation effect = BasicObjectBuilders.loadEffect(StaticConfFiles.f1_buff);
+        try { Thread.sleep(BasicCommands.playEffectAnimation(out, effect, clickedTile)); }
+        catch (InterruptedException e) { Thread.currentThread().interrupt(); }
+      
         target.takeDamage(out, -4);
-    }
+      
+        BasicCommands.playUnitAnimation(out, player.getAvatar(), UnitAnimationType.idle);
 
+        
+    }
 }
