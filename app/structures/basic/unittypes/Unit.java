@@ -242,6 +242,9 @@ public class Unit {
 	@JsonIgnore
 	public void die(ActorRef out) {
 		BasicCommands.playUnitAnimation(out, this, UnitAnimationType.death);
+		for (int i = 0; i < 30; i++) {
+			try {Thread.sleep(30);} catch (InterruptedException e) {e.printStackTrace();} // 如果 blink() 不好用，可以直接用标准的 Thread.sleep(1000) 代替这个循环
+		}
 		if (currentTile != null) {
 			currentTile.setUnit(null);
 			currentTile = null;
@@ -283,7 +286,7 @@ public class Unit {
 	public void openingGambit(ActorRef out, GameState gameState) {};
 
 	/// Triggers when ANY unit dies.
-	public void deathwatch(ActorRef out) {};
+	public void deathwatch(ActorRef out, GameState gameState) {};
 
 	// Getters for ability flags
 

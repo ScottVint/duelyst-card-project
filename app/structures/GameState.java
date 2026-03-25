@@ -113,7 +113,7 @@ public class GameState {
 
 		if (target.isDead()) {
 			target.die(out);
-
+			triggerDeathwatch(out, target);
 			// Win condition: avatar death ends the game
 			if (target == player1.getAvatar()) {
 				gameOver = true;
@@ -125,6 +125,24 @@ public class GameState {
 		}
 	}
 
+	/**
+	 * 扫描棋盘，触发所有存活单位的 Deathwatch 技能。
+	 * @param out ActorRef
+	 * @param deadUnit 刚刚死亡的单位（防止死人触发自己的亡语）
+	 */
+	public void triggerDeathwatch(ActorRef out, Unit deadUnit) {
+		for (int x = 0; x < board.getTiles().length; x++) {
+			for (int y = 0; y < board.getTiles()[x].length; y++) {
+				Unit unit = board.getTile(x, y).getUnit();
+
+				// 确保该格子有单位，该单位不是刚死的单位，且该单位没有处于死亡状态
+				if (unit != null && unit != deadUnit && !unit.isDead()) {
+					// 调用我们在 Unit.java 中修改过的带有 GameState 参数的 deathwatch 方法
+					unit.deathwatch(out, this);
+				}
+			}
+		}
+	}
 
 	public void endTurn(ActorRef out, Player playerEndingTurn, Player playerStartingTurn) {
 		
