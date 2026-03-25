@@ -19,7 +19,7 @@ public class Deck {
         } else {
             throw new IllegalArgumentException("Invalid player type.");
         }
-        Collections.shuffle(cards);
+        Collections.shuffle(cards); //TODO apparently there's instructions to not shuffle the deck... somewhere. Comment this out later
 
         for (Card card : cards) {
             card.setSpell();

@@ -1,6 +1,5 @@
 package structures.basic.unittypes;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -35,7 +34,7 @@ public class BetterUnit extends Unit {
 
 	public void setKeywords(Set<String> keywords) {
 		this.keywords = keywords;
-	};
+	}
 
 	/**
 	 * Story Card #2: sets unit health, updates the HP badge on the front-end,
@@ -44,10 +43,7 @@ public class BetterUnit extends Unit {
 	 */
 	@Override
 	public void setHealth(ActorRef out, Player player, int health) {
-		super.setHealth(out, health);
-		// setUnitHealth is NOT called in super (Unit.setHealth only updates the field),
-		// so we must emit it here to keep the front-end HP badge up-to-date (SC#2).
-		BasicCommands.setUnitHealth(out, this, this.health); //TODO we probably *should* call it in super? It's in the signature.
+		super.setHealth(out, health); // also calls BasicCommands.setUnitHealth internally
 		player.setHealth(out, this.health);
 	}
 
@@ -66,32 +62,37 @@ public class BetterUnit extends Unit {
 	 * Sets the health of the unit and displays it, then sets the corresponding
 	 * player's health to the same value. <br />
 	 * The display is currently unimplemented.
-	 * @param damage
 	 * @author Scott
 	 */
 	@Override
 	public void takeDamage(ActorRef out, GameState gameState, int damage) {
-		// Summon a wraithling in a random adjacent tile if unit has horn charges
-		if (hornCharges > 0 ) {
-			hornCharges--;
-			List<Tile> summonable = new ArrayList<>(BoardLogic.findAdjacentTiles(this.currentTile, gameState.getBoard()));
-			// Remove occupied tiles
-            summonable.removeIf(tile -> tile.getUnit() != null);
-			if (!summonable.isEmpty()) {
-				int idx = (int) (Math.random() * summonable.size());
-				Tile tile = summonable.get(idx);
-				summonWraithling(out, tile, this.owner, gameState);
+		super.takeDamage(out, damage);
+		if (!isDead()) {
+			// Summon a wraithling in a random adjacent tile if unit has horn charges
+			if (damage > 0) {
+				if (hornCharges > 0) {
+					hornCharges--;
+					List<Tile> summonable = new ArrayList<>(BoardLogic.findAdjacentTiles(this.currentTile, gameState.getBoard()));
+					// Remove occupied tiles
+					summonable.removeIf(tile -> tile.getUnit() != null);
+					if (!summonable.isEmpty()) {
+						int idx = (int) (Math.random() * summonable.size());
+						Tile tile = summonable.get(idx);
+						summonWraithling(out, tile, this.owner, gameState);
+					}
+				}
+				for (Unit ally : owner.getUnitList().values())
+					if (ally.hasZeal())
+						ally.setAttack(null, ally.getAttack() + 2);
 			}
 		}
-		super.takeDamage(out, damage);
-		setHealth(out, this.health);
 	}
 	
 	
 	public static void main(String[] args) {
 		
 		BetterUnit unit = (BetterUnit)BasicObjectBuilders.loadUnit(StaticConfFiles.humanAvatar, 0, BetterUnit.class);
-		Set<String> keywords = new HashSet<String>();
+		Set<String> keywords = new HashSet<>();
 		keywords.add("MyKeyword");
 		unit.setKeywords(keywords);
 		

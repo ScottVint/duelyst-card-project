@@ -3,6 +3,7 @@ package events;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import akka.actor.ActorRef;
+import commands.BasicCommands;
 import structures.GameState;
 import structures.logic.BoardLogic;
 
@@ -23,6 +24,11 @@ public class OtherClicked implements EventProcessor {
 
 	@Override
 	public void processEvent(ActorRef out, GameState gameState, JsonNode message) {
+		if (gameState.gameOver) {
+			BasicCommands.addPlayer1Notification(out, "The game is over.", 2);
+			return;
+		}
+
 		gameState.selectedUnit = null;
 		gameState.selectedHandPosition = null;
 		gameState.player1.drawHand(out);
