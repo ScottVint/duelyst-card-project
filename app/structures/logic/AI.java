@@ -4,7 +4,6 @@ import akka.actor.ActorRef;
 import commands.BasicCommands;
 import structures.GameState;
 import structures.basic.Tile;
-import structures.basic.UnitAnimationType;
 import structures.basic.unittypes.Unit;
 import structures.basic.players.Player;
 
@@ -138,14 +137,7 @@ public class AI {
                 if (!validTargets.isEmpty()) {
                     Tile targetTile = validTargets.iterator().next();
                     Unit target = targetTile.getUnit();
-
-                    BasicCommands.playUnitAnimation(out, unit, UnitAnimationType.attack);
-                    for (int i = 0; i < 30; i++) BoardLogic.blink();
-                    BasicCommands.playUnitAnimation(out, target, UnitAnimationType.hit);
-                    for (int i = 0; i < 30; i++) BoardLogic.blink();
-
-                    gs.dealDamage(out, unit, target);
-                    unit.hasAttacked = true;
+                    CombatLogic.resolveCombat(out, gs, unit, target);
                 }
             }
         }
