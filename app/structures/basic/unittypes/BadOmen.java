@@ -7,7 +7,6 @@ public class BadOmen extends Unit {
 
     @Override
     public void deathwatch(ActorRef out, GameState gameState) {
-        // 增加 1 点攻击力并同步给前端
-        this.setAttack(out, this.getAttack() + 1);
+        this.setAttack(out, this.getAttack() + 1);    // Increase attack power by 1 point
     }
 }

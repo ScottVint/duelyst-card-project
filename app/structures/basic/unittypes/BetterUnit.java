@@ -66,7 +66,7 @@ public class BetterUnit extends Unit {
 	 */
 	@Override
 	public void takeDamage(ActorRef out, GameState gameState, int damage) {
-		super.takeDamage(out, damage);
+		super.takeDamage(out, gameState, damage);
 		if (!isDead()) {
 			// Summon a wraithling in a random adjacent tile if unit has horn charges
 			if (damage > 0) {
