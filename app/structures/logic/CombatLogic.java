@@ -32,6 +32,12 @@ public class CombatLogic {
         attacker.hasAttacked = true;
         attacker.hasMoved = true;
 
+        // Restore idle animation after the attack sequence (SC#14)
+        BasicCommands.playUnitAnimation(out, attacker, UnitAnimationType.idle);
+        if (!defender.isDead()) {
+            BasicCommands.playUnitAnimation(out, defender, UnitAnimationType.idle);
+        }
+
         // Counterattack: allowed once per turn if defender survived
         if (!defender.isDead() && !defender.hasCounterattacked) {
             BasicCommands.playUnitAnimation(out, defender, UnitAnimationType.attack);
@@ -39,6 +45,12 @@ public class CombatLogic {
             attacker.takeDamage(out, gameState, defender.getAttack());
 
             defender.hasCounterattacked = true;
+
+            // Restore idle after counterattack (SC#14)
+            BasicCommands.playUnitAnimation(out, defender, UnitAnimationType.idle);
+            if (!attacker.isDead()) {
+                BasicCommands.playUnitAnimation(out, attacker, UnitAnimationType.idle);
+            }
         }
     }
 
