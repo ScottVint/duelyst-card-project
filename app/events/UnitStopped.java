@@ -3,9 +3,11 @@ package events;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import akka.actor.ActorRef;
+import commands.BasicCommands;
 import structures.GameState;
 import structures.logic.BoardLogic;
 import structures.basic.Tile;
+import structures.basic.UnitAnimationType;
 import structures.basic.unittypes.Unit;
 
 import structures.logic.CombatLogic;
@@ -48,6 +50,7 @@ public class UnitStopped implements EventProcessor {
 
 // Movement is now fully complete
 		movingUnit.hasMoved = true;
+		BasicCommands.playUnitAnimation(out, movingUnit, UnitAnimationType.idle);
 
 // Snapshot pending move-then-attack state before cleanup
 		boolean shouldResolvePendingAttack =

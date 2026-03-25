@@ -10,7 +10,9 @@ import structures.basic.players.Player;
 import structures.basic.spells.*;
 import structures.basic.unittypes.Unit;
 import structures.logic.BoardLogic;
+import structures.basic.EffectAnimation;
 import utils.BasicObjectBuilders;
+import utils.StaticConfFiles;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
