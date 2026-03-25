@@ -69,7 +69,7 @@ public class GameState {
 	/**
 	 * Optional turn timer state for story #34
 	 */
-	public boolean turnTimerEnabled = true;
+	public boolean turnTimerEnabled = false; // It's not very fun so im falsing this out for now
 	public int turnTimeLimitSeconds = 60;
 	public long currentTurnDeadlineMillis = -1L;
 	public boolean timerExpiredThisTurn = false;
@@ -152,7 +152,7 @@ public class GameState {
 
 		BasicCommands.drawUnit(out, avatar, tile);
 		EffectAnimation summonEffect = BasicObjectBuilders.loadEffect(StaticConfFiles.f1_summon);
-		try { Thread.sleep(BasicCommands.playEffectAnimation(out, summonEffect, tile)); }
+		try { Thread.sleep(BasicCommands.playEffectAnimation(out, summonEffect, tile) / 2); }
 		catch (InterruptedException e) { Thread.currentThread().interrupt(); }
 		BasicCommands.setUnitHealth(out, avatar, avatar.getHealth());
 		for (int i = 0; i < 30; i++) {

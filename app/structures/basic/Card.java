@@ -171,6 +171,9 @@ public class Card {
 		summonedUnit.setPositionByTile(clickedTile);
 		clickedTile.setUnit(summonedUnit);
 
+		EffectAnimation summonEffect = BasicObjectBuilders.loadEffect(StaticConfFiles.f1_summon);
+		try { Thread.sleep(BasicCommands.playEffectAnimation(out, summonEffect, clickedTile) / 2); }
+		catch (InterruptedException e) { Thread.currentThread().interrupt(); }
 		BasicCommands.drawUnit(out, summonedUnit, clickedTile);
 		for (int i = 0; i < 30; i++)
 			BoardLogic.blink();
