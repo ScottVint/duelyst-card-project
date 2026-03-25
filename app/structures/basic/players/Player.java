@@ -147,10 +147,7 @@ public class Player {
 		} else {
 			card.getSpell().cast(out, gameState, this, clickedTile);
 		}
-
-		destroyHand(out);
 		this.getHand().remove(cardIndex);
-		drawHand(out);
 
 		BoardLogic.clearSelection(out, gameState.board);
 	}
