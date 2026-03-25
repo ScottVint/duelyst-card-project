@@ -30,17 +30,19 @@ public class Beamshock extends Spell {
         return targets;
     }
 
+    @Override
     public void cast(ActorRef out, GameState gameState,
                      Player player, Tile clickedTile,
                      Board board, int cardIndex) {
+        Unit enemy = clickedTile.getUnit();
+        enemy.hasAttacked = true;
+        enemy.hasMoved = true;
+      
         BasicCommands.playUnitAnimation(out, player.getAvatar(), UnitAnimationType.channel);
         EffectAnimation effect = BasicObjectBuilders.loadEffect(StaticConfFiles.f1_inmolation);
         try { Thread.sleep(BasicCommands.playEffectAnimation(out, effect, clickedTile)); }
         catch (InterruptedException e) { Thread.currentThread().interrupt(); }
         BasicCommands.playUnitAnimation(out, player.getAvatar(), UnitAnimationType.idle);
 
-        Unit enemy = clickedTile.getUnit();
-        enemy.hasAttacked = true;
-        enemy.hasMoved = true;
     }
 }

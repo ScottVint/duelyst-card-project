@@ -1,7 +1,6 @@
 package structures.basic.spells;
 
 import akka.actor.ActorRef;
-import commands.BasicCommands;
 import structures.GameState;
 import structures.basic.Board;
 import structures.basic.EffectAnimation;
@@ -33,6 +32,7 @@ public class DarkTerminus extends Spell {
         return targets;
     }
 
+  @Override
     public void cast(ActorRef out, GameState gameState,
                      Player player, Tile clickedTile,
                      Board board, int cardIndex) {
@@ -40,10 +40,13 @@ public class DarkTerminus extends Spell {
         EffectAnimation effect = BasicObjectBuilders.loadEffect(StaticConfFiles.f1_martyrdom);
         try { Thread.sleep(BasicCommands.playEffectAnimation(out, effect, clickedTile)); }
         catch (InterruptedException e) { Thread.currentThread().interrupt(); }
-        BasicCommands.playUnitAnimation(out, player.getAvatar(), UnitAnimationType.idle);
-
+        
         Unit enemy = clickedTile.getUnit();
-        CombatLogic.death(out, gameState, enemy);
+        enemy.die(out);
+        
+        BasicCommands.playUnitAnimation(out, player.getAvatar(), UnitAnimationType.idle);
+    
+        Wraithling summon = Unit.createWraithling(out, player, gameState);
         Unit.summonWraithling(out, clickedTile, player, gameState);
     }
 }

@@ -38,7 +38,9 @@ public class TileClicked implements EventProcessor {
     public void processEvent(ActorRef out, GameState gameState, JsonNode message) {
         // Give nothing if clicked outside of turn
         // or if a unit is moving
-        if (!gameState.player1Turn) {
+        if (gameState.gameOver) {
+            return;
+        } else if (!gameState.player1Turn) {
             BasicCommands.addPlayer1Notification(out, "It is not your turn.", 2);
             return;
         } else if (gameState.unitMoving) {
@@ -72,9 +74,7 @@ public class TileClicked implements EventProcessor {
             if (gameState.player1.enoughMana(out, selectedCard.getManacost())) {
                 BasicCommands.deleteCard(out, gameState.selectedHandPosition);
                 gameState.getPlayer1().useCard(out, gameState,
-                        gameState.player1, cardIndex,
-                        clickedTile, selectedCard.getManacost()
-                );
+                        cardIndex, clickedTile, selectedCard.getManacost());
             }
         }
 
@@ -85,7 +85,7 @@ public class TileClicked implements EventProcessor {
             // If a friendly unit is already selected and player clicks an enemy -> try attack
             if (gameState.selectedUnit != null && clickedUnit.getOwner() != gameState.getPlayer1() &&
                 !clickedUnit.hasAttacked) {
-                CombatLogic.tryAttackSelectedUnit(out, gameState, clickedTile, board); //TODO rename method
+                CombatLogic.tryAttackSelectedUnit(out, gameState, clickedTile); //TODO rename method
             }
 
             // Select friendly unit for movement if unit has not moved

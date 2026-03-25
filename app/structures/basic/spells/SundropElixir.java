@@ -45,13 +45,16 @@ public class SundropElixir extends Spell {
     public void cast(ActorRef out, GameState gameState,
                      Player player, Tile clickedTile,
                      Board board, int cardIndex) {
+        Unit target = clickedTile.getUnit();
         BasicCommands.playUnitAnimation(out, player.getAvatar(), UnitAnimationType.channel);
         EffectAnimation effect = BasicObjectBuilders.loadEffect(StaticConfFiles.f1_buff);
         try { Thread.sleep(BasicCommands.playEffectAnimation(out, effect, clickedTile)); }
         catch (InterruptedException e) { Thread.currentThread().interrupt(); }
+      
+        target.takeDamage(out, -4);
+      
         BasicCommands.playUnitAnimation(out, player.getAvatar(), UnitAnimationType.idle);
 
-        Unit target = clickedTile.getUnit();
-        target.takeDamage(out, -4);
+        
     }
 }

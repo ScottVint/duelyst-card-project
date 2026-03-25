@@ -8,7 +8,6 @@ import structures.basic.EffectAnimation;
 import structures.basic.Tile;
 import structures.basic.UnitAnimationType;
 import structures.basic.players.Player;
-import structures.basic.unittypes.BetterUnit;
 import structures.logic.BoardLogic;
 import utils.BasicObjectBuilders;
 import utils.StaticConfFiles;
@@ -51,7 +50,7 @@ public class HornOfTheForsaken extends Spell {
         catch (InterruptedException e) { Thread.currentThread().interrupt(); }
         BasicCommands.playUnitAnimation(out, player.getAvatar(), UnitAnimationType.idle);
 
+                     Player player, Tile clickedTile) {
         player.getAvatar().setHornCharges(player.getAvatar().MAX_HORN_CHARGES);
-        BasicCommands.addPlayer1Notification(out, "Horn equipped", 1);
     }
 }

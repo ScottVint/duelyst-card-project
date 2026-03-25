@@ -35,12 +35,13 @@ public class GameState {
 	public boolean player1Turn = true;
 
 	public int turnCount = 1;
+	public boolean gameOver = false;
 
 	/** 1-indexed hand position of the selected card, or null if none selected */
 	public Integer selectedHandPosition = null;
 
-	/** Next unique unit id for summoned units. Avatars already use 1 and 2 */ //TODO make fit with summon method instead
-	private int nextUnitId = 3;
+	/** Next unique unit id for summoned units. */
+	private int nextUnitId = 0;
 
 	/** List of currently highlighted tiles. Used for validation.*/
 	public Set<Tile> highlightedTiles = new HashSet<Tile>();
@@ -61,8 +62,8 @@ public class GameState {
 	public int getNextUnitId() { return nextUnitId++; }
 
 
-	public void placeAvatar(ActorRef out, GameState gameState, BetterUnit avatar, int x, int y) {
-		Tile tile = gameState.getBoard().getTile(x, y);
+	public void placeAvatar(ActorRef out, BetterUnit avatar, int x, int y) {
+		Tile tile = this.board.getTile(x, y);
 		tile.setUnit(avatar);
 		avatar.setPositionByTile(tile);
 
@@ -76,7 +77,7 @@ public class GameState {
 		}
 		BasicCommands.setUnitAttack(out, avatar, avatar.getAttack());
 	}
-	//TODO Create CombatLogic class
+
 	/**
 	 * Combat damage based on attacker attack stat.
 	 */
@@ -91,13 +92,14 @@ public class GameState {
 		}
 
 		dealDirectDamage(out, target, damage);
-	}
+	} // These will need to be moved into takeDamage;
+	// we have 3 nigh-identical damage-dealing functions right now
 
 	/**
 	 * Direct spell / combat damage.
 	 */
 	public void dealDirectDamage(ActorRef out, Unit target, int damage) {
-		if (target == null || damage <= 0) return;
+		if (target == null || damage <= 0 || gameOver) return;
 
 		int newHealth = target.getHealth() - damage;
 		target.setHealth(out, newHealth);
@@ -112,29 +114,43 @@ public class GameState {
 			BasicCommands.setPlayer2Health(out, player2);
 		}
 
-		if (target.getHealth() <= 0) {
-			CombatLogic.death(out, this, target);
+		if (target.isDead()) {
+			target.die(out);
+
+			// Win condition: avatar death ends the game
+			if (target == player1.getAvatar()) {
+				gameOver = true;
+				BasicCommands.addPlayer1Notification(out, "You Lose!", 5);
+			} else if (target == player2.getAvatar()) {
+				gameOver = true;
+				BasicCommands.addPlayer1Notification(out, "You Win!", 5);
+			}
 		}
 	}
 
 
 	public void endTurn(ActorRef out, Player playerEndingTurn, Player playerStartingTurn) {
+		
+
 		if (!player1Turn) {
 			turnCount++;
 		}
 		player1Turn = !player1Turn;
+
 		// Refresh mana
 		int startingMana = Math.min(turnCount + 1, Player.getMaxMana());
 		playerStartingTurn.setMana(out, startingMana);
 		playerEndingTurn.setMana(out, 0);
 
-		// Draw card
+		// Draw card: the ending player draws 1 card at the end of their turn (for next turn)
 		playerEndingTurn.drawCardIntoHand();
 
 		// Reset flags
-		playerEndingTurn.getAvatar().hasAttacked = false; playerEndingTurn.getAvatar().hasMoved = false;
+		playerEndingTurn.getAvatar().hasAttacked = false;
+		playerEndingTurn.getAvatar().hasMoved = false;
 		for (Unit unit : playerEndingTurn.getUnitList().values()) {
-			unit.hasAttacked = false; unit.hasMoved = false;
+			unit.hasAttacked = false;
+			unit.hasMoved = false;
 		}
 
 		// Run AI on AI turn

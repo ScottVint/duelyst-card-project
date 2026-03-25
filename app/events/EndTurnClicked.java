@@ -1,14 +1,10 @@
 package events;
 
-import java.util.List;
-
 import com.fasterxml.jackson.databind.JsonNode;
 
 import akka.actor.ActorRef;
 import commands.BasicCommands;
 import structures.GameState;
-import structures.basic.Card;
-import structures.basic.players.Player;
 import structures.logic.BoardLogic;
 
 /**
@@ -30,6 +26,10 @@ public class EndTurnClicked implements EventProcessor {
 
 	@Override
 	public void processEvent(ActorRef out, GameState gameState, JsonNode message) {
+		if (gameState.gameOver) {
+			BasicCommands.addPlayer1Notification(out, "The game is over.", 2);
+			return;
+		}
 
 		// Clear any active unit/card selection
 		gameState.selectedUnit = null;
@@ -42,11 +42,12 @@ public class EndTurnClicked implements EventProcessor {
 			gameState.endTurn(out, gameState.getPlayer1(), gameState.getPlayer2());
 		} else {
 			// Player 2 ends their turn → Player 1's turn begins (new round)
-
 			gameState.endTurn(out, gameState.getPlayer2(), gameState.getPlayer1());
-
 		}
-		gameState.player1.drawHand(out);
 
+		// Story Card #21: redraw player 1's hand after all turns resolve
+		// (covers the case where the AI auto-ends player 2's turn)
+		gameState.getPlayer1().destroyHand(out);
+		gameState.getPlayer1().drawHand(out);
 	}
 }

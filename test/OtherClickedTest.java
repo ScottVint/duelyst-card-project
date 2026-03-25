@@ -87,6 +87,10 @@ public class OtherClickedTest {
 
         gameState = new GameState();
         new Initalize().processEvent(null, gameState, Json.newObject());
+        // Force P1-first for test determinism (SP32 randomises in production)
+        gameState.player1Turn = true;
+        gameState.getPlayer1().setMana(null, 2);
+        gameState.getPlayer2().setMana(null, 0);
 
         // Give Player 1 a known creature card at position 1
         gameState.getPlayer1().getHand().clear();
@@ -111,7 +115,7 @@ public class OtherClickedTest {
     @Test
     public void backgroundClickDeselectsUnit() {
         // Manually simulate a unit being selected
-        Unit unit = gameState.getBoard().getTile(2, 3).getUnit(); // P1 avatar
+        Unit unit = gameState.getBoard().getTile(1, 2).getUnit(); // P1 avatar
         gameState.selectedUnit = unit;
 
         otherClicked.processEvent(null, gameState, otherClickMsg());

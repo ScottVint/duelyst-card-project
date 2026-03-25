@@ -5,43 +5,34 @@ import com.fasterxml.jackson.databind.JsonNode;
 import akka.actor.ActorRef;
 import commands.BasicCommands;
 import structures.GameState;
-import structures.basic.Card;
-import structures.basic.unittypes.BetterUnit;
 import structures.basic.players.Player;
-import structures.basic.unittypes.Unit;
-import structures.basic.Tile;
+import structures.basic.unittypes.BetterUnit;
+import structures.logic.AI;
 import structures.logic.BoardLogic;
 
-import utils.BasicObjectBuilders;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
- * Indicates that both the core game loop in the browser is starting, meaning
- * that it is ready to recieve commands from the back-end.
- * <p>
- * Handles Story Card #18: initialises avatars (HP, position, ownership) and
- * deals 3 starting cards to each player.
- * <pre>
- * {
- *   messageType = "initalize"
- * }
- * </pre>
- *
- * @author Dr. Richard McCreadie
- * @author Minghao
+ * Indicates that both the core game loop in the browser is starting.
  */
 public class Initalize implements EventProcessor {
 
     @Override
     public void processEvent(ActorRef out, GameState gameState, JsonNode message) {
+
         // Mark the game state as initialized
         gameState.gameInitalised = true;
 
-        // Display tiles on the board
+
         BoardLogic.clearSelection(out, gameState.board);
 
-        // Retrieve player objects
+        // Retrieve players
         Player player1 = gameState.getPlayer1();
         Player player2 = gameState.getPlayer2();
+
+        // SC#32: randomise which player goes first
+        boolean humanStarts = ThreadLocalRandom.current().nextBoolean();
+        gameState.player1Turn = humanStarts;
 
         System.out.println("Players: " + player1.getClass() + "," + player2.getClass());
 
@@ -52,42 +43,28 @@ public class Initalize implements EventProcessor {
         BetterUnit humanAvatar = player1.getAvatar();
         BetterUnit aiAvatar = player2.getAvatar();
 
-        // Player starts their first turn with 2 mana
-        player1.setMana(out, 2);
+        // Starting player begins with 2 mana, the other with 0
+        if (humanStarts) {
+            player1.setMana(out, 2);
+            player2.setMana(out, 0);
+            BasicCommands.addPlayer1Notification(out, "You go first!", 2);
+        } else {
+            player1.setMana(out, 0);
+            player2.setMana(out, 2);
+            BasicCommands.addPlayer1Notification(out, "AI goes first!", 2);
+        }
 
-        // Player 1 avatar starts at [2,3]
-        gameState.placeAvatar(out, gameState, humanAvatar, 1, 2); //It's 0-indexed
+        // Place avatars at correct starting positions
+        gameState.placeAvatar(out, humanAvatar, 2, 3);
+        gameState.placeAvatar(out, aiAvatar, 8, 3);
 
-        // Player 2 avatar starts at [8,3]
-        gameState.placeAvatar(out, gameState, aiAvatar, 7, 2);
-
-        // Let the avatars move on turn 1
+        // Reset action flags
         humanAvatar.hasAttacked = false;
         humanAvatar.hasMoved = false;
-
         aiAvatar.hasAttacked = false;
         aiAvatar.hasMoved = false;
-//        // Temporary enemy non-avatar unit for testing Dark Terminus
-//        Unit testEnemy = BasicObjectBuilders.loadUnit(
-//                "conf/gameconfs/units/gloom_chaser.json",
-//                gameState.getNextUnitId(),
-//                Unit.class
-//        );
-//        testEnemy.setOwner(player2);
-//        testEnemy.setAttack(3);
-//        testEnemy.setMaxHealth(1);
-//        testEnemy.setHealth(out, 1);
-//
-//        Tile enemyTestTile = gameState.getBoard().getTile(7, 2);
-//        enemyTestTile.setUnit(testEnemy);
-//        testEnemy.setPositionByTile(enemyTestTile);
-//
-//        BasicCommands.drawUnit(out, testEnemy, enemyTestTile);
-//        BasicCommands.setUnitAttack(out, testEnemy, testEnemy.getAttack());
-//        BasicCommands.setUnitHealth(out, testEnemy, testEnemy.getHealth());
 
-        // Each player starts with 3 cards drawn from the deck
-
+        // Draw 3 starting cards each (SC#18)
         for (int i = 0; i < 3; i++) {
             player1.drawCardIntoHand();
             player2.drawCardIntoHand();
@@ -95,7 +72,9 @@ public class Initalize implements EventProcessor {
 
         gameState.player1.drawHand(out);
 
-        // Note: As per the template's instructions, comment out the demo execution when implementing your own solution
-        // CommandDemo.executeDemo(out);
+        // If AI goes first, run its turn immediately
+        if (!humanStarts) {
+            AI.AILogic.runAI(out, gameState, player1, player2);
+        }
     }
 }

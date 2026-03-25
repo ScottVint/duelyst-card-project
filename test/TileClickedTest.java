@@ -98,6 +98,10 @@ public class TileClickedTest {
 
         gameState = new GameState();
         new Initalize().processEvent(null, gameState, Json.newObject());
+        // Force P1-first for test determinism (SP32 randomises in production)
+        gameState.player1Turn = true;
+        gameState.getPlayer1().setMana(null, 2);
+        gameState.getPlayer2().setMana(null, 0);
 
         processor = new TileClicked();
     }
@@ -168,10 +172,12 @@ public class TileClickedTest {
      */
     @Test
     public void reClickingDifferentUnitUpdatesSelection() {
-        // Place a second P1 unit at [3, 2]
+        // Place a second P1 unit at [3, 1] with actions remaining
         Unit extra = new Unit();
         extra.setOwner(gameState.getPlayer1());
-        Tile t = gameState.getBoard().getTile(3, 2);
+        extra.hasMoved = false;
+        extra.hasAttacked = false;
+        Tile t = gameState.getBoard().getTile(3, 1);
         t.setUnit(extra);
         extra.setPositionByTile(t);
 
@@ -179,7 +185,7 @@ public class TileClickedTest {
         assertSame("First click should select the avatar",
                 gameState.getPlayer1().getAvatar(), gameState.getSelectedUnit());
 
-        processor.processEvent(null, gameState, clickMsg(3, 2)); // then select extra unit
+        processor.processEvent(null, gameState, clickMsg(3, 1)); // then select extra unit
         assertSame("Second click must update selectedUnit to the new unit",
                 extra, gameState.getSelectedUnit());
     }
@@ -211,7 +217,7 @@ public class TileClickedTest {
         assertTrue("[2,2] must be highlighted (1 step up)",     recorder.wasHighlighted(2, 2));
         assertTrue("[2,1] must be highlighted (2 steps up)",    recorder.wasHighlighted(2, 1));
 
-        // Down: [2,4] (only 1 step; [2,5] is off the board)
+        // Down: [2,4] (only 1 step; y=5 is off the board)
         assertTrue("[2,4] must be highlighted (1 step down)",   recorder.wasHighlighted(2, 4));
     }
 
@@ -221,8 +227,8 @@ public class TileClickedTest {
 
     /**
      * Story Card #3 - AC6 (diagonal):
-     * After selecting the Player 1 avatar at [2,3], all four diagonal tiles
-     * one step away must be highlighted in white.
+     * After selecting the Player 1 avatar at [2,3], all four L-shaped 2-hop
+     * tiles (equivalent to diagonal neighbours) must be highlighted in white.
      */
     @Test
     public void diagonalTilesOneStepAwayAreHighlighted() {

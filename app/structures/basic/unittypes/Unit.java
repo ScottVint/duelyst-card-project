@@ -41,6 +41,9 @@ public class Unit {
 	 */
 	@JsonIgnore
 	Player owner;
+	/** The tile this unit currently occupies. Not serialised to JSON. @author Minghao */
+	@JsonIgnore
+	Tile currentTile;
 	/**
 	 * Maximum hit points of this unit. @author Minghao
 	 */
@@ -55,6 +58,26 @@ public class Unit {
 	int attack;
 	public boolean hasMoved = true;
 	public boolean hasAttacked = true;
+
+	// ////////// ABILITY FLAGS ////////////
+	// These abilities share a unified function and have a trigger each.
+	// The flags are to be check in the relevant trigger.
+
+	/// Enemies in range can only attack this unit (or others with provoke), and can't move away.
+	/// Triggers when the attacking/moving unit checks for valid tiles.
+	protected boolean provoke = false;
+
+	/// Unit gains +2 to their attack.
+	/// Triggers when the allied avatar is damaged.
+	protected boolean zeal = false;
+
+	/// Unit can move to any unoccupied space on the board.
+	/// Triggers when this unit checks for valid movement tiles.
+	protected boolean flying = false;
+
+	/// Unit can move and attack on the same turn it's summoned.
+	/// Triggers when the unit is summoned.
+	protected boolean rush = false;
 
 	public Unit() {
 	}
@@ -90,7 +113,7 @@ public class Unit {
 		this.correction = correction;
 	}
 
-
+	// ////////// GETTER / SETTERS ////////////
 	public int getId() {
 		return id;
 	}
@@ -130,8 +153,6 @@ public class Unit {
 	public void setAnimations(UnitAnimationSet animations) {
 		this.animations = animations;
 	}
-
-	// Extended getter/setters
 
 	public int getHealth() {
 		return health;
@@ -197,9 +218,42 @@ public class Unit {
 	@JsonIgnore
 	public void setPositionByTile(Tile tile) {
 		position = new Position(tile.getXpos(), tile.getYpos(), tile.getTilex(), tile.getTiley());
+		this.currentTile = tile;
 	}
 
+	/** Returns the tile this unit currently occupies. @author Minghao */
+	public Tile getCurrentTile() {
+		return currentTile;
+	}
 
+	/**
+	 * Returns true if this unit's health is at or below zero.
+	 * @author Minghao
+	 */
+	public boolean isDead() {
+		return health <= 0;
+	}
+
+	/**
+	 * Story Card #35: plays the death animation, removes the unit from its tile,
+	 * and sends the delete command to the front-end.
+	 * @param out
+	 * @author Minghao
+	 */
+	@JsonIgnore
+	public void die(ActorRef out) {
+		BasicCommands.playUnitAnimation(out, this, UnitAnimationType.death);
+		if (currentTile != null) {
+			currentTile.setUnit(null);
+			currentTile = null;
+		}
+		if (owner != null) {
+			owner.getUnitList().remove(this.id);
+		}
+		BasicCommands.deleteUnit(out, this);
+	}
+
+	// ////////// BASIC METHODS ////////////
 	/**
 	 * This command automatically calls setUnitHealth to the
 	 * new health value based on the damage taken, and
@@ -213,14 +267,44 @@ public class Unit {
 	public void takeDamage(ActorRef out, int damage) {
 		setHealth(out, health - damage);
 		BasicCommands.setUnitHealth(out, this, health);
+		if (isDead()) {
+			die(out);
+		}
 	}
 
-
 	/// Method for BetterUnit to override
-	public void takeDamage(ActorRef out, Player player, int damage) {
+	public void takeDamage(ActorRef out, GameState gameState, int damage) {
 		takeDamage(out, damage);
 	}
 
+	// ////////// ABILITIES //////////
+	// Abstract methods to be implemented by unit subclasses
+
+	/// Triggers when the unit is summoned.
+	public void openingGambit(ActorRef out, GameState gameState) {};
+
+	/// Triggers when ANY unit dies.
+	public void deathwatch(ActorRef out) {};
+
+	// Getters for ability flags
+
+	public boolean hasFlying() {
+		return flying;
+	}
+
+	public boolean hasProvoke() {
+		return provoke;
+	}
+
+	public boolean hasRush() {
+		return rush;
+	}
+
+	public boolean hasZeal() {
+		return zeal;
+	}
+
+	// ////////// REFERENCE / MISC ////////////
 	/// Way to find a unit's related subclass since I can't think of any other way to do this
 	public static Class<? extends Unit> findUnitClass(String configFile) {
 		Class<? extends Unit> unitClass = Unit.class;
@@ -239,7 +323,7 @@ public class Unit {
 				break;
 
 			case "conf/gameconfs/units/ironcliff_guardian.json":
-				unitClass = IroncliffGuardian.class;
+				unitClass = IroncliffeGuardian.class;
 				break;
 
 			case "conf/gameconfs/units/nightsorrow_assassin.json":
@@ -295,6 +379,7 @@ public class Unit {
 		Wraithling wraithling = (Wraithling) BasicObjectBuilders.loadUnit("conf/gameconfs/units/wraithling.json", gameState.getNextUnitId(), Wraithling.class);
 
 		wraithling.setOwner(player);
+		wraithling.setMaxHealth(1);
 		wraithling.setHealth(out, 1);
 		wraithling.setAttack(out, 1);
 		wraithling.setMaxHealth(wraithling.getHealth());
@@ -315,10 +400,12 @@ public class Unit {
 			EffectAnimation summonEffect = BasicObjectBuilders.loadEffect(StaticConfFiles.f1_summon);
 			try { Thread.sleep(BasicCommands.playEffectAnimation(out, summonEffect, clickedTile)); }
 			catch (InterruptedException e) { Thread.currentThread().interrupt(); }
-			BasicCommands.setUnitHealth(out,wraithling,wraithling.getHealth());
-			for (int i = 0; i < 10; i++) {
+    
+			for (int i = 0; i < 15; i++)
 				BoardLogic.blink();
-			}
+			BasicCommands.setUnitHealth(out,wraithling,wraithling.getHealth());
+			for (int i = 0; i < 15; i++)
+				BoardLogic.blink();
 			BasicCommands.setUnitAttack(out, wraithling, wraithling.getAttack());
 	}
 }
