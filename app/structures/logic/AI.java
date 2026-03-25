@@ -105,7 +105,7 @@ public class AI {
                 unit.setPositionByTile(bestMove);
 
                 BasicCommands.moveUnitToTile(out, unit, bestMove);
-                for (int i = 0; i < 30; i++) BoardLogic.blink();
+                try { Thread.sleep(1500); } catch (InterruptedException e) { Thread.currentThread().interrupt(); }
 
                 unit.hasMoved = true;
             }
@@ -153,6 +153,7 @@ public class AI {
             castSpells(out, gs);
             moveUnit(out, gs);
             attack(out, gs);
+            try { Thread.sleep(500); } catch (InterruptedException e) { Thread.currentThread().interrupt(); }
             gs.endTurn(out, p2, p1);
         }
 
