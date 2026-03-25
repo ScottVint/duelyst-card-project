@@ -3,24 +3,15 @@ package structures.logic;
 import akka.actor.ActorRef;
 import commands.BasicCommands;
 import structures.GameState;
+import structures.basic.Board;
 import structures.basic.Tile;
 import structures.basic.UnitAnimationType;
+import structures.basic.players.Player;
 import structures.basic.unittypes.Unit;
-import structures.basic.Board;
+
 import java.util.Set;
 
 public class CombatLogic {
-
-    public static void tryAttackSelectedUnit(ActorRef out, GameState gameState, Unit defender) {
-        Unit attacker = gameState.getSelectedUnit();
-
-        resolveCombat(out, gameState, attacker, defender);
-
-        BoardLogic.clearSelection(out, gameState.getBoard());
-        gameState.selectedUnit = null;
-        gameState.selectedHandPosition = null;
-        gameState.highlightedTiles.clear();
-    }
 
     /**
      * Resolves the full combat sequence:
@@ -35,11 +26,13 @@ public class CombatLogic {
         BasicCommands.playUnitAnimation(out, defender, UnitAnimationType.hit);
         defender.takeDamage(out, attacker.getAttack());
 
-        // After an attack, the unit cannot attack again this turn; if it has not moved before, it also loses the right to move.
+        // After an attack the unit cannot attack again this turn; per Moodle FAQ
+        // ("If a unit attacks and has not moved it loses its move action that turn")
+        // attacking also consumes the move action.
         attacker.hasAttacked = true;
         attacker.hasMoved = true;
 
-        // Counterattack is only allowed if you haven't counterattacked in this round yet, and is defender isn't dead.
+        // Counterattack: allowed once per turn if defender survived
         if (!defender.isDead() && !defender.hasCounterattacked) {
             BasicCommands.playUnitAnimation(out, defender, UnitAnimationType.attack);
             BasicCommands.playUnitAnimation(out, attacker, UnitAnimationType.hit);
@@ -49,16 +42,25 @@ public class CombatLogic {
         }
     }
 
+    public static void death(ActorRef out, GameState gameState, Unit unit) {
+        if (unit == null) return;
+        unit.die(out);
+        Player owner = unit.getOwner();
+        if (owner != null) {
+            owner.getUnitList().remove(unit.getId());
+        }
+    }
+
+    /**
+     * Finds the best tile to move to in order to attack the given enemy tile.
+     * Returns null if no reachable attack position exists.
+     */
     public static Tile findAutoAttackDestination(Unit attacker, Tile enemyTile, Board board) {
         if (attacker == null || enemyTile == null || enemyTile.getUnit() == null || board == null) {
             return null;
         }
 
-        Tile origin = board.getTile(
-                attacker.getPosition().getTilex(),
-                attacker.getPosition().getTiley()
-        );
-
+        Tile origin = attacker.getCurrentTile();
         if (origin == null) {
             return null;
         }
@@ -91,5 +93,14 @@ public class CombatLogic {
         }
 
         return bestTile;
+    }
+
+    public static Set<Tile> findUnitsWithProvokeAdjacent(Board board, Unit startingUnit) {
+        Set<Tile> targets = BoardLogic.findAdjacentTiles(startingUnit.getCurrentTile(), board);
+        Player unitOwner = startingUnit.getOwner();
+        targets.removeIf(tile -> tile.getUnit() == null
+                || !tile.getUnit().hasProvoke()
+                || tile.getUnit().getOwner().equals(unitOwner));
+        return targets;
     }
 }

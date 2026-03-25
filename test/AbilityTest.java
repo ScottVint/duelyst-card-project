@@ -15,7 +15,9 @@ import structures.basic.unittypes.Wraithling;
 import structures.logic.BoardLogic;
 import utils.BasicObjectBuilders;
 
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.junit.Assert.*;
 
@@ -31,11 +33,16 @@ public class AbilityTest {
         BasicCommands.altTell = altTell; // specify that the alternative tell should be used
         player.setAvatar(null, gs);
         gs.placeAvatar(null, player.getAvatar(), 3, 2);
-        gs.selectedHandPosition = 1;
-        player.getHand().clear();
-        opponent.getHand().clear();
+
         opponent.setAvatar(null, gs);
         gs.placeAvatar(null, opponent.getAvatar(), 7, 2);
+
+        player.getAvatar().hasMoved = false;
+        opponent.getAvatar().hasMoved = false;
+
+        player.getHand().clear();
+        opponent.getHand().clear();
+
 
     }
 
@@ -51,7 +58,7 @@ public class AbilityTest {
 
     ///////////// Gloom Chaser //////////////
     @Test
-    public void GloomChaserGambitSummonedTest () {
+    public void gloomChaserGambitSummonedTest () {
         // Gloomchaser summons wraithling in emtpy space
         Card testCard = BasicObjectBuilders.loadCard("conf/gameconfs/cards/1_3_c_u_gloom_chaser.json", 12, Card.class);
 
@@ -64,7 +71,7 @@ public class AbilityTest {
     }
 
     @Test
-    public void GloomChaserGambitDoesNotOverwriteTest () {
+    public void gloomChaserGambitDoesNotOverwriteTest () {
         // Gloomchaser does not overwrite occupied tile
         Card testCard = BasicObjectBuilders.loadCard("conf/gameconfs/cards/1_3_c_u_gloom_chaser.json", 1, Card.class);
         player.getHand().add(testCard);
@@ -76,7 +83,7 @@ public class AbilityTest {
     }
 
     @Test
-    public void GloomChaserDoesNotCrash() {
+    public void gloomChaserDoesNotCrash() {
         // Summon does not crash if done at edge of board
         Card testCard = BasicObjectBuilders.loadCard("conf/gameconfs/cards/1_3_c_u_gloom_chaser.json", 1, Card.class);
         player.getHand().add(testCard);
@@ -88,8 +95,9 @@ public class AbilityTest {
         assertEquals("Wraithling should not overwrite existing unit.", GloomChaser.class, unitOnTile.getClass());
     }
 
+    // /////////// Nightsorrow Assassin /////////////
     @Test
-    public void NightsorrowAssassinOpeningGambitTest() {
+    public void nightsorrowAssassinOpeningGambitTest() {
         // Check if valid target is killed
         Card opponentCard = BasicObjectBuilders.loadCard("conf/gameconfs/cards/2_6_c_u_young_flamewing.json", 2, Card.class);
         opponent.getHand().add(opponentCard);
@@ -104,14 +112,12 @@ public class AbilityTest {
 
         Tile summonTile = gs.getBoard().getTile(4, 1);
         player.useCard(null, gs, 0, summonTile, 0);
-        Unit unit = summonTile.getUnit();
 
         assertNull("Target should be deleted.", targetTile.getUnit());
-        summonTile.setUnit(null);
     }
 
     @Test
-    public void NightsorrowAssassinGambitFullHPStaysTest() {
+    public void nightsorrowAssassinGambitFullHPStaysTest() {
         // Check if full HP target is not deleted
         Card opponentCard = BasicObjectBuilders.loadCard("conf/gameconfs/cards/2_6_c_u_young_flamewing.json", 2, Card.class);
         Card testCard = BasicObjectBuilders.loadCard("conf/gameconfs/cards/1_6_c_u_nightsorrow_assassin.json", 1, Card.class);
@@ -129,7 +135,7 @@ public class AbilityTest {
     }
 
     @Test
-    public void NightsorrowAssassinGambitNoAllyKillTest() {
+    public void nightsorrowAssassinGambitNoAllyKillTest() {
         // Check if allied unit is deleted
         Card opponentCard = BasicObjectBuilders.loadCard("conf/gameconfs/cards/2_6_c_u_young_flamewing.json", 2, Card.class);
         Card testCard = BasicObjectBuilders.loadCard("conf/gameconfs/cards/1_6_c_u_nightsorrow_assassin.json", 1, Card.class);
@@ -147,7 +153,7 @@ public class AbilityTest {
     }
 
     @Test
-    public void NightsorrowAssassinGambitNoAvatarKillTest() {
+    public void nightsorrowAssassinGambitNoAvatarKillTest() {
         Card testCard = BasicObjectBuilders.loadCard("conf/gameconfs/cards/1_6_c_u_nightsorrow_assassin.json", 1, Card.class);
 
         player.getHand().add(testCard);
@@ -160,7 +166,7 @@ public class AbilityTest {
     }
 
     @Test
-    public void NightsorrowAssassinGambit1UnitKilledTest() {
+    public void nightsorrowAssassinGambit1UnitKilledTest() {
         Card opponentCard = BasicObjectBuilders.loadCard("conf/gameconfs/cards/2_6_c_u_young_flamewing.json", 2, Card.class);
         Card testCard = BasicObjectBuilders.loadCard("conf/gameconfs/cards/1_6_c_u_nightsorrow_assassin.json", 1, Card.class);
         Tile summonTile = gs.getBoard().getTile(4, 1);
@@ -183,12 +189,12 @@ public class AbilityTest {
         assertEquals("Only one target should be deleted.",  7, after);
     }
 
+    /// /////////// Silverguard Squire /////////////
     @Test
-    public void SilverguardSquireBuffOneUnitTest() {
+    public void silverguardSquireBuffOneUnitTest() {
         Card allyCard = BasicObjectBuilders.loadCard("conf/gameconfs/cards/2_4_c_u_saberspine_tiger.json",  1, Card.class);
         Card squireCard = BasicObjectBuilders.loadCard("conf/gameconfs/cards/2_7_c_u_silverguard_squire.json", 1 , Card.class);
         Tile summonLeft = gs.getBoard().getTile(2,2);
-        Tile summonRight = gs.getBoard().getTile(4,2);
         Tile unitSummon = gs.getBoard().getTile(0,0);
 
         player.getHand().add(allyCard);
@@ -208,7 +214,7 @@ public class AbilityTest {
     }
 
     @Test
-    public void SilverguardSquireBuffBothUnitsTest() {
+    public void silverguardSquireBuffBothUnitsTest() {
         Card allyCard = BasicObjectBuilders.loadCard("conf/gameconfs/cards/2_4_c_u_saberspine_tiger.json",  1, Card.class);
         Card squireCard = BasicObjectBuilders.loadCard("conf/gameconfs/cards/2_7_c_u_silverguard_squire.json", 1 , Card.class);
         Tile summonLeft = gs.getBoard().getTile(2,2);
@@ -240,7 +246,7 @@ public class AbilityTest {
     }
 
     @Test
-    public void SilverguardSquireDontBuffEnemiesTest() {
+    public void silverguardSquireDontBuffEnemiesTest() {
         Card enemyCard = BasicObjectBuilders.loadCard("conf/gameconfs/cards/2_4_c_u_saberspine_tiger.json",  1, Card.class);
         Card squireCard = BasicObjectBuilders.loadCard("conf/gameconfs/cards/2_7_c_u_silverguard_squire.json", 1 , Card.class);
         Tile summonLeft = gs.getBoard().getTile(2,2);
@@ -262,7 +268,7 @@ public class AbilityTest {
     }
 
     @Test
-    public void SilverguarSquireDontBuffAboveUnitsTest() {
+    public void silverguardSquireDontBuffAboveUnitsTest() {
             Card allyCard = BasicObjectBuilders.loadCard("conf/gameconfs/cards/2_4_c_u_saberspine_tiger.json",  1, Card.class);
             Card squireCard = BasicObjectBuilders.loadCard("conf/gameconfs/cards/2_7_c_u_silverguard_squire.json", 1 , Card.class);
             Tile summonUp = gs.getBoard().getTile(3,1);
@@ -291,4 +297,286 @@ public class AbilityTest {
             assertEquals("Attack should not increase.", startAttack, ally.getAttack());
             assertEquals("Both allies' attack should not increase.", startAttack, allyRight.getAttack());
     }
+
+    // /////////// Silverspine Tiger /////////////
+    @Test
+    public void saberspineTigerRushIsTrueTest() {
+        Card tigerCard = BasicObjectBuilders.loadCard("conf/gameconfs/cards/2_4_c_u_saberspine_tiger.json", 2, Card.class);
+        opponent.getHand().add(tigerCard);
+        Tile summontile =  gs.getBoard().getTile(2,2);
+        opponent.useCard(null, gs, 0, summontile, 0);
+        Unit tiger =  summontile.getUnit();
+
+        assertTrue("Silverspine Tiger should have rush attribute as true.", tiger.hasRush());
+        assertEquals("Values should initialise as normal.", 2, tiger.getMaxHealth());
+        assertEquals("Values should initialise as normal.", 3, tiger.getAttack());
+    }
+
+    @Test
+    public void saberspineTigerRushWorksTest() {
+        Card tigerCard = BasicObjectBuilders.loadCard("conf/gameconfs/cards/2_4_c_u_saberspine_tiger.json", 2, Card.class);
+        opponent.getHand().add(tigerCard);
+        Tile summontile =  gs.getBoard().getTile(2,2);
+        opponent.useCard(null, gs, 0, summontile, 0);
+        Unit tiger =  summontile.getUnit();
+
+        assertFalse("Movement and Attack should be refreshed.", tiger.hasMoved);
+        assertFalse("Movement and Attack should be refreshed.", tiger.hasAttacked);
+    }
+
+    // /////////// Young Flamewing /////////////
+    @Test
+    public void youngFlamewingFlyingIsTrueTest() {
+        Card flamewingCard = BasicObjectBuilders.loadCard("conf/gameconfs/cards/2_6_c_u_young_flamewing.json", 2, Card.class);
+        opponent.getHand().add(flamewingCard);
+        Tile summontile =  gs.getBoard().getTile(2,2);
+        opponent.useCard(null, gs, 0, summontile, 0);
+        Unit flamewing =  summontile.getUnit();
+
+        assertTrue("Young Flamewing should have flying attribute as true.", flamewing.hasFlying());
+        assertEquals("Values should initialise as normal.", 4, flamewing.getMaxHealth());
+        assertEquals("Values should initialise as normal.", 5, flamewing.getAttack());
+    }
+
+    @Test
+    public void youngFlamewingFliesEverywhereTest() {
+        player.getAvatar().getCurrentTile().setUnit(null);
+        opponent.getAvatar().getCurrentTile().setUnit(null);
+
+        Card flamewingCard = BasicObjectBuilders.loadCard("conf/gameconfs/cards/2_6_c_u_young_flamewing.json", 2, Card.class);
+        opponent.getHand().add(flamewingCard);
+        Tile summontile =  gs.getBoard().getTile(2,2);
+        opponent.useCard(null, gs, 0, summontile, 0);
+        Unit flamewing =  summontile.getUnit();
+        flamewing.hasMoved = false;
+
+        Set<Tile> expectedMovement =  new HashSet<>();
+        for (Tile[] row : gs.getBoard().getTiles())
+            Collections.addAll(expectedMovement, row);
+
+        expectedMovement.remove(gs.getBoard().getTile(2,2));
+
+        assertEquals(expectedMovement, BoardLogic.findValidMovement(summontile, flamewing, gs.getBoard()));
+    }
+
+    @Test
+    public void youngFlamewingFlyingRespectsOtherUnitsTest() {
+        Card flamewingCard = BasicObjectBuilders.loadCard("conf/gameconfs/cards/2_6_c_u_young_flamewing.json", 2, Card.class);
+        opponent.getHand().add(flamewingCard);
+        Tile summontile =  gs.getBoard().getTile(2,2);
+        opponent.useCard(null, gs, 0, summontile, 0);
+        Unit flamewing =  summontile.getUnit();
+        flamewing.hasMoved = false;
+
+        Tile playerAvatarTile = player.getAvatar().getCurrentTile();
+        Tile opponentAvatarTile = opponent.getAvatar().getCurrentTile();
+
+        Set<Tile> expectedMovement =  new HashSet<>();
+        for (Tile[] row : gs.getBoard().getTiles())
+            expectedMovement.addAll(Arrays.asList(row));
+
+        expectedMovement.remove(gs.getBoard().getTile(2,2));
+        expectedMovement.remove(playerAvatarTile);
+        expectedMovement.remove(opponentAvatarTile);
+
+
+        assertEquals(expectedMovement, BoardLogic.findValidMovement(summontile, flamewing, gs.getBoard()));
+    }
+
+    /// ////////  Units with provoke //////////
+    @Test
+    public void unitsProvokeIsTrueTest() {
+        // Units with provoke: Rock Pulveriser, Swamp Entangler, Silverguard Knight, Ironcliffe Guardian
+        Card rockCard = BasicObjectBuilders.loadCard("conf/gameconfs/cards/1_7_c_u_rock_pulveriser.json", 2, Card.class);
+        Card swampCard = BasicObjectBuilders.loadCard("conf/gameconfs/cards/2_2_c_u_swamp_entangler.json", 2, Card.class);
+        Card knightCard = BasicObjectBuilders.loadCard("conf/gameconfs/cards/2_3_c_u_silverguard_knight.json", 2, Card.class);
+        Card guardianCard = BasicObjectBuilders.loadCard("conf/gameconfs/cards/2_8_c_u_ironcliff_guardian.json", 2, Card.class);
+
+        opponent.getHand().add(rockCard);
+        opponent.getHand().add(swampCard);
+        opponent.getHand().add(knightCard);
+        opponent.getHand().add(guardianCard);
+
+        List<Unit> summonedUnits = new ArrayList<>();
+        for (int i = 0; i < 4; i++) {
+            opponent.useCard(null, gs, 0, gs.getBoard().getTile(i, 0), 0);
+            summonedUnits.add(gs.getBoard().getTile(i, 0).getUnit());
+        }
+        assertTrue("Rock Pulveriser should have Provoke attribute as true.", summonedUnits.get(0).hasProvoke());
+        assertTrue("Swamp Entangler should have Provoke attribute as true.", summonedUnits.get(0).hasProvoke());
+        assertTrue("Silverguard Knight should have Provoke attribute as true.", summonedUnits.get(0).hasProvoke());
+        assertTrue("Ironcliffe Guardian should have Provoke attribute as true.", summonedUnits.get(0).hasProvoke());
+    }
+
+    @Test
+    public void provokePreventsMovementTest() {
+        Card guardianCard = BasicObjectBuilders.loadCard("conf/gameconfs/cards/2_8_c_u_ironcliff_guardian.json", 2, Card.class);
+        opponent.getHand().add(guardianCard);
+
+        Tile summontile =  gs.getBoard().getTile(2,2);
+        opponent.useCard(null, gs, 0, summontile, 0);
+
+        Tile avatarTile = player.getAvatar().getCurrentTile();
+
+        assertTrue("Avatar should not be able to move.", BoardLogic.findValidMovement(avatarTile, gs.getBoard().getTile(3,2).getUnit(), gs.getBoard()).isEmpty());
+    }
+
+    @Test
+    public void provokeForcesAttackTest() {
+        Card guardianCard = BasicObjectBuilders.loadCard("conf/gameconfs/cards/2_8_c_u_ironcliff_guardian.json", 2, Card.class);
+        Card otherUnitCard = BasicObjectBuilders.loadCard("conf/gameconfs/cards/2_4_c_u_saberspine_tiger.json",  2, Card.class);
+        opponent.getHand().add(guardianCard);
+        opponent.getHand().add(otherUnitCard);
+        opponent.getHand().add(otherUnitCard);
+
+        Tile summontile =  gs.getBoard().getTile(2,2), dummyTile1 = gs.getBoard().getTile(4,2),  dummyTile2 = gs.getBoard().getTile(4,3);
+        opponent.useCard(null, gs, 0, summontile, 0);
+        opponent.useCard(null, gs, 0, dummyTile1, 0);
+        opponent.useCard(null, gs, 0, dummyTile2, 0);
+
+        Tile avatarTile = player.getAvatar().getCurrentTile();
+        Set<Tile> expected = new HashSet<>();
+        expected.add(summontile);
+
+        assertEquals("Only Ironcliffe Guardian should be able to be attacked.", BoardLogic.findValidAttackUnits(avatarTile, avatarTile.getUnit(), gs.getBoard()), expected);
+    }
+
+    @Test
+    public void provokeMultipleTargetsTest() {
+        Card guardianCard = BasicObjectBuilders.loadCard("conf/gameconfs/cards/2_8_c_u_ironcliff_guardian.json", 2, Card.class);
+        Card knightCard = BasicObjectBuilders.loadCard("conf/gameconfs/cards/2_3_c_u_silverguard_knight.json", 2, Card.class);
+        Card otherUnitCard = BasicObjectBuilders.loadCard("conf/gameconfs/cards/2_4_c_u_saberspine_tiger.json",  2, Card.class);
+        opponent.getHand().add(guardianCard);
+        opponent.getHand().add(knightCard);
+        opponent.getHand().add(otherUnitCard);
+        opponent.getHand().add(otherUnitCard);
+
+        Tile summontile =  gs.getBoard().getTile(2,2), dummyTile1 = gs.getBoard().getTile(4,2),  dummyTile2 = gs.getBoard().getTile(4,3);
+        Tile otherTile = gs.getBoard().getTile(3,3);
+
+        opponent.useCard(null, gs, 0, summontile, 0);
+        opponent.useCard(null, gs, 0, otherTile, 0);
+        opponent.useCard(null, gs, 0, dummyTile1, 0);
+        opponent.useCard(null, gs, 0, dummyTile2, 0);
+
+        Tile avatarTile = player.getAvatar().getCurrentTile();
+        Set<Tile> expected = new HashSet<>();
+        expected.add(summontile);
+        expected.add(otherTile);
+
+        assertEquals("Both units should be able to be attacked, but no other.", BoardLogic.findValidAttackUnits(avatarTile, avatarTile.getUnit(), gs.getBoard()), expected);
+    }
+
+    @Test
+    public void alliesDontTriggerProvokeTest() {
+        Card guardianCard = BasicObjectBuilders.loadCard("conf/gameconfs/cards/2_8_c_u_ironcliff_guardian.json", 2, Card.class);
+        Card knightCard = BasicObjectBuilders.loadCard("conf/gameconfs/cards/2_3_c_u_silverguard_knight.json", 2, Card.class);
+        Card otherUnitCard = BasicObjectBuilders.loadCard("conf/gameconfs/cards/2_4_c_u_saberspine_tiger.json",  2, Card.class);
+        player.getHand().add(guardianCard);
+        player.getHand().add(knightCard);
+        opponent.getHand().add(otherUnitCard);
+        opponent.getHand().add(otherUnitCard);
+
+        Tile summontile =  gs.getBoard().getTile(2,2), dummyTile1 = gs.getBoard().getTile(4,2),  dummyTile2 = gs.getBoard().getTile(4,3);
+        Tile otherTile = gs.getBoard().getTile(3,3);
+        Tile avatarTile = player.getAvatar().getCurrentTile();
+
+        Set<Tile> expectedMovement = Stream.of(
+                        new int[][]{ {2,1}, {3,1}, {2,3}, {3,4}, {4,1}, {3,0}, {1,2} }
+                ).map(coord -> gs.getBoard().getTile(coord[0], coord[1]))
+                .collect(Collectors.toSet());
+
+        Set<Tile> expectedAttack = new HashSet<>();
+        expectedAttack.add(dummyTile1);
+        expectedAttack.add(dummyTile2);
+
+        player.useCard(null, gs, 0, summontile, 0);
+        player.useCard(null, gs, 0, otherTile, 0);
+        opponent.useCard(null, gs, 0, dummyTile1, 0);
+        opponent.useCard(null, gs, 0, dummyTile2, 0);
+
+        assertEquals("Allied units should not trigger Provoke.", expectedMovement, BoardLogic.findValidMovement(avatarTile, avatarTile.getUnit(), gs.getBoard()));
+        assertEquals("Allied units should not trigger Provoke.", expectedAttack, BoardLogic.findValidAttackUnits(avatarTile, avatarTile.getUnit(), gs.getBoard()));
+    }
+
+    /// //////////////  Zeal /////////////////
+    @Test
+    public void silverguardKnightZealIsTrueTest() {
+        Card knightCard = BasicObjectBuilders.loadCard("conf/gameconfs/cards/2_3_c_u_silverguard_knight.json", 2, Card.class);
+        player.getHand().add(knightCard);
+
+        Tile summonTile = gs.getBoard().getTile(2, 2);
+        player.useCard(null, gs, 0, summonTile, 0);
+        Unit knight = summonTile.getUnit();
+
+        assertTrue("Silverguard Knight should have Zeal attribute as true.", knight.hasZeal());
+    }
+
+    @Test
+    public void allyAvatarHitTriggersZealTest() {
+        Card knightCard = BasicObjectBuilders.loadCard("conf/gameconfs/cards/2_3_c_u_silverguard_knight.json", 2, Card.class);
+        player.getHand().add(knightCard);
+
+        Tile summonTile = gs.getBoard().getTile(2, 2);
+        player.useCard(null, gs, 0, summonTile, 0);
+        Unit knight = summonTile.getUnit();
+
+        Unit avatar = player.getAvatar();
+        avatar.takeDamage(null, gs, 1);
+
+        assertEquals("Silverguard Knight Attack should raise by 2.", 3, knight.getAttack());
+    }
+
+    @Test
+    public void enemyAvatarHitDoesNotTriggerZealTest() {
+        Card knightCard = BasicObjectBuilders.loadCard("conf/gameconfs/cards/2_3_c_u_silverguard_knight.json", 2, Card.class);
+        player.getHand().add(knightCard);
+
+        Tile summonTile = gs.getBoard().getTile(2, 2);
+        player.useCard(null, gs, 0, summonTile, 0);
+        Unit knight = summonTile.getUnit();
+
+        Unit avatar = opponent.getAvatar();
+        avatar.takeDamage(null, 1);
+
+        assertEquals("Silverguard Attack HP should not raise.", 1, knight.getAttack());
+    }
+
+    @Test
+    public void zealStacksTest() {
+        Card knightCard = BasicObjectBuilders.loadCard("conf/gameconfs/cards/2_3_c_u_silverguard_knight.json", 2, Card.class);
+        player.getHand().add(knightCard);
+
+        Tile summonTile = gs.getBoard().getTile(2, 2);
+        player.useCard(null, gs, 0, summonTile, 0);
+        Unit knight = summonTile.getUnit();
+
+        Unit avatar = player.getAvatar();
+        avatar.takeDamage(null, gs,1);
+        avatar.takeDamage(null, gs,1);
+        avatar.takeDamage(null, gs,1);
+        avatar.takeDamage(null, gs,1);
+
+        assertEquals("Silverguard Knight HP should raise by 9, 2 per hit.", 9, knight.getAttack());
+    }
+
+    @Test
+    public void healingDoesNotTriggerZealTest() {
+        Card knightCard = BasicObjectBuilders.loadCard("conf/gameconfs/cards/2_3_c_u_silverguard_knight.json", 2, Card.class);
+        player.getHand().add(knightCard);
+
+        Tile summonTile = gs.getBoard().getTile(2, 2);
+        player.useCard(null, gs, 0, summonTile, 0);
+        Unit knight = summonTile.getUnit();
+
+        Unit avatar = player.getAvatar();
+        avatar.setHealth(null, 10);
+        avatar.takeDamage(null, gs,-1);
+        avatar.takeDamage(null, gs,-1);
+
+        assertEquals("Silverguard Knight HP should not raise.", 1, knight.getAttack());
+
+    }
+
+
 }

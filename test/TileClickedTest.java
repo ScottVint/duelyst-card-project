@@ -28,8 +28,8 @@ import structures.basic.unittypes.Unit;
  * ownership, exactly as would happen in a real game.
  *
  * Board layout after Initalize:
- *   Player 1 avatar → [1, 2]
- *   Player 2 avatar → [7, 2]
+ *   Player 1 avatar → [2, 3]
+ *   Player 2 avatar → [8, 3]
  *
  * @author Minghao
  */
@@ -98,6 +98,10 @@ public class TileClickedTest {
 
         gameState = new GameState();
         new Initalize().processEvent(null, gameState, Json.newObject());
+        // Force P1-first for test determinism (SP32 randomises in production)
+        gameState.player1Turn = true;
+        gameState.getPlayer1().setMana(null, 2);
+        gameState.getPlayer2().setMana(null, 0);
 
         processor = new TileClicked();
     }
@@ -116,7 +120,7 @@ public class TileClickedTest {
         assertNull("No unit should be selected before any click",
                 gameState.getSelectedUnit());
 
-        processor.processEvent(null, gameState, clickMsg(1, 2)); // P1 avatar at [1,2]
+        processor.processEvent(null, gameState, clickMsg(2, 3)); // P1 avatar at [2,3]
 
         assertNotNull("A Player 1 unit click must set selectedUnit",
                 gameState.getSelectedUnit());
@@ -135,7 +139,7 @@ public class TileClickedTest {
      */
     @Test
     public void clickingPlayer2UnitDoesNotSelectIt() {
-        processor.processEvent(null, gameState, clickMsg(7, 2)); // P2 avatar at [7,2]
+        processor.processEvent(null, gameState, clickMsg(8, 3)); // P2 avatar at [8,3]
 
         assertNull("Clicking a Player 2 unit must not set selectedUnit",
                 gameState.getSelectedUnit());
@@ -177,7 +181,7 @@ public class TileClickedTest {
         t.setUnit(extra);
         extra.setPositionByTile(t);
 
-        processor.processEvent(null, gameState, clickMsg(1, 2)); // select avatar first
+        processor.processEvent(null, gameState, clickMsg(2, 3)); // select avatar first
         assertSame("First click should select the avatar",
                 gameState.getPlayer1().getAvatar(), gameState.getSelectedUnit());
 
@@ -199,22 +203,22 @@ public class TileClickedTest {
     @Test
     public void cardinalTilesWithinTwoStepsAreHighlighted() {
         recorder.messages.clear();
-        processor.processEvent(null, gameState, clickMsg(1, 2));
+        processor.processEvent(null, gameState, clickMsg(2, 3));
 
-        // Right: [2,2] and [3,2]
-        assertTrue("[2,2] must be highlighted (1 step right)",  recorder.wasHighlighted(2, 2));
-        assertTrue("[3,2] must be highlighted (2 steps right)", recorder.wasHighlighted(3, 2));
+        // Right: [3,3] and [4,3]
+        assertTrue("[3,3] must be highlighted (1 step right)",  recorder.wasHighlighted(3, 3));
+        assertTrue("[4,3] must be highlighted (2 steps right)", recorder.wasHighlighted(4, 3));
 
-        // Left: [0,2] (only 1 step; [-1,2] is off the board)
-        assertTrue("[0,2] must be highlighted (1 step left)",   recorder.wasHighlighted(0, 2));
+        // Left: [1,3] and [0,3]
+        assertTrue("[1,3] must be highlighted (1 step left)",   recorder.wasHighlighted(1, 3));
+        assertTrue("[0,3] must be highlighted (2 steps left)",  recorder.wasHighlighted(0, 3));
 
-        // Up: [1,1] and [1,0]
-        assertTrue("[1,1] must be highlighted (1 step up)",     recorder.wasHighlighted(1, 1));
-        assertTrue("[1,0] must be highlighted (2 steps up)",    recorder.wasHighlighted(1, 0));
+        // Up: [2,2] and [2,1]
+        assertTrue("[2,2] must be highlighted (1 step up)",     recorder.wasHighlighted(2, 2));
+        assertTrue("[2,1] must be highlighted (2 steps up)",    recorder.wasHighlighted(2, 1));
 
-        // Down: [1,3] and [1,4]
-        assertTrue("[1,3] must be highlighted (1 step down)",   recorder.wasHighlighted(1, 3));
-        assertTrue("[1,4] must be highlighted (2 steps down)",  recorder.wasHighlighted(1, 4));
+        // Down: [2,4] (only 1 step; y=5 is off the board)
+        assertTrue("[2,4] must be highlighted (1 step down)",   recorder.wasHighlighted(2, 4));
     }
 
     // -----------------------------------------------------------------------
@@ -223,18 +227,18 @@ public class TileClickedTest {
 
     /**
      * Story Card #3 - AC6 (diagonal):
-     * After selecting the Player 1 avatar at [2,3], all four diagonal tiles
-     * one step away must be highlighted in white.
+     * After selecting the Player 1 avatar at [2,3], all four L-shaped 2-hop
+     * tiles (equivalent to diagonal neighbours) must be highlighted in white.
      */
     @Test
     public void diagonalTilesOneStepAwayAreHighlighted() {
         recorder.messages.clear();
-        processor.processEvent(null, gameState, clickMsg(1, 2));
+        processor.processEvent(null, gameState, clickMsg(2, 3));
 
-        assertTrue("[2,3] must be highlighted (diagonal down-right)", recorder.wasHighlighted(2, 3));
-        assertTrue("[2,1] must be highlighted (diagonal up-right)",   recorder.wasHighlighted(2, 1));
-        assertTrue("[0,3] must be highlighted (diagonal down-left)",  recorder.wasHighlighted(0, 3));
-        assertTrue("[0,1] must be highlighted (diagonal up-left)",    recorder.wasHighlighted(0, 1));
+        assertTrue("[3,4] must be highlighted (diagonal down-right)", recorder.wasHighlighted(3, 4));
+        assertTrue("[3,2] must be highlighted (diagonal up-right)",   recorder.wasHighlighted(3, 2));
+        assertTrue("[1,4] must be highlighted (diagonal down-left)",  recorder.wasHighlighted(1, 4));
+        assertTrue("[1,2] must be highlighted (diagonal up-left)",    recorder.wasHighlighted(1, 2));
     }
 
     // -----------------------------------------------------------------------
@@ -249,21 +253,21 @@ public class TileClickedTest {
      */
     @Test
     public void blockerUnitStopsCardinalHighlightBeyondIt() {
-        // Place an enemy unit at [2,2] — one step right of P1 avatar at [1,2]
+        // Place an enemy unit at [3,3] — one step right of P1 avatar at [2,3]
         Unit blocker = new Unit();
         blocker.setOwner(gameState.getPlayer2());
-        Tile blockerTile = gameState.getBoard().getTile(2, 2);
+        Tile blockerTile = gameState.getBoard().getTile(3, 3);
         blockerTile.setUnit(blocker);
 
         recorder.messages.clear();
-        processor.processEvent(null, gameState, clickMsg(1, 2));
+        processor.processEvent(null, gameState, clickMsg(2, 3));
 
         // The blocker tile itself must not be a valid landing square
-        assertFalse("[2,2] must NOT be highlighted (occupied by blocker)",
-                recorder.wasHighlighted(2, 2));
+        assertFalse("[3,3] must NOT be highlighted (occupied by blocker)",
+                recorder.wasHighlighted(3, 3));
         // The tile behind the blocker must also not be highlighted
-        assertFalse("[3,2] must NOT be highlighted (path blocked at [2,2])",
-                recorder.wasHighlighted(3, 2));
+        assertFalse("[4,3] must NOT be highlighted (path blocked at [3,3])",
+                recorder.wasHighlighted(4, 3));
     }
 
     // -----------------------------------------------------------------------
@@ -279,8 +283,8 @@ public class TileClickedTest {
      */
     @Test
     public void movementHighlightAtCornerDoesNotCrash() {
-        // Move P1 avatar from [1,2] to corner [0,0]
-        gameState.getBoard().getTile(1, 2).setUnit(null);
+        // Move P1 avatar from [2,3] to corner [0,0]
+        gameState.getBoard().getTile(2, 3).setUnit(null);
         Unit unit = gameState.getPlayer1().getAvatar();
         Tile corner = gameState.getBoard().getTile(0, 0);
         corner.setUnit(unit);

@@ -31,7 +31,8 @@ public class GameState {
 	public Unit selectedUnit = null;
 	public boolean player1Turn = true;
 
-	public double turnCount = 1;
+	public int turnCount = 1;
+	public boolean gameOver = false;
 
 	/**
 	 * 1-indexed hand position of the selected card, or null if none selected
@@ -157,44 +158,85 @@ public class GameState {
 		BasicCommands.setUnitAttack(out, avatar, avatar.getAttack());
 	}
 
+	/**
+	 * Combat damage based on attacker attack stat.
+	 */
+	public void dealDamage(ActorRef out, Unit attacker, Unit target) {
+		if (attacker == null || target == null) return;
+
+		int damage = attacker.getAttack();
+
+		if (damage <= 0) {
+			BasicCommands.addPlayer1Notification(out, "Attacker has 0 attack.", 2);
+			return;
+		}
+
+		dealDirectDamage(out, target, damage);
+	}
+
+	/**
+	 * Direct spell / combat damage.
+	 */
+	public void dealDirectDamage(ActorRef out, Unit target, int damage) {
+		if (target == null || damage <= 0 || gameOver) return;
+
+		int newHealth = target.getHealth() - damage;
+		target.setHealth(out, newHealth);
+
+		BasicCommands.setUnitHealth(out, target, target.getHealth());
+
+		if (target == player1.getAvatar()) {
+			player1.setHealth(target.getHealth());
+			BasicCommands.setPlayer1Health(out, player1);
+		} else if (target == player2.getAvatar()) {
+			player2.setHealth(target.getHealth());
+			BasicCommands.setPlayer2Health(out, player2);
+		}
+
+		if (target.isDead()) {
+			target.die(out);
+
+			// Win condition: avatar death ends the game
+			if (target == player1.getAvatar()) {
+				gameOver = true;
+				BasicCommands.addPlayer1Notification(out, "You Lose!", 5);
+			} else if (target == player2.getAvatar()) {
+				gameOver = true;
+				BasicCommands.addPlayer1Notification(out, "You Win!", 5);
+			}
+		}
+	}
+
 	public void endTurn(ActorRef out, Player playerEndingTurn, Player playerStartingTurn) {
-		// Stop the previous turn timer first
+		// Stop the previous turn timer
 		stopTurnTimer();
 
-		// A full round increments when the second player's turn ends
-		turnCount+= 0.5;
-
-		// Swap active side
+		// Increment turn count once per full round (when P2's turn ends)
+		if (!player1Turn) {
+			turnCount++;
+		}
 		player1Turn = !player1Turn;
 
 		// End-turn board/input cleanup
 		selectedUnit = null;
 		selectedHandPosition = null;
 		highlightedTiles.clear();
-
 		movingUnit = null;
 		moveTargetTile = null;
 		unitMoving = false;
 
-
 		// Mana transfer
-		int startingMana = Math.min((int) turnCount + 1, Player.getMaxMana());
+		int startingMana = Math.min(turnCount + 1, Player.getMaxMana());
 		playerEndingTurn.setMana(out, 0);
 		playerStartingTurn.setMana(out, startingMana);
 
-//			 VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV
-//		 >>> Keep existing behaviour until the team resolves the spec conflict around card draw timing <<<
-//			 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-//											 AI comment pin of shame
-//							There is no spec conflict, use your brain or eyes for once
-//								instead of reading off of what you've prompted
-
+		// Draw card for the player ending their turn
 		playerEndingTurn.drawCardIntoHand();
 
-		// Refresh actions for the player whose turn is starting
+		// Reset action flags for the player whose turn is starting
 		resetTurnFlags(playerStartingTurn);
 
-		// Optional turn ownership feedback
+		// Turn ownership feedback + timer
 		if (playerStartingTurn instanceof HumanPlayer) {
 			BasicCommands.addPlayer1Notification(out, "Player Turn", 2);
 
@@ -214,7 +256,6 @@ public class GameState {
 		// Trigger AI after control has passed to AI
 		if (playerStartingTurn instanceof AIPlayer) {
 			AI.AILogic.runAI(out, this, player1, player2);
-			}
 		}
 	}
-
+}
