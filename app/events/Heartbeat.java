@@ -19,11 +19,23 @@ import structures.logic.AI;
  * @author Dr. Richard McCreadie
  *
  */
-public class Heartbeat implements EventProcessor{
+public class Heartbeat implements EventProcessor {
 
 	@Override
 	public void processEvent(ActorRef out, GameState gameState, JsonNode message) {
 		AI.passTime();
-	}
 
+		if (gameState.player1Turn
+				&& gameState.turnTimerEnabled
+				&& gameState.hasTurnTimerExpired()
+				&& !gameState.timerExpiredThisTurn) {
+
+			gameState.timerExpiredThisTurn = true;
+
+			gameState.endTurn(out, gameState.getPlayer1(), gameState.getPlayer2());
+
+			gameState.getPlayer1().destroyHand(out);
+			gameState.getPlayer1().drawHand(out);
+		}
+	}
 }

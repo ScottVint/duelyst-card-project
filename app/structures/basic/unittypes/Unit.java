@@ -58,6 +58,7 @@ public class Unit {
 	int attack;
 	public boolean hasMoved = true;
 	public boolean hasAttacked = true;
+	public boolean hasCounterattacked = false;
 
 	// ////////// ABILITY FLAGS ////////////
 	// These abilities share a unified function and have a trigger each.

@@ -391,7 +391,27 @@ public class BasicCommands {
 			e.printStackTrace();
 		}
 	}
-	
+	public static void startTurnTimer(ActorRef out, long deadlineMillis) {
+		try {
+			ObjectNode returnMessage = Json.newObject();
+			returnMessage.put("messagetype", "startTurnTimer");
+			returnMessage.put("deadlineMillis", deadlineMillis);
+			if (altTell!=null) altTell.tell(returnMessage);
+			else out.tell(returnMessage, out);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	public static void stopTurnTimer(ActorRef out) {
+		try {
+			ObjectNode returnMessage = Json.newObject();
+			returnMessage.put("messagetype", "stopTurnTimer");
+			if (altTell!=null) altTell.tell(returnMessage);
+			else out.tell(returnMessage, out);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 	/**
 	 * Plays a projectile fire animation between two tiles
 	 * @param out

@@ -23,7 +23,6 @@ public class Initalize implements EventProcessor {
         // Mark the game state as initialized
         gameState.gameInitalised = true;
 
-
         BoardLogic.clearSelection(out, gameState.board);
 
         // Retrieve players
@@ -72,8 +71,13 @@ public class Initalize implements EventProcessor {
 
         gameState.player1.drawHand(out);
 
-        // If AI goes first, run its turn immediately
-        if (!humanStarts) {
+        // Start timer when human goes first; trigger AI turn otherwise
+        if (humanStarts) {
+            if (gameState.turnTimerEnabled) {
+                gameState.startTurnTimer();
+                BasicCommands.startTurnTimer(out, gameState.currentTurnDeadlineMillis);
+            }
+        } else {
             AI.AILogic.runAI(out, gameState, player1, player2);
         }
     }
