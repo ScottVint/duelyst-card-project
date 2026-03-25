@@ -69,21 +69,15 @@ public class UnitStopped implements EventProcessor {
 
 			// Only attack if target still exists, is still an enemy,
 			// and is still a legal attack target from the new position
-			Tile attackerTile = gameState.getBoard().getTile(
-					movingUnit.getPosition().getTilex(),
-					movingUnit.getPosition().getTiley()
-			);
+			Tile attackerTile = gameState.pendingAttackAttacker.getCurrentTile();
 
 			boolean validPendingAttack =
-					defender != null
-							&& defender.getOwner() != movingUnit.getOwner()
-							&& attackerTile != null
-							&& BoardLogic.findValidAttackUnits(attackerTile, movingUnit, gameState.getBoard())
+					defender.getOwner() != movingUnit.getOwner()
+					&& BoardLogic.findValidAttackUnits(attackerTile, movingUnit, gameState.getBoard())
 							.contains(pendingTargetTile);
 
-			if (validPendingAttack) {
+			if (validPendingAttack)
 				CombatLogic.resolveCombat(out, gameState, movingUnit, defender);
-			}
 
 			gameState.clearPendingAttackAfterMove();
 		}

@@ -11,27 +11,9 @@ import java.util.Set;
 
 public class CombatLogic {
 
-    public static void tryAttackSelectedUnit(ActorRef out, GameState gameState, Tile target) {
+    public static void tryAttackSelectedUnit(ActorRef out, GameState gameState, Unit defender) {
         Unit attacker = gameState.getSelectedUnit();
 
-        if (attacker == null || target == null || target.getUnit() == null) {
-            return;
-        }
-
-        int tileX = attacker.getPosition().getTilex();
-        int tileY = attacker.getPosition().getTiley();
-        Tile origin = gameState.getBoard().getTile(tileX, tileY);
-
-        if (origin == null) {
-            return;
-        }
-
-        // Only attack targets within the current legal range of attack.
-        if (!BoardLogic.findValidAttackUnits(origin, attacker, gameState.getBoard()).contains(target)) {
-            return;
-        }
-
-        Unit defender = target.getUnit();
         resolveCombat(out, gameState, attacker, defender);
 
         BoardLogic.clearSelection(out, gameState.getBoard());
@@ -47,37 +29,26 @@ public class CombatLogic {
      * 3) otherwise defender may counterattack once per turn
      */
     public static void resolveCombat(ActorRef out, GameState gameState, Unit attacker, Unit defender) {
-        if (attacker == null || defender == null) {
-            return;
-        }
-
-        if (attacker.isDead() || defender.isDead()) {
-            return;
-        }
 
         // Active attack
         BasicCommands.playUnitAnimation(out, attacker, UnitAnimationType.attack);
         BasicCommands.playUnitAnimation(out, defender, UnitAnimationType.hit);
-        gameState.dealDamage(out, attacker, defender);
+        defender.takeDamage(out, attacker.getAttack());
 
         // After an attack, the unit cannot attack again this turn; if it has not moved before, it also loses the right to move.
         attacker.hasAttacked = true;
         attacker.hasMoved = true;
 
-        // The Defender is dead and can't fight back.
-        if (defender.isDead()) {
-            return;
-        }
-
-        // Counterattack is only allowed if you haven't counterattacked in this round yet.
-        if (!defender.hasCounterattacked) {
+        // Counterattack is only allowed if you haven't counterattacked in this round yet, and is defender isn't dead.
+        if (!defender.isDead() && !defender.hasCounterattacked) {
             BasicCommands.playUnitAnimation(out, defender, UnitAnimationType.attack);
             BasicCommands.playUnitAnimation(out, attacker, UnitAnimationType.hit);
-            gameState.dealDamage(out, defender, attacker);
+            attacker.takeDamage(out, gameState, defender.getAttack());
 
             defender.hasCounterattacked = true;
         }
     }
+
     public static Tile findAutoAttackDestination(Unit attacker, Tile enemyTile, Board board) {
         if (attacker == null || enemyTile == null || enemyTile.getUnit() == null || board == null) {
             return null;
@@ -111,8 +82,8 @@ public class CombatLogic {
                         || distance < bestDistance
                         || (distance == bestDistance && moveTile.getTilex() < bestTile.getTilex())
                         || (distance == bestDistance
-                        && moveTile.getTilex() == bestTile.getTilex()
-                        && moveTile.getTiley() < bestTile.getTiley())) {
+                            && moveTile.getTilex() == bestTile.getTilex()
+                            && moveTile.getTiley() < bestTile.getTiley())) {
                     bestTile = moveTile;
                     bestDistance = distance;
                 }
