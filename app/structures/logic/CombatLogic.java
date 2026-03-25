@@ -23,7 +23,9 @@ public class CombatLogic {
 
         // Active attack
         BasicCommands.playUnitAnimation(out, attacker, UnitAnimationType.attack);
+        for (int i = 0; i < 30; i++) BoardLogic.blink();
         BasicCommands.playUnitAnimation(out, defender, UnitAnimationType.hit);
+        for (int i = 0; i < 30; i++) BoardLogic.blink();
         defender.takeDamage(out, attacker.getAttack());
 
         // After an attack the unit cannot attack again this turn; per Moodle FAQ
@@ -40,8 +42,11 @@ public class CombatLogic {
 
         // Counterattack: allowed once per turn if defender survived
         if (!defender.isDead() && !defender.hasCounterattacked) {
+            for (int i = 0; i < 30; i++) BoardLogic.blink();
             BasicCommands.playUnitAnimation(out, defender, UnitAnimationType.attack);
+            for (int i = 0; i < 30; i++) BoardLogic.blink();
             BasicCommands.playUnitAnimation(out, attacker, UnitAnimationType.hit);
+            for (int i = 0; i < 30; i++) BoardLogic.blink();
             attacker.takeDamage(out, gameState, defender.getAttack());
 
             defender.hasCounterattacked = true;
