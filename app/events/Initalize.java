@@ -7,7 +7,10 @@ import commands.BasicCommands;
 import structures.GameState;
 import structures.basic.players.Player;
 import structures.basic.unittypes.BetterUnit;
+import structures.logic.AI;
 import structures.logic.BoardLogic;
+
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * Indicates that both the core game loop in the browser is starting.
@@ -27,9 +30,9 @@ public class Initalize implements EventProcessor {
         Player player1 = gameState.getPlayer1();
         Player player2 = gameState.getPlayer2();
 
-        // Fixed starting player for stable game setup/tests
-        boolean humanStarts = true;
-        gameState.player1Turn = true;
+        // SC#32: randomise which player goes first
+        boolean humanStarts = ThreadLocalRandom.current().nextBoolean();
+        gameState.player1Turn = humanStarts;
 
         System.out.println("Players: " + player1.getClass() + "," + player2.getClass());
 
@@ -51,9 +54,9 @@ public class Initalize implements EventProcessor {
             BasicCommands.addPlayer1Notification(out, "AI goes first!", 2);
         }
 
-        // Place avatars
-        gameState.placeAvatar(out, humanAvatar, 1, 2);
-        gameState.placeAvatar(out, aiAvatar, 7, 2);
+        // Place avatars at correct starting positions
+        gameState.placeAvatar(out, humanAvatar, 2, 3);
+        gameState.placeAvatar(out, aiAvatar, 8, 3);
 
         // Reset action flags
         humanAvatar.hasAttacked = false;
@@ -61,12 +64,17 @@ public class Initalize implements EventProcessor {
         aiAvatar.hasAttacked = false;
         aiAvatar.hasMoved = false;
 
-        // Draw starting cards
-        for (int i = 0; i < 2; i++) {
+        // Draw 3 starting cards each (SC#18)
+        for (int i = 0; i < 3; i++) {
             player1.drawCardIntoHand();
             player2.drawCardIntoHand();
         }
 
         gameState.player1.drawHand(out);
+
+        // If AI goes first, run its turn immediately
+        if (!humanStarts) {
+            AI.AILogic.runAI(out, gameState, player1, player2);
+        }
     }
 }

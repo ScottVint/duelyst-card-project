@@ -43,7 +43,8 @@ public class BetterUnit extends Unit {
 	 */
 	@Override
 	public void setHealth(ActorRef out, Player player, int health) {
-		super.setHealth(out, health); // also calls BasicCommands.setUnitHealth internally
+		super.setHealth(out, health);
+		BasicCommands.setUnitHealth(out, this, this.health);
 		player.setHealth(out, this.health);
 	}
 
