@@ -55,8 +55,8 @@ public class Initalize implements EventProcessor {
         }
 
         // Place avatars at correct starting positions
-        gameState.placeAvatar(out, humanAvatar, 2, 3);
-        gameState.placeAvatar(out, aiAvatar, 8, 3);
+        gameState.placeAvatar(out, humanAvatar, 1, 2);
+        gameState.placeAvatar(out, aiAvatar, 7, 2);
 
         // Reset action flags
         humanAvatar.hasAttacked = false;

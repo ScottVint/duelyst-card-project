@@ -1,6 +1,7 @@
 package structures.basic.spells;
 
 import akka.actor.ActorRef;
+import commands.BasicCommands;
 import structures.GameState;
 import structures.basic.Board;
 import structures.basic.EffectAnimation;
@@ -30,7 +31,7 @@ public class Truestrike extends Spell {
     }
 
     @Override
-    public void cast(ActorRef out, GameState gameState, Player player, Tile clickedTile, Board board, int cardIndex) {
+    public void cast(ActorRef out, GameState gameState, Player player, Tile clickedTile) {
         Unit enemy = clickedTile.getUnit();
       
         BasicCommands.playUnitAnimation(out, player.getAvatar(), UnitAnimationType.channel);

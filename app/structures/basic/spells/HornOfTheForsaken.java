@@ -42,15 +42,13 @@ public class HornOfTheForsaken extends Spell {
 
     @Override
     public void cast(ActorRef out, GameState gameState,
-                     Player player, Tile clickedTile,
-                     Board board, int cardIndex) {
+                     Player player, Tile clickedTile) {
         BasicCommands.playUnitAnimation(out, player.getAvatar(), UnitAnimationType.channel);
         EffectAnimation effect = BasicObjectBuilders.loadEffect(StaticConfFiles.f1_buff);
         try { Thread.sleep(BasicCommands.playEffectAnimation(out, effect, clickedTile)); }
         catch (InterruptedException e) { Thread.currentThread().interrupt(); }
         BasicCommands.playUnitAnimation(out, player.getAvatar(), UnitAnimationType.idle);
 
-                     Player player, Tile clickedTile) {
         player.getAvatar().setHornCharges(player.getAvatar().MAX_HORN_CHARGES);
     }
 }
