@@ -37,16 +37,15 @@ public class DarkTerminus extends Spell {
     public void cast(ActorRef out, GameState gameState,
                      Player player, Tile clickedTile) {
         BasicCommands.playUnitAnimation(out, player.getAvatar(), UnitAnimationType.channel);
-        EffectAnimation effect = BasicObjectBuilders.loadEffect(StaticConfFiles.f1_martyrdom);
+        EffectAnimation effect = BasicObjectBuilders.loadEffect("conf/gameconfs/effects/f1_soulshatter.json");
         try { Thread.sleep(BasicCommands.playEffectAnimation(out, effect, clickedTile)); }
         catch (InterruptedException e) { Thread.currentThread().interrupt(); }
         
         Unit enemy = clickedTile.getUnit();
-        enemy.die(out);
+        enemy.die(out, gameState);
         
         BasicCommands.playUnitAnimation(out, player.getAvatar(), UnitAnimationType.idle);
-    
-        Wraithling summon = Unit.createWraithling(out, player, gameState);
+
         Unit.summonWraithling(out, clickedTile, player, gameState);
     }
 }

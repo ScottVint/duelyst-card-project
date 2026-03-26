@@ -107,7 +107,6 @@ public class BoardLogic {
 	/// Searches for all valid tiles, then highlights them.
 	/// Enemy units block pathfinding.
 	public static void highlightMovement(ActorRef out, Tile startingTile, Unit unit, Board board) {
-		int range = 2; //unit.getMovement(); TODO create separate unit movement stats
 		Set<Tile> targets = findValidMovement(startingTile, unit, board);
 		for (Tile target : targets) {
 			BasicCommands.drawTile(out, target, 1);

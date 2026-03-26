@@ -82,6 +82,8 @@ public class AI {
 
                     Tile target = targets.iterator().next();
                     ai.useCard(out, gs, handIndex, target, card.getManacost());
+                    System.out.println("AI casted spell: " + card.getCardname() + " at "
+                    + target.getTilex() + "," + target.getTiley());
                     played = true;
                     break; // hand changed — restart the loop
                 }

@@ -112,10 +112,15 @@ public class TileClicked implements EventProcessor {
                 }
 
                 // highlight valid enemy targets if attack is still available
-                if (canAttack)
+                if (canAttack) {
                     BoardLogic.highlightAttackTiles(out, clickedTile, clickedUnit, board);
+                    // Highlight units attackable from a distance as well
+                    for (Tile tile : gameState.highlightedTiles) {
+                        BoardLogic.highlightAttackTiles(out, tile, clickedUnit, board);
+                    }
 
-                gameState.player1.drawHand(out);
+                    gameState.player1.drawHand(out);
+                }
             }
 
 
@@ -160,4 +165,5 @@ public class TileClicked implements EventProcessor {
         gameState.player1.drawHand(out);
     }
 }
+
 

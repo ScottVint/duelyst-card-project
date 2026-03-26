@@ -235,50 +235,91 @@ public class Unit {
 		return health <= 0;
 	}
 
+//	/**
+//	 * Story Card #35: plays the death animation, removes the unit from its tile,
+//	 * and sends the delete command to the front-end.
+//	 * @param out
+//	 * @author Minghao
+//	 */
+//	@JsonIgnore
+//	public void die(ActorRef out) {
+//		BasicCommands.playUnitAnimation(out, this, UnitAnimationType.death);
+//		if (currentTile != null) {
+//			currentTile.setUnit(null);
+//			currentTile = null;
+//		}
+//		if (owner != null) {
+//			owner.getUnitList().remove(this.id);
+//		}
+//		BasicCommands.deleteUnit(out, this);
+//	}
+
+
 	/**
 	 * Story Card #35: plays the death animation, removes the unit from its tile,
 	 * and sends the delete command to the front-end.
-	 * @param out
-	 * @author Minghao
 	 */
 	@JsonIgnore
 	public void die(ActorRef out) {
+		die(out, null);
+	}
+
+	/**
+	 * Overloaded die method that also triggers Deathwatch for all other alive units.
+	 * @author Minghao & Scott
+	 */
+	@JsonIgnore
+	public void die(ActorRef out, GameState gameState) {
 		BasicCommands.playUnitAnimation(out, this, UnitAnimationType.death);
 		try { Thread.sleep(BasicCommands.playUnitAnimation(out, this, UnitAnimationType.death)); }
 		catch (InterruptedException e) { Thread.currentThread().interrupt(); }
+
+		EffectAnimation desummonEffect = BasicObjectBuilders.loadEffect(StaticConfFiles.f1_summon);
+		try { Thread.sleep(BasicCommands.playEffectAnimation(out, desummonEffect, this.currentTile) / 2); }
+		catch (InterruptedException e) { Thread.currentThread().interrupt(); }
+
 		if (currentTile != null) {
 			currentTile.setUnit(null);
 			currentTile = null;
 		}
-		if (owner != null) {
-			owner.getUnitList().remove(this.id);
-		}
+		owner.getUnitList().remove(this.id);
 		BasicCommands.deleteUnit(out, this);
+
+		// Trigger for Player 1 Units
+		for (Unit unit : gameState.getPlayer1().getUnitList().values())
+			unit.deathwatch(out, gameState);
+			
+		// Trigger for Player 2 Units
+		for (Unit unit : gameState.getPlayer2().getUnitList().values()) 
+				unit.deathwatch(out, gameState);
+		
 	}
 
 	// ////////// BASIC METHODS ////////////
+
+	@JsonIgnore
+	public void takeDamage(ActorRef out, int damage) {
+		takeDamage(out, null, damage);
+	}
+
 	/**
 	 * This command automatically calls setUnitHealth to the
 	 * new health value based on the damage taken, and
 	 * displays it to the UI.
-	 *
-	 * @param out
-	 * @param damage
-	 * @author Scott
+	 * * Method for BetterUnit to override
 	 */
-	@JsonIgnore
-	public void takeDamage(ActorRef out, int damage) {
+	public void takeDamage(ActorRef out, GameState gameState, int damage) {
 		setHealth(out, health - damage);
 		BasicCommands.setUnitHealth(out, this, health);
 		if (isDead()) {
-			die(out);
+			die(out, gameState);
 		}
 	}
 
-	/// Method for BetterUnit to override
-	public void takeDamage(ActorRef out, GameState gameState, int damage) {
-		takeDamage(out, damage);
-	}
+//	/// Method for BetterUnit to override
+//	public void takeDamage(ActorRef out, GameState gameState, int damage) {
+//		takeDamage(out, damage);
+//	}
 
 	// ////////// ABILITIES //////////
 	// Abstract methods to be implemented by unit subclasses
@@ -287,7 +328,7 @@ public class Unit {
 	public void openingGambit(ActorRef out, GameState gameState) {};
 
 	/// Triggers when ANY unit dies.
-	public void deathwatch(ActorRef out) {};
+	public void deathwatch(ActorRef out, GameState gameState) {};
 
 	// Getters for ability flags
 
@@ -399,11 +440,11 @@ public class Unit {
 			wraithling.setPositionByTile(clickedTile);
 			clickedTile.setUnit(wraithling);
 
-			BasicCommands.drawUnit(out, wraithling, clickedTile);
-			EffectAnimation summonEffect = BasicObjectBuilders.loadEffect(StaticConfFiles.f1_summon);
-			try { Thread.sleep(BasicCommands.playEffectAnimation(out, summonEffect, clickedTile)); }
+			EffectAnimation summonEffect = BasicObjectBuilders.loadEffect("conf/gameconfs/effects/f1_wraithsummon.json");
+			try { Thread.sleep(BasicCommands.playEffectAnimation(out, summonEffect, clickedTile) / 2); }
 			catch (InterruptedException e) { Thread.currentThread().interrupt(); }
-    
+
+			BasicCommands.drawUnit(out, wraithling, clickedTile);
 			for (int i = 0; i < 15; i++)
 				BoardLogic.blink();
 			BasicCommands.setUnitHealth(out,wraithling,wraithling.getHealth());

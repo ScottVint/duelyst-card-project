@@ -56,6 +56,8 @@ public class CombatLogic {
                 BasicCommands.playUnitAnimation(out, attacker, UnitAnimationType.idle);
             }
         }
+
+        return bestTile;
     }
 
     public static void death(ActorRef out, GameState gameState, Unit unit) {

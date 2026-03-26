@@ -38,7 +38,7 @@ public class Beamshock extends Spell {
         enemy.hasMoved = true;
       
         BasicCommands.playUnitAnimation(out, player.getAvatar(), UnitAnimationType.channel);
-        EffectAnimation effect = BasicObjectBuilders.loadEffect(StaticConfFiles.f1_inmolation);
+        EffectAnimation effect = BasicObjectBuilders.loadEffect("conf/gameconfs/effects/f1_heavenlystrike.json");
         try { Thread.sleep(BasicCommands.playEffectAnimation(out, effect, clickedTile)); }
         catch (InterruptedException e) { Thread.currentThread().interrupt(); }
         BasicCommands.playUnitAnimation(out, player.getAvatar(), UnitAnimationType.idle);

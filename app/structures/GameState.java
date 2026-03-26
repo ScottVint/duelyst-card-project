@@ -185,8 +185,11 @@ public class GameState {
 		// Draw card for the player ending their turn
 		playerEndingTurn.drawCardIntoHand();
 
-		// Reset action flags for the player whose turn is starting
-		resetTurnFlags(playerStartingTurn);
+		// Reset action flags for the player whose turn is ending
+		resetTurnFlags(playerEndingTurn);
+
+		// Do not show turn notifications or trigger AI after game over
+		if (gameOver) return;
 
 		// Do not show turn notifications or trigger AI after game over
 		if (gameOver) return;

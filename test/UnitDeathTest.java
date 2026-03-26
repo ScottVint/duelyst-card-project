@@ -3,6 +3,7 @@ import org.junit.Before;
 import org.junit.Test;
 import commands.BasicCommands;
 import commands.DummyTell;
+import structures.GameState;
 import structures.basic.Tile;
 import structures.basic.unittypes.Unit;
 import utils.BasicObjectBuilders;
@@ -72,7 +73,9 @@ public class UnitDeathTest implements DummyTell {
         assertNotNull("Pre-condition: currentTile should be set", unit.getCurrentTile());
         assertEquals("Pre-condition: tile should contain the unit", unit, tile.getUnit());
 
-        unit.die(null);
+//        unit.die(null);
+        GameState dummyGameState = new GameState();
+        unit.die(null, dummyGameState);
 
         assertNull("currentTile must be null after die()", unit.getCurrentTile());
         assertNull("tile.getUnit() must be null after die()", tile.getUnit());
