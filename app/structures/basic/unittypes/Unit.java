@@ -273,6 +273,11 @@ public class Unit {
 		BasicCommands.playUnitAnimation(out, this, UnitAnimationType.death);
 		try { Thread.sleep(BasicCommands.playUnitAnimation(out, this, UnitAnimationType.death)); }
 		catch (InterruptedException e) { Thread.currentThread().interrupt(); }
+
+		EffectAnimation desummonEffect = BasicObjectBuilders.loadEffect(StaticConfFiles.f1_summon);
+		try { Thread.sleep(BasicCommands.playEffectAnimation(out, desummonEffect, this.currentTile) / 2); }
+		catch (InterruptedException e) { Thread.currentThread().interrupt(); }
+
 		if (currentTile != null) {
 			currentTile.setUnit(null);
 			currentTile = null;
@@ -435,11 +440,11 @@ public class Unit {
 			wraithling.setPositionByTile(clickedTile);
 			clickedTile.setUnit(wraithling);
 
-			BasicCommands.drawUnit(out, wraithling, clickedTile);
-			EffectAnimation summonEffect = BasicObjectBuilders.loadEffect(StaticConfFiles.f1_summon);
-			try { Thread.sleep(BasicCommands.playEffectAnimation(out, summonEffect, clickedTile)); }
+			EffectAnimation summonEffect = BasicObjectBuilders.loadEffect("conf/gameconfs/effects/f1_wraithsummon.json");
+			try { Thread.sleep(BasicCommands.playEffectAnimation(out, summonEffect, clickedTile) / 2); }
 			catch (InterruptedException e) { Thread.currentThread().interrupt(); }
-    
+
+			BasicCommands.drawUnit(out, wraithling, clickedTile);
 			for (int i = 0; i < 15; i++)
 				BoardLogic.blink();
 			BasicCommands.setUnitHealth(out,wraithling,wraithling.getHealth());

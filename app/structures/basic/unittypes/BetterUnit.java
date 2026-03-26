@@ -84,6 +84,11 @@ public class BetterUnit extends Unit {
 						int idx = (int) (Math.random() * summonable.size());
 						Tile tile = summonable.get(idx);
 						summonWraithling(out, tile, this.owner, gameState);
+						Unit wraithling = tile.getUnit();
+						if (!gameState.player1Turn) {
+							wraithling.hasAttacked = false;
+							wraithling.hasMoved = false;
+						}
 					}
 				}
 

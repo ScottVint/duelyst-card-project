@@ -1,0 +1,19 @@
+{
+  "animationTextures": [
+    "assets/game/extra/cards/minicards/fx_f1_casterprojectile/fx_f1casterprojectilecharge_000.png",
+    "assets/game/extra/cards/minicards/fx_f1_casterprojectile/fx_f1casterprojectilecharge_001.png",
+    "assets/game/extra/cards/minicards/fx_f1_casterprojectile/fx_f1casterprojectilecharge_002.png",
+    "assets/game/extra/cards/minicards/fx_f1_casterprojectile/fx_f1casterprojectilecharge_003.png"
+  ],
+  "correction": {
+    "imgWidth" : 50,
+    "imgHeight" : 50,
+    "scale": 2.0,
+    "offsetX": -20,
+    "offsetY": -20,
+    "spriteTopLeftX" : 0,
+    "spriteTopLeftY" : 0,
+    "reflected": false
+  },
+  "fps": 9
+}

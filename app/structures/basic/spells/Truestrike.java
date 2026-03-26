@@ -33,14 +33,26 @@ public class Truestrike extends Spell {
     @Override
     public void cast(ActorRef out, GameState gameState, Player player, Tile clickedTile) {
         Unit enemy = clickedTile.getUnit();
-      
+
         BasicCommands.playUnitAnimation(out, player.getAvatar(), UnitAnimationType.channel);
-        EffectAnimation effect = BasicObjectBuilders.loadEffect(StaticConfFiles.f1_inmolation);
-        try { Thread.sleep(BasicCommands.playEffectAnimation(out, effect, clickedTile)); }
+        EffectAnimation effect = BasicObjectBuilders.loadEffect("conf/gameconfs/effects/f1_projectilesummon.json");
+        // Create projectile
+        try { Thread.sleep(BasicCommands.playEffectAnimation(out, effect, player.getAvatar().getCurrentTile())); }
         catch (InterruptedException e) { Thread.currentThread().interrupt(); }
-        
+        // Fire projectile
+        EffectAnimation projectile = BasicObjectBuilders.loadEffect("conf/gameconfs/effects/f1_projectiles.json");
+        BasicCommands.playProjectileAnimation(out, projectile, 0, player.getAvatar().getCurrentTile(), clickedTile);
+        try { Thread.sleep(1000); }
+        // Projectile hits
+        catch (InterruptedException e) { Thread.currentThread().interrupt(); }
+        try { Thread.sleep(BasicCommands.playEffectAnimation(out, projectile, clickedTile) / 4 * 3); }
+        catch (InterruptedException e) { Thread.currentThread().interrupt(); }
+        // Hurt animation plays
+        try { Thread.sleep(BasicCommands.playUnitAnimation(out, enemy, UnitAnimationType.hit)); }
+        catch (InterruptedException e) { Thread.currentThread().interrupt(); }
+        BasicCommands.playUnitAnimation(out, enemy, UnitAnimationType.idle);
         enemy.takeDamage(out, gameState, 2);
-        
+
         BasicCommands.playUnitAnimation(out, player.getAvatar(), UnitAnimationType.idle);
     }
 }

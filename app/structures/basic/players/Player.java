@@ -146,19 +146,10 @@ public class Player {
 		} else {
 			card.getSpell().cast(out, gameState, this, clickedTile);
 		}
-		this.getHand().remove(cardIndex);
-
 		BoardLogic.clearSelection(out, gameState.board);
+		this.getHand().remove(cardIndex);
 	}
 
-	/// Gets the current unitId, then increments the count.
-	/// @author Scott
-	// TODO See if this should be put in GameState or if there's already a function for that
-//	protected int useUnitId() {
-//		int id = unitId;
-//		unitId++;
-//		return id;
-//	}
 
 	public String toString() {
 		return "Unknown Player";
