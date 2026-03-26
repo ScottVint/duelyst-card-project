@@ -111,14 +111,4 @@ public class BetterUnit extends Unit {
 	}
 	
 	
-	public static void main(String[] args) {
-		
-		BetterUnit unit = (BetterUnit)BasicObjectBuilders.loadUnit(StaticConfFiles.humanAvatar, 0, BetterUnit.class);
-		Set<String> keywords = new HashSet<>();
-		keywords.add("MyKeyword");
-		unit.setKeywords(keywords);
-		
-		System.err.println(unit.getClass());
-		
-	}
 }

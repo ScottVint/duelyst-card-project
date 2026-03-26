@@ -56,17 +56,11 @@ public class CombatLogic {
                 BasicCommands.playUnitAnimation(out, attacker, UnitAnimationType.idle);
             }
         }
-
-        return bestTile;
     }
 
     public static void death(ActorRef out, GameState gameState, Unit unit) {
         if (unit == null) return;
-        unit.die(out);
-        Player owner = unit.getOwner();
-        if (owner != null) {
-            owner.getUnitList().remove(unit.getId());
-        }
+        unit.die(out, gameState);
     }
 
     /**
