@@ -191,9 +191,6 @@ public class GameState {
 		// Do not show turn notifications or trigger AI after game over
 		if (gameOver) return;
 
-		// Do not show turn notifications or trigger AI after game over
-		if (gameOver) return;
-
 		// Turn ownership feedback + timer
 		if (playerStartingTurn instanceof HumanPlayer) {
 			BasicCommands.addPlayer1Notification(out, "Player Turn", 2);
