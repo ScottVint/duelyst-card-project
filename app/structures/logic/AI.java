@@ -24,8 +24,36 @@ public class AI {
 
         private AILogic() {}
 
-        public static void summon() {
-            // TODO: implement later
+        /**
+         * AI Unit Summoning.
+         * Plays all affordable creature cards in the AI's hand onto a valid adjacent
+         * tile. Keeps trying until no more creatures can be summoned this turn.
+         *
+         * @author Minghao
+         */
+        public static void summonUnits(ActorRef out, GameState gs) {
+            Player ai = gs.getPlayer2();
+            boolean played = true;
+
+            while (played) {
+                played = false;
+                List<structures.basic.Card> currentHand = new ArrayList<>(ai.getHand());
+                for (structures.basic.Card card : currentHand) {
+                    if (!card.isCreature()) continue;
+                    if (ai.getMana() < card.getManacost()) continue;
+
+                    Set<Tile> summonTiles = BoardLogic.findValidSummonTiles(ai, gs.getBoard());
+                    if (summonTiles == null || summonTiles.isEmpty()) continue;
+
+                    int handIndex = ai.getHand().indexOf(card);
+                    if (handIndex == -1) continue;
+
+                    Tile target = summonTiles.iterator().next();
+                    ai.useCard(out, gs, handIndex, target, card.getManacost());
+                    played = true;
+                    break; // hand changed — restart the loop
+                }
+            }
         }
 
         public void checkSummon() {
@@ -99,13 +127,13 @@ public class AI {
                 Tile bestMove = findClosestTileToTarget(validMoves, nearestEnemy);
                 if (bestMove == null || bestMove.equals(unitTile)) continue;
 
-                // Execute the move
+                // Send the move command first (unit still has old position so frontend
+                // knows where to animate from), then update backend state
+                BasicCommands.moveUnitToTile(out, unit, bestMove);
                 unitTile.setUnit(null);
                 bestMove.setUnit(unit);
                 unit.setPositionByTile(bestMove);
-
-                BasicCommands.moveUnitToTile(out, unit, bestMove);
-                try { Thread.sleep(1500); } catch (InterruptedException e) { Thread.currentThread().interrupt(); }
+                try { Thread.sleep(2000); } catch (InterruptedException e) { Thread.currentThread().interrupt(); }
 
                 unit.hasMoved = true;
             }
@@ -151,6 +179,7 @@ public class AI {
             if (out == null) return;
 
             castSpells(out, gs);
+            summonUnits(out, gs);
             moveUnit(out, gs);
             attack(out, gs);
             try { Thread.sleep(500); } catch (InterruptedException e) { Thread.currentThread().interrupt(); }
