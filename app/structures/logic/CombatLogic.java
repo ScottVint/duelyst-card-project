@@ -23,14 +23,13 @@ public class CombatLogic {
 
         // Active attack — wait for each animation to finish before sending the next
         try {
-            Thread.sleep(BasicCommands.playUnitAnimation(out, attacker, UnitAnimationType.attack));
+            Thread.sleep(BasicCommands.playUnitAnimation(out, attacker, UnitAnimationType.attack) / 4 * 3);
             Thread.sleep(BasicCommands.playUnitAnimation(out, defender, UnitAnimationType.hit));
         } catch (InterruptedException e) { Thread.currentThread().interrupt(); }
-
-        // Fix: Pass gameState to ensure Deathwatch triggers if defender dies during main attack
         defender.takeDamage(out, gameState, attacker.getAttack());
 
         // After an attack the unit cannot attack again this turn; per Moodle FAQ
+        // ("If a unit attacks and has not moved it loses its move action that turn")
         // attacking also consumes the move action.
         attacker.hasAttacked = true;
         attacker.hasMoved = true;
@@ -44,10 +43,9 @@ public class CombatLogic {
         // Counterattack: allowed once per turn if defender survived
         if (!defender.isDead() && !defender.hasCounterattacked) {
             try {
-                Thread.sleep(BasicCommands.playUnitAnimation(out, defender, UnitAnimationType.attack));
+                Thread.sleep(BasicCommands.playUnitAnimation(out, defender, UnitAnimationType.attack) / 4 * 3);
                 Thread.sleep(BasicCommands.playUnitAnimation(out, attacker, UnitAnimationType.hit));
             } catch (InterruptedException e) { Thread.currentThread().interrupt(); }
-
             attacker.takeDamage(out, gameState, defender.getAttack());
 
             defender.hasCounterattacked = true;
@@ -58,13 +56,13 @@ public class CombatLogic {
                 BasicCommands.playUnitAnimation(out, attacker, UnitAnimationType.idle);
             }
         }
+
+        return bestTile;
     }
 
     public static void death(ActorRef out, GameState gameState, Unit unit) {
         if (unit == null) return;
-        // Fix: Pass gameState to properly trigger Deathwatch upon arbitrary death
-        unit.die(out, gameState);
-
+        unit.die(out);
         Player owner = unit.getOwner();
         if (owner != null) {
             owner.getUnitList().remove(unit.getId());
@@ -104,8 +102,8 @@ public class CombatLogic {
                         || distance < bestDistance
                         || (distance == bestDistance && moveTile.getTilex() < bestTile.getTilex())
                         || (distance == bestDistance
-                        && moveTile.getTilex() == bestTile.getTilex()
-                        && moveTile.getTiley() < bestTile.getTiley())) {
+                            && moveTile.getTilex() == bestTile.getTilex()
+                            && moveTile.getTiley() < bestTile.getTiley())) {
                     bestTile = moveTile;
                     bestDistance = distance;
                 }

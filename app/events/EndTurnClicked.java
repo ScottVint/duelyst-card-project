@@ -47,7 +47,7 @@ public class EndTurnClicked implements EventProcessor {
 
 		// Story Card #21: redraw player 1's hand after all turns resolve
 		// (covers the case where the AI auto-ends player 2's turn)
-		gameState.getPlayer1().destroyHand(out);
-		gameState.getPlayer1().drawHand(out);
+		gameState.player1.destroyHand(out);
+		gameState.player1.drawHand(out);
 	}
 }

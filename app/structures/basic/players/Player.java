@@ -120,9 +120,8 @@ public class Player {
 
 	/// Destroys all cards on screen.
 	public void destroyHand(ActorRef out) {
-		for (Card card : hand) {
-			BasicCommands.deleteCard(out, hand.indexOf(card) + 1);
-		}
+		for (int i = 1; i <= 6; i++)
+			BasicCommands.deleteCard(out, i);
 	}
 	/// Displays all cards in hand to the screen.
 	/// @author Scott
@@ -147,10 +146,7 @@ public class Player {
 		} else {
 			card.getSpell().cast(out, gameState, this, clickedTile);
 		}
-
-		destroyHand(out);
 		this.getHand().remove(cardIndex);
-		drawHand(out);
 
 		BoardLogic.clearSelection(out, gameState.board);
 	}

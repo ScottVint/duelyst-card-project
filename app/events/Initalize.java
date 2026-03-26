@@ -5,9 +5,15 @@ import com.fasterxml.jackson.databind.JsonNode;
 import akka.actor.ActorRef;
 import commands.BasicCommands;
 import structures.GameState;
+import structures.basic.EffectAnimation;
 import structures.basic.players.Player;
 import structures.basic.unittypes.BetterUnit;
+import structures.logic.AI;
 import structures.logic.BoardLogic;
+import utils.BasicObjectBuilders;
+import utils.StaticConfFiles;
+
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * Indicates that both the core game loop in the browser is starting.
@@ -20,16 +26,15 @@ public class Initalize implements EventProcessor {
         // Mark the game state as initialized
         gameState.gameInitalised = true;
 
-
         BoardLogic.clearSelection(out, gameState.board);
 
         // Retrieve players
         Player player1 = gameState.getPlayer1();
         Player player2 = gameState.getPlayer2();
 
-        // Fixed starting player for stable game setup/tests
-        boolean humanStarts = true;
-        gameState.player1Turn = true;
+        // SC#32: randomise which player goes first
+        boolean humanStarts = ThreadLocalRandom.current().nextBoolean();
+        gameState.player1Turn = humanStarts;
 
         System.out.println("Players: " + player1.getClass() + "," + player2.getClass());
 
@@ -51,7 +56,7 @@ public class Initalize implements EventProcessor {
             BasicCommands.addPlayer1Notification(out, "AI goes first!", 2);
         }
 
-        // Place avatars
+        // Place avatars at correct starting positions
         gameState.placeAvatar(out, humanAvatar, 1, 2);
         gameState.placeAvatar(out, aiAvatar, 7, 2);
 
@@ -61,12 +66,24 @@ public class Initalize implements EventProcessor {
         aiAvatar.hasAttacked = false;
         aiAvatar.hasMoved = false;
 
-        // Draw starting cards
-        for (int i = 0; i < 2; i++) {
+        // Draw 3 starting cards each (SC#18)
+        for (int i = 0; i < 3; i++) {
             player1.drawCardIntoHand();
             player2.drawCardIntoHand();
         }
 
         gameState.player1.drawHand(out);
+
+        // Start timer when human goes first; trigger AI turn otherwise
+        if (humanStarts) {
+            if (gameState.turnTimerEnabled) {
+                gameState.startTurnTimer();
+                BasicCommands.startTurnTimer(out, gameState.currentTurnDeadlineMillis);
+            }
+        } else {
+            try { Thread.sleep(1000); }
+            catch (InterruptedException e) { Thread.currentThread().interrupt(); }
+            AI.AILogic.runAI(out, gameState, player1, player2);
+        }
     }
 }

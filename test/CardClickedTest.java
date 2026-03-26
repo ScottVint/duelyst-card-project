@@ -25,8 +25,8 @@ import structures.basic.unittypes.Unit;
  * are highlighted in green (mode 2).  Occupied tiles are never highlighted.
  *
  * Board layout after Initalize:
- *   Player 1 avatar → [1, 2]
- *   Player 2 avatar → [7, 2]
+ *   Player 1 avatar → [2, 3]
+ *   Player 2 avatar → [8, 3]
  *
  * @author Minghao
  */
@@ -79,6 +79,10 @@ public class CardClickedTest {
 
         gameState = new GameState();
         new Initalize().processEvent(null, gameState, Json.newObject());
+        // Force P1-first for test determinism (SP32 randomises in production)
+        gameState.player1Turn = true;
+        gameState.getPlayer1().setMana(null, 2);
+        gameState.getPlayer2().setMana(null, 0);
 
         // Replace Player 1's hand with a single known creature card at position 1
         gameState.getPlayer1().getHand().clear();
@@ -114,22 +118,22 @@ public class CardClickedTest {
     /**
      * Story Card #22 - AC2 (summon range):
      * Selecting a creature card must highlight every empty tile adjacent to
-     * the Player 1 avatar at [1,2] in green (mode 2).
+     * the Player 1 avatar at [2,3] in green (mode 2).
      */
     @Test
     public void selectingCreatureCardHighlightsAllAdjacentEmptyTiles() {
         recorder.messages.clear();
         processor.processEvent(null, gameState, cardClickMsg(1));
 
-        // All 8 neighbours of [1,2] are empty (P2 avatar is at [7,2], not adjacent)
-        assertTrue("[0,1] must be highlighted (mode 2)", recorder.wasTileDrawnWithMode(0, 1, 2));
-        assertTrue("[1,1] must be highlighted (mode 2)", recorder.wasTileDrawnWithMode(1, 1, 2));
-        assertTrue("[2,1] must be highlighted (mode 2)", recorder.wasTileDrawnWithMode(2, 1, 2));
-        assertTrue("[0,2] must be highlighted (mode 2)", recorder.wasTileDrawnWithMode(0, 2, 2));
+        // All 8 neighbours of [2,3] are empty (P2 avatar is at [8,3], not adjacent)
+        assertTrue("[1,2] must be highlighted (mode 2)", recorder.wasTileDrawnWithMode(1, 2, 2));
         assertTrue("[2,2] must be highlighted (mode 2)", recorder.wasTileDrawnWithMode(2, 2, 2));
-        assertTrue("[0,3] must be highlighted (mode 2)", recorder.wasTileDrawnWithMode(0, 3, 2));
+        assertTrue("[3,2] must be highlighted (mode 2)", recorder.wasTileDrawnWithMode(3, 2, 2));
         assertTrue("[1,3] must be highlighted (mode 2)", recorder.wasTileDrawnWithMode(1, 3, 2));
-        assertTrue("[2,3] must be highlighted (mode 2)", recorder.wasTileDrawnWithMode(2, 3, 2));
+        assertTrue("[3,3] must be highlighted (mode 2)", recorder.wasTileDrawnWithMode(3, 3, 2));
+        assertTrue("[1,4] must be highlighted (mode 2)", recorder.wasTileDrawnWithMode(1, 4, 2));
+        assertTrue("[2,4] must be highlighted (mode 2)", recorder.wasTileDrawnWithMode(2, 4, 2));
+        assertTrue("[3,4] must be highlighted (mode 2)", recorder.wasTileDrawnWithMode(3, 4, 2));
     }
 
     // -----------------------------------------------------------------------
@@ -143,17 +147,17 @@ public class CardClickedTest {
      */
     @Test
     public void occupiedAdjacentTileIsNotHighlighted() {
-        // Place an enemy unit at [2,2] — adjacent to P1 avatar at [1,2]
+        // Place an enemy unit at [3,3] — adjacent to P1 avatar at [2,3]
         Unit blocker = new Unit();
         blocker.setOwner(gameState.getPlayer2());
-        Tile blockerTile = gameState.getBoard().getTile(2, 2);
+        Tile blockerTile = gameState.getBoard().getTile(3, 3);
         blockerTile.setUnit(blocker);
 
         recorder.messages.clear();
         processor.processEvent(null, gameState, cardClickMsg(1));
 
-        assertFalse("[2,2] must NOT be highlighted (it is occupied)",
-                recorder.wasTileDrawnWithMode(2, 2, 2));
+        assertFalse("[3,3] must NOT be highlighted (it is occupied)",
+                recorder.wasTileDrawnWithMode(3, 3, 2));
     }
 
     // -----------------------------------------------------------------------

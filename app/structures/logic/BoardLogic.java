@@ -8,6 +8,7 @@ import structures.basic.Card;
 import structures.basic.Tile;
 import structures.basic.unittypes.Unit;
 import structures.basic.players.Player;
+import structures.basic.UnitAnimationType;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -202,8 +203,7 @@ public class BoardLogic {
 
 	public static void moveSelectedUnit(ActorRef out, GameState gameState, Tile destination, Board board) {
 		Unit selectedUnit = gameState.getSelectedUnit();
-		Tile origin = board.getTile(selectedUnit.getPosition().getTilex(), selectedUnit.getPosition().getTiley());
-		if (selectedUnit == null) return;
+		Tile origin = selectedUnit.getCurrentTile();
 
 		if (findValidMovement(origin, selectedUnit, board).contains(destination)) {
 			gameState.movingUnit = selectedUnit;
@@ -215,6 +215,7 @@ public class BoardLogic {
 		gameState.selectedUnit = null;
 		gameState.selectedHandPosition = null;
 
+		BasicCommands.playUnitAnimation(out, selectedUnit, UnitAnimationType.move);
 		BasicCommands.moveUnitToTile(out, selectedUnit, destination);
 	}
 }

@@ -9,6 +9,7 @@ import structures.basic.*;
 import structures.basic.players.Player;
 import structures.logic.BoardLogic;
 import utils.BasicObjectBuilders;
+import utils.StaticConfFiles;
 
 /**
  * This is a representation of a Unit on the game board.
@@ -58,6 +59,7 @@ public class Unit {
 	public boolean hasMoved = true;
 	public boolean hasAttacked = true;
 	public boolean hasCounterattacked = false;
+
 	// ////////// ABILITY FLAGS ////////////
 	// These abilities share a unified function and have a trigger each.
 	// The flags are to be check in the relevant trigger.
@@ -269,6 +271,8 @@ public class Unit {
 	@JsonIgnore
 	public void die(ActorRef out, GameState gameState) {
 		BasicCommands.playUnitAnimation(out, this, UnitAnimationType.death);
+		try { Thread.sleep(BasicCommands.playUnitAnimation(out, this, UnitAnimationType.death)); }
+		catch (InterruptedException e) { Thread.currentThread().interrupt(); }
 		if (currentTile != null) {
 			currentTile.setUnit(null);
 			currentTile = null;
@@ -432,6 +436,10 @@ public class Unit {
 			clickedTile.setUnit(wraithling);
 
 			BasicCommands.drawUnit(out, wraithling, clickedTile);
+			EffectAnimation summonEffect = BasicObjectBuilders.loadEffect(StaticConfFiles.f1_summon);
+			try { Thread.sleep(BasicCommands.playEffectAnimation(out, summonEffect, clickedTile)); }
+			catch (InterruptedException e) { Thread.currentThread().interrupt(); }
+    
 			for (int i = 0; i < 15; i++)
 				BoardLogic.blink();
 			BasicCommands.setUnitHealth(out,wraithling,wraithling.getHealth());

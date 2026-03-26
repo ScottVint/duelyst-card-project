@@ -40,8 +40,6 @@ public class WraithlingSwarm extends Spell {
                      Player player,
                      Tile clickedTile) {
 
-
-
         List<Tile> validTargets = new ArrayList<>(validTargets(player, gameState.getBoard()));
 
         // First Wraithling must be placed on the clicked tile (SC#7)
