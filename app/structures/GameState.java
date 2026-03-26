@@ -188,6 +188,9 @@ public class GameState {
 		// Reset action flags for the player whose turn is ending
 		resetTurnFlags(playerEndingTurn);
 
+		// Do not show turn notifications or trigger AI after game over
+		if (gameOver) return;
+
 		// Turn ownership feedback + timer
 		if (playerStartingTurn instanceof HumanPlayer) {
 			BasicCommands.addPlayer1Notification(out, "Player Turn", 2);

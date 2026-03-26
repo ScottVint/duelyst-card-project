@@ -189,7 +189,9 @@ public class Card {
 		// Opening gambit usage
 		summonedUnit.openingGambit(out, gameState);
 
-		// Rush check
+		// Summoned units cannot act this turn by default (SC#7); Rush overrides this
+		summonedUnit.hasMoved = true;
+		summonedUnit.hasAttacked = true;
 		if (summonedUnit.hasRush()) {
 			summonedUnit.hasMoved = false;
 			summonedUnit.hasAttacked = false;
