@@ -161,55 +161,6 @@ public class GameState {
 		BasicCommands.setUnitAttack(out, avatar, avatar.getAttack());
 	}
 
-	/**
-	 * Combat damage based on attacker attack stat.
-	 */
-	public void dealDamage(ActorRef out, Unit attacker, Unit target) {
-		if (attacker == null || target == null) return;
-
-		int damage = attacker.getAttack();
-
-		if (damage <= 0) {
-			BasicCommands.addPlayer1Notification(out, "Attacker has 0 attack.", 2);
-			return;
-		}
-
-		dealDirectDamage(out, target, damage);
-	}
-
-	/**
-	 * Direct spell / combat damage.
-	 */
-	public void dealDirectDamage(ActorRef out, Unit target, int damage) {
-		if (target == null || damage <= 0 || gameOver) return;
-
-		int newHealth = target.getHealth() - damage;
-		target.setHealth(out, newHealth);
-
-		BasicCommands.setUnitHealth(out, target, target.getHealth());
-
-		if (target == player1.getAvatar()) {
-			player1.setHealth(target.getHealth());
-			BasicCommands.setPlayer1Health(out, player1);
-		} else if (target == player2.getAvatar()) {
-			player2.setHealth(target.getHealth());
-			BasicCommands.setPlayer2Health(out, player2);
-		}
-
-		if (target.isDead()) {
-			target.die(out);
-
-			// Win condition: avatar death ends the game
-			if (target == player1.getAvatar()) {
-				gameOver = true;
-				BasicCommands.addPlayer1Notification(out, "You Lose!", 5);
-			} else if (target == player2.getAvatar()) {
-				gameOver = true;
-				BasicCommands.addPlayer1Notification(out, "You Win!", 5);
-			}
-		}
-	}
-
 	public void endTurn(ActorRef out, Player playerEndingTurn, Player playerStartingTurn) {
 		// Stop the previous turn timer
 		stopTurnTimer();

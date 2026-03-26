@@ -93,6 +93,16 @@ public class BetterUnit extends Unit {
 						ally.setAttack(null, ally.getAttack() + 2);
 			}
 		}
+
+		// Win condition: avatar death ends the game
+		if (this.owner.getHealth() <= 0) {
+			gameState.gameOver = true;
+			if (this.owner instanceof HumanPlayer)
+				BasicCommands.addPlayer1Notification(out, "You Lose!", 5);
+			else
+				BasicCommands.addPlayer1Notification(out, "You Win!", 5);
+		}
+
 	}
 	
 	
