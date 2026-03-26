@@ -3,6 +3,7 @@ package structures.logic;
 import akka.actor.ActorRef;
 import commands.BasicCommands;
 import structures.GameState;
+import structures.basic.Card;
 import structures.basic.Tile;
 import structures.basic.unittypes.Unit;
 import structures.basic.players.Player;
@@ -37,10 +38,9 @@ public class AI {
 
             while (played) {
                 played = false;
-                List<structures.basic.Card> currentHand = new ArrayList<>(ai.getHand());
-                for (structures.basic.Card card : currentHand) {
+                for (Card card : ai.getHand()) {
                     if (!card.isCreature()) continue;
-                    if (ai.getMana() < card.getManacost()) continue;
+                    if (!ai.enoughMana(out, card.getManacost())) continue;
 
                     Set<Tile> summonTiles = BoardLogic.findValidSummonTiles(ai, gs.getBoard());
                     if (summonTiles == null || summonTiles.isEmpty()) continue;
@@ -56,10 +56,6 @@ public class AI {
             }
         }
 
-        public void checkSummon() {
-            // TODO: implement later
-        }
-
         /**
          * SC#17: AI Spell Usage.
          * Plays all affordable spell cards in the AI's hand that have at least one
@@ -73,11 +69,10 @@ public class AI {
 
             while (played) {
                 played = false;
-                List<structures.basic.Card> currentHand = new ArrayList<>(ai.getHand());
-                for (structures.basic.Card card : currentHand) {
+                for (Card card : ai.getHand()) {
                     if (card.isCreature()) continue;
                     if (card.getSpell() == null) continue;
-                    if (ai.getMana() < card.getManacost()) continue;
+                    if (!ai.enoughMana(out, card.getManacost())) continue;
 
                     Set<Tile> targets = card.getTargets(ai, gs.getBoard());
                     if (targets == null || targets.isEmpty()) continue;
@@ -178,8 +173,8 @@ public class AI {
             // AI requires a live WebSocket connection; skip during unit tests
             if (out == null) return;
 
-            castSpells(out, gs);
             summonUnits(out, gs);
+            castSpells(out, gs);
             moveUnit(out, gs);
             attack(out, gs);
             try { Thread.sleep(500); } catch (InterruptedException e) { Thread.currentThread().interrupt(); }
