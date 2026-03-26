@@ -314,6 +314,7 @@ public class Unit {
 	 * * Method for BetterUnit to override
 	 */
 	public void takeDamage(ActorRef out, GameState gameState, int damage) {
+		if (isDead()) return; // already dead — prevent deathwatch infinite loops
 		setHealth(out, health - damage);
 		BasicCommands.setUnitHealth(out, this, health);
 		if (isDead()) {
