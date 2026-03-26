@@ -26,7 +26,7 @@ public class CombatLogic {
             Thread.sleep(BasicCommands.playUnitAnimation(out, attacker, UnitAnimationType.attack) / 4 * 3);
             Thread.sleep(BasicCommands.playUnitAnimation(out, defender, UnitAnimationType.hit));
         } catch (InterruptedException e) { Thread.currentThread().interrupt(); }
-        defender.takeDamage(out, attacker.getAttack());
+        defender.takeDamage(out, gameState, attacker.getAttack());
 
         // After an attack the unit cannot attack again this turn; per Moodle FAQ
         // ("If a unit attacks and has not moved it loses its move action that turn")

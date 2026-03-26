@@ -9,6 +9,8 @@ import akka.actor.ActorRef;
 import commands.BasicCommands;
 import structures.GameState;
 import structures.basic.Tile;
+import structures.basic.players.AIPlayer;
+import structures.basic.players.HumanPlayer;
 import structures.basic.players.Player;
 import structures.logic.BoardLogic;
 import utils.BasicObjectBuilders;
@@ -68,6 +70,8 @@ public class BetterUnit extends Unit {
 	@Override
 	public void takeDamage(ActorRef out, GameState gameState, int damage) {
 		super.takeDamage(out, damage);
+		this.owner.setHealth(out, this.health);
+
 		if (!isDead()) {
 			// Summon a wraithling in a random adjacent tile if unit has horn charges
 			if (damage > 0) {
@@ -82,6 +86,8 @@ public class BetterUnit extends Unit {
 						summonWraithling(out, tile, this.owner, gameState);
 					}
 				}
+
+				// Trigger Zeal in available allies
 				for (Unit ally : owner.getUnitList().values())
 					if (ally.hasZeal())
 						ally.setAttack(null, ally.getAttack() + 2);
