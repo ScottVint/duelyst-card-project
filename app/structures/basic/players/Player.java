@@ -118,6 +118,22 @@ public class Player {
 		}
 	}
 
+	/**
+	 * SC#20: Draws a card into hand. If the deck is empty, triggers game over.
+	 * @author Minghao
+	 */
+	public void drawCardIntoHand(ActorRef out, GameState gameState) {
+		if (deck == null || deck.cards.isEmpty()) {
+			gameState.gameOver = true;
+			if (this instanceof HumanPlayer)
+				BasicCommands.addPlayer1Notification(out, "You Lose!", 5);
+			else
+				BasicCommands.addPlayer1Notification(out, "You Win!", 5);
+			return;
+		}
+		drawCardIntoHand();
+	}
+
 	/// Destroys all cards on screen.
 	public void destroyHand(ActorRef out) {
 		for (int i = 1; i <= 6; i++)

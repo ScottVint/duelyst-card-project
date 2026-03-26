@@ -182,8 +182,8 @@ public class GameState {
 		playerEndingTurn.setMana(out, 0);
 		playerStartingTurn.setMana(out, startingMana);
 
-		// Draw card for the player ending their turn
-		playerEndingTurn.drawCardIntoHand();
+		// Draw card for the player ending their turn (SC#20: triggers game over if deck empty)
+		playerEndingTurn.drawCardIntoHand(out, this);
 
 		// Reset action flags for the player whose turn is ending
 		resetTurnFlags(playerEndingTurn);
