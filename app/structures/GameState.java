@@ -185,8 +185,8 @@ public class GameState {
 		// Draw card for the player ending their turn
 		playerEndingTurn.drawCardIntoHand();
 
-		// Reset action flags for the player whose turn is starting
-		resetTurnFlags(playerStartingTurn);
+		// Reset action flags for the player whose turn is ending
+		resetTurnFlags(playerEndingTurn);
 
 		// Turn ownership feedback + timer
 		if (playerStartingTurn instanceof HumanPlayer) {

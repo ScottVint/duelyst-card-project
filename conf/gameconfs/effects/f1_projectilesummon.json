@@ -6,8 +6,8 @@
     "assets/game/extra/cards/minicards/fx_f1_casterprojectile/fx_f1casterprojectilecharge_003.png"
   ],
   "correction": {
-    "imgWidth" : 80,
-    "imgHeight" : 80,
+    "imgWidth" : 50,
+    "imgHeight" : 50,
     "scale": 2.0,
     "offsetX": -20,
     "offsetY": -20,

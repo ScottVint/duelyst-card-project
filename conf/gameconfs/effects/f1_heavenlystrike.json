@@ -1,0 +1,26 @@
+{
+  "animationTextures": [
+    "assets/game/extra/cards/minicards/fx_heavenlystrike/fx_heavenlystrike_000.png",
+    "assets/game/extra/cards/minicards/fx_heavenlystrike/fx_heavenlystrike_001.png",
+    "assets/game/extra/cards/minicards/fx_heavenlystrike/fx_heavenlystrike_002.png",
+    "assets/game/extra/cards/minicards/fx_heavenlystrike/fx_heavenlystrike_003.png",
+    "assets/game/extra/cards/minicards/fx_heavenlystrike/fx_heavenlystrike_004.png",
+    "assets/game/extra/cards/minicards/fx_heavenlystrike/fx_heavenlystrike_005.png",
+    "assets/game/extra/cards/minicards/fx_heavenlystrike/fx_heavenlystrike_006.png",
+    "assets/game/extra/cards/minicards/fx_heavenlystrike/fx_heavenlystrike_007.png",
+    "assets/game/extra/cards/minicards/fx_heavenlystrike/fx_heavenlystrike_008.png",
+    "assets/game/extra/cards/minicards/fx_heavenlystrike/fx_heavenlystrike_009.png",
+    "assets/game/extra/cards/minicards/fx_heavenlystrike/fx_heavenlystrike_010.png"
+  ],
+  "correction": {
+    "imgWidth" : 100,
+    "imgHeight" : 1000,
+    "scale": 1.0,
+    "offsetX": 5,
+    "offsetY": -895,
+    "spriteTopLeftX" : 0,
+    "spriteTopLeftY" : 0,
+    "reflected": false
+  },
+  "fps": 10
+}

@@ -146,9 +146,8 @@ public class Player {
 		} else {
 			card.getSpell().cast(out, gameState, this, clickedTile);
 		}
-		this.getHand().remove(cardIndex);
-
 		BoardLogic.clearSelection(out, gameState.board);
+		this.getHand().remove(cardIndex);
 	}
 
 
