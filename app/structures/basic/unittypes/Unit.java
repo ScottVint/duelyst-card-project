@@ -57,7 +57,7 @@ public class Unit {
 	int attack;
 	public boolean hasMoved = true;
 	public boolean hasAttacked = true;
-
+	public boolean hasCounterattacked = false;
 	// ////////// ABILITY FLAGS ////////////
 	// These abilities share a unified function and have a trigger each.
 	// The flags are to be check in the relevant trigger.
@@ -279,13 +279,24 @@ public class Unit {
 		BasicCommands.deleteUnit(out, this);
 
 		if (gameState != null) {
-			// 遍历 Player 1 存活的单位
+			// Trigger for Player 1 Avatar (Cast as Unit to resolve compiler issues)
+			Unit p1Avatar = gameState.getPlayer1().getAvatar();
+			if (p1Avatar != null && p1Avatar != this && !p1Avatar.isDead()) {
+				p1Avatar.deathwatch(out, gameState);
+			}
+			// Trigger for Player 1 Units
 			for (Unit unit : gameState.getPlayer1().getUnitList().values()) {
 				if (unit != this && !unit.isDead()) {
 					unit.deathwatch(out, gameState);
 				}
 			}
-			// 遍历 Player 2 存活的单位
+
+			// Trigger for Player 2 Avatar
+			Unit p2Avatar = gameState.getPlayer2().getAvatar();
+			if (p2Avatar != null && p2Avatar != this && !p2Avatar.isDead()) {
+				p2Avatar.deathwatch(out, gameState);
+			}
+			// Trigger for Player 2 Units
 			for (Unit unit : gameState.getPlayer2().getUnitList().values()) {
 				if (unit != this && !unit.isDead()) {
 					unit.deathwatch(out, gameState);

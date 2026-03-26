@@ -61,6 +61,7 @@ public class DeathwatchTest implements DummyTell {
         sacrifice.setPositionByTile(tile2);
         gameState.getPlayer2().getUnitList().put(sacrifice.getId(), sacrifice);
 
+        // Trigger combat kill
         sacrifice.takeDamage(null, gameState, 10);
 
         assertEquals("Bad Omen attack should increase by 1", initialAttack + 1, badOmen.getAttack());
@@ -98,6 +99,7 @@ public class DeathwatchTest implements DummyTell {
         sacrifice.setPositionByTile(tile2);
         gameState.getPlayer2().getUnitList().put(sacrifice.getId(), sacrifice);
 
+        // Trigger arbitrary death
         sacrifice.die(null, gameState);
 
         assertEquals("Friendly avatar should be healed by 1", 16, p1Avatar.getHealth());
@@ -128,7 +130,7 @@ public class DeathwatchTest implements DummyTell {
         sacrifice.setMaxHealth(1);
         sacrifice.setHealth(null, 1);
         sacrifice.setOwner(gameState.getPlayer2());
-        gameState.getBoard().getTile(0, 0).setUnit(sacrifice); // Far away
+        gameState.getBoard().getTile(0, 0).setUnit(sacrifice);
         gameState.getPlayer2().getUnitList().put(sacrifice.getId(), sacrifice);
 
         sacrifice.die(null, gameState);

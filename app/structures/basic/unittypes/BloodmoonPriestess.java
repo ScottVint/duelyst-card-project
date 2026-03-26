@@ -11,8 +11,11 @@ public class BloodmoonPriestess extends Unit {
 
     @Override
     public void deathwatch(ActorRef out, GameState gameState) {
+        // Find valid adjacent empty tiles
         List<Tile> adjacentTiles = new ArrayList<>(BoardLogic.findAdjacentTiles(this.currentTile, gameState.getBoard()));
         adjacentTiles.removeIf(tile -> tile.getUnit() != null);
+
+        // Summon a Wraithling on a random available adjacent tile
         if (!adjacentTiles.isEmpty()) {
             int idx = (int) (Math.random() * adjacentTiles.size());
             Tile targetTile = adjacentTiles.get(idx);
@@ -20,3 +23,4 @@ public class BloodmoonPriestess extends Unit {
         }
     }
 }
+

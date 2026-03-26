@@ -7,13 +7,14 @@ public class Shadowdancer extends Unit {
 
     @Override
     public void deathwatch(ActorRef out, GameState gameState) {
-        // Heal the friendly avatar by 1
+        // Heal the friendly avatar by 1, capped at maxHealth to prevent overhealing
         BetterUnit ownAvatar = this.owner.getAvatar();
         if (ownAvatar != null) {
-            ownAvatar.setHealth(out, ownAvatar.getOwner(), ownAvatar.getHealth() + 1);
+            int newHealth = Math.min(ownAvatar.getHealth() + 1, ownAvatar.getMaxHealth());
+            ownAvatar.setHealth(out, ownAvatar.getOwner(), newHealth);
         }
 
-        // Deal 1 damage to the enemy avatar directly (without iterating the board)
+        // Deal 1 damage to the enemy avatar directly
         BetterUnit enemyAvatar = null;
         if (this.owner == gameState.getPlayer1()) {
             enemyAvatar = gameState.getPlayer2().getAvatar();
@@ -26,3 +27,4 @@ public class Shadowdancer extends Unit {
         }
     }
 }
+

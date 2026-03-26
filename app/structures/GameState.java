@@ -145,9 +145,12 @@ public class GameState {
 		// Reset flags
 		playerEndingTurn.getAvatar().hasAttacked = false;
 		playerEndingTurn.getAvatar().hasMoved = false;
+		playerEndingTurn.getAvatar().hasCounterattacked = false;
+
 		for (Unit unit : playerEndingTurn.getUnitList().values()) {
 			unit.hasAttacked = false;
 			unit.hasMoved = false;
+			unit.hasCounterattacked = false;
 		}
 
 		// Run AI on AI turn
