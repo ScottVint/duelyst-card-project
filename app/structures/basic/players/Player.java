@@ -151,14 +151,6 @@ public class Player {
 		BoardLogic.clearSelection(out, gameState.board);
 	}
 
-	/// Gets the current unitId, then increments the count.
-	/// @author Scott
-	// TODO See if this should be put in GameState or if there's already a function for that
-//	protected int useUnitId() {
-//		int id = unitId;
-//		unitId++;
-//		return id;
-//	}
 
 	public String toString() {
 		return "Unknown Player";
