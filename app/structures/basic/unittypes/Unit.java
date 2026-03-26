@@ -246,6 +246,11 @@ public class Unit {
 		BasicCommands.playUnitAnimation(out, this, UnitAnimationType.death);
 		try { Thread.sleep(BasicCommands.playUnitAnimation(out, this, UnitAnimationType.death)); }
 		catch (InterruptedException e) { Thread.currentThread().interrupt(); }
+
+		EffectAnimation desummonEffect = BasicObjectBuilders.loadEffect(StaticConfFiles.f1_summon);
+		try { Thread.sleep(BasicCommands.playEffectAnimation(out, desummonEffect, this.currentTile) / 2); }
+		catch (InterruptedException e) { Thread.currentThread().interrupt(); }
+
 		if (currentTile != null) {
 			currentTile.setUnit(null);
 			currentTile = null;
@@ -253,6 +258,8 @@ public class Unit {
 		if (owner != null) {
 			owner.getUnitList().remove(this.id);
 		}
+
+
 		BasicCommands.deleteUnit(out, this);
 	}
 
