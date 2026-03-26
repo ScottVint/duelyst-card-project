@@ -39,7 +39,7 @@ public class Truestrike extends Spell {
         try { Thread.sleep(BasicCommands.playEffectAnimation(out, effect, clickedTile)); }
         catch (InterruptedException e) { Thread.currentThread().interrupt(); }
         
-        enemy.takeDamage(out, 2);
+        enemy.takeDamage(out, gameState, 2);
         
         BasicCommands.playUnitAnimation(out, player.getAvatar(), UnitAnimationType.idle);
     }

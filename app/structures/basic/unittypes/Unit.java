@@ -244,6 +244,8 @@ public class Unit {
 	@JsonIgnore
 	public void die(ActorRef out) {
 		BasicCommands.playUnitAnimation(out, this, UnitAnimationType.death);
+		try { Thread.sleep(BasicCommands.playUnitAnimation(out, this, UnitAnimationType.death)); }
+		catch (InterruptedException e) { Thread.currentThread().interrupt(); }
 		if (currentTile != null) {
 			currentTile.setUnit(null);
 			currentTile = null;

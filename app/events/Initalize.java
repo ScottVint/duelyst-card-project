@@ -5,10 +5,13 @@ import com.fasterxml.jackson.databind.JsonNode;
 import akka.actor.ActorRef;
 import commands.BasicCommands;
 import structures.GameState;
+import structures.basic.EffectAnimation;
 import structures.basic.players.Player;
 import structures.basic.unittypes.BetterUnit;
 import structures.logic.AI;
 import structures.logic.BoardLogic;
+import utils.BasicObjectBuilders;
+import utils.StaticConfFiles;
 
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -54,8 +57,8 @@ public class Initalize implements EventProcessor {
         }
 
         // Place avatars at correct starting positions
-        gameState.placeAvatar(out, humanAvatar, 2, 3);
-        gameState.placeAvatar(out, aiAvatar, 8, 3);
+        gameState.placeAvatar(out, humanAvatar, 1, 2);
+        gameState.placeAvatar(out, aiAvatar, 7, 2);
 
         // Reset action flags
         humanAvatar.hasAttacked = false;
@@ -78,6 +81,8 @@ public class Initalize implements EventProcessor {
                 BasicCommands.startTurnTimer(out, gameState.currentTurnDeadlineMillis);
             }
         } else {
+            try { Thread.sleep(1000); }
+            catch (InterruptedException e) { Thread.currentThread().interrupt(); }
             AI.AILogic.runAI(out, gameState, player1, player2);
         }
     }

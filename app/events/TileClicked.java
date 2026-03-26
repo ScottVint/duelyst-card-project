@@ -37,15 +37,8 @@ public class TileClicked implements EventProcessor {
     public void processEvent(ActorRef out, GameState gameState, JsonNode message) {
         // Give nothing if clicked outside of turn
         // or if a unit is moving
-        if (gameState.gameOver) {
+        if (gameState.gameOver || !gameState.player1Turn || gameState.unitMoving)
             return;
-        } else if (!gameState.player1Turn) {
-            BasicCommands.addPlayer1Notification(out, "It is not your turn.", 2);
-            return;
-        } else if (gameState.unitMoving) {
-            BasicCommands.addPlayer1Notification(out, "A unit is already moving.", 2);
-            return;
-        }
 
         int tilex = message.get("tilex").asInt();
         int tiley = message.get("tiley").asInt();
@@ -59,9 +52,9 @@ public class TileClicked implements EventProcessor {
         // Clear board selection
         BoardLogic.clearSelection(out, board);
 
-// Ensure highlighted tile cache exists.
-// Do NOT clear it here, because card targeting relies on the previously
-// highlighted valid targets from cardClicked / unit selection.
+        // Ensure highlighted tile cache exists.
+        // Do NOT clear it here, because card targeting relies on the previously
+        // highlighted valid targets from cardClicked / unit selection.
         if (gameState.highlightedTiles == null) { //TODO just set it as an emtpy hashset on initialisation
             gameState.highlightedTiles = new HashSet<>();
         }
@@ -77,7 +70,6 @@ public class TileClicked implements EventProcessor {
         if (selectedCard != null) {
             if (gameState.highlightedTiles.contains(clickedTile)) {
                 if (gameState.player1.enoughMana(out, selectedCard.getManacost())) {
-                    BasicCommands.deleteCard(out, gameState.selectedHandPosition);
                     gameState.getPlayer1().useCard(out, gameState,
                             cardIndex, clickedTile, selectedCard.getManacost());
                 }
@@ -86,6 +78,7 @@ public class TileClicked implements EventProcessor {
             // Do not fall through into unit logic after a card click attempt
             gameState.selectedHandPosition = null;
             gameState.highlightedTiles.clear();
+            gameState.player1.destroyHand(out);
             gameState.player1.drawHand(out);
             return;
         }

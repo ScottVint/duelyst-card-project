@@ -23,10 +23,10 @@ public class CombatLogic {
 
         // Active attack — wait for each animation to finish before sending the next
         try {
-            Thread.sleep(BasicCommands.playUnitAnimation(out, attacker, UnitAnimationType.attack));
+            Thread.sleep(BasicCommands.playUnitAnimation(out, attacker, UnitAnimationType.attack) / 4 * 3);
             Thread.sleep(BasicCommands.playUnitAnimation(out, defender, UnitAnimationType.hit));
         } catch (InterruptedException e) { Thread.currentThread().interrupt(); }
-        defender.takeDamage(out, attacker.getAttack());
+        defender.takeDamage(out, gameState, attacker.getAttack());
 
         // After an attack the unit cannot attack again this turn; per Moodle FAQ
         // ("If a unit attacks and has not moved it loses its move action that turn")
@@ -43,7 +43,7 @@ public class CombatLogic {
         // Counterattack: allowed once per turn if defender survived
         if (!defender.isDead() && !defender.hasCounterattacked) {
             try {
-                Thread.sleep(BasicCommands.playUnitAnimation(out, defender, UnitAnimationType.attack));
+                Thread.sleep(BasicCommands.playUnitAnimation(out, defender, UnitAnimationType.attack) / 4 * 3);
                 Thread.sleep(BasicCommands.playUnitAnimation(out, attacker, UnitAnimationType.hit));
             } catch (InterruptedException e) { Thread.currentThread().interrupt(); }
             attacker.takeDamage(out, gameState, defender.getAttack());

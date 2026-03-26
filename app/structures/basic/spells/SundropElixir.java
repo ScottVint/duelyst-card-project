@@ -50,7 +50,7 @@ public class SundropElixir extends Spell {
         try { Thread.sleep(BasicCommands.playEffectAnimation(out, effect, clickedTile)); }
         catch (InterruptedException e) { Thread.currentThread().interrupt(); }
       
-        target.takeDamage(out, -4);
+        target.takeDamage(out, gameState, -4);
       
         BasicCommands.playUnitAnimation(out, player.getAvatar(), UnitAnimationType.idle);
 
