@@ -42,7 +42,7 @@ public class DarkTerminus extends Spell {
         catch (InterruptedException e) { Thread.currentThread().interrupt(); }
         
         Unit enemy = clickedTile.getUnit();
-        enemy.die(out);
+        enemy.die(out, gameState);
         
         BasicCommands.playUnitAnimation(out, player.getAvatar(), UnitAnimationType.idle);
     
