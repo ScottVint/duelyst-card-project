@@ -15,6 +15,8 @@ import utils.StaticConfFiles;
 import java.util.HashSet;
 import java.util.Set;
 
+import static utils.StaticConfFiles.f1_buff;
+
 public class HornOfTheForsaken extends Spell {
 
     // Returns only the related avatar unit.
@@ -44,7 +46,11 @@ public class HornOfTheForsaken extends Spell {
     public void cast(ActorRef out, GameState gameState,
                      Player player, Tile clickedTile) {
         BasicCommands.playUnitAnimation(out, player.getAvatar(), UnitAnimationType.channel);
-        EffectAnimation effect = BasicObjectBuilders.loadEffect(StaticConfFiles.f1_buff);
+        EffectAnimation effect = BasicObjectBuilders.loadEffect("conf/gameconfs/effects/f1_soulshatter.json");
+        try { Thread.sleep(BasicCommands.playEffectAnimation(out, effect, clickedTile)); }
+        catch (InterruptedException e) { Thread.currentThread().interrupt(); }
+
+        effect = BasicObjectBuilders.loadEffect(f1_buff);
         try { Thread.sleep(BasicCommands.playEffectAnimation(out, effect, clickedTile)); }
         catch (InterruptedException e) { Thread.currentThread().interrupt(); }
         BasicCommands.playUnitAnimation(out, player.getAvatar(), UnitAnimationType.idle);
