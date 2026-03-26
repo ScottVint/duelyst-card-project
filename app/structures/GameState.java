@@ -34,7 +34,7 @@ public class GameState {
 	public Unit selectedUnit = null;
 	public boolean player1Turn = true;
 
-	public int turnCount = 1;
+	public float turnCount = 1;
 	public boolean gameOver = false;
 
 	/**
@@ -215,9 +215,7 @@ public class GameState {
 		stopTurnTimer();
 
 		// Increment turn count once per full round (when P2's turn ends)
-		if (!player1Turn) {
-			turnCount++;
-		}
+			turnCount += 0.5;
 		player1Turn = !player1Turn;
 
 		// End-turn board/input cleanup
@@ -229,7 +227,7 @@ public class GameState {
 		unitMoving = false;
 
 		// Mana transfer
-		int startingMana = Math.min(turnCount + 1, Player.getMaxMana());
+		int startingMana = Math.min((int) turnCount + 1, Player.getMaxMana());
 		playerEndingTurn.setMana(out, 0);
 		playerStartingTurn.setMana(out, startingMana);
 
