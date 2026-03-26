@@ -11,6 +11,9 @@ import structures.logic.BoardLogic;
 import utils.BasicObjectBuilders;
 import utils.StaticConfFiles;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * This is a representation of a Unit on the game board.
  * A unit has a unique id (this is used by the front-end.
@@ -274,25 +277,27 @@ public class Unit {
 		try { Thread.sleep(BasicCommands.playUnitAnimation(out, this, UnitAnimationType.death)); }
 		catch (InterruptedException e) { Thread.currentThread().interrupt(); }
 
-		EffectAnimation desummonEffect = BasicObjectBuilders.loadEffect(StaticConfFiles.f1_summon);
-		try { Thread.sleep(BasicCommands.playEffectAnimation(out, desummonEffect, this.currentTile) / 2); }
-		catch (InterruptedException e) { Thread.currentThread().interrupt(); }
-
 		if (currentTile != null) {
+			EffectAnimation desummonEffect = BasicObjectBuilders.loadEffect(StaticConfFiles.f1_summon);
+			try { Thread.sleep(BasicCommands.playEffectAnimation(out, desummonEffect, currentTile) / 2); }
+			catch (InterruptedException e) { Thread.currentThread().interrupt(); }
 			currentTile.setUnit(null);
 			currentTile = null;
 		}
-		owner.getUnitList().remove(this.id);
+		if (owner != null) {
+			owner.getUnitList().remove(this.id);
+		}
 		BasicCommands.deleteUnit(out, this);
 
-		// Trigger for Player 1 Units
-		for (Unit unit : gameState.getPlayer1().getUnitList().values())
-			unit.deathwatch(out, gameState);
-			
-		// Trigger for Player 2 Units
-		for (Unit unit : gameState.getPlayer2().getUnitList().values()) 
-				unit.deathwatch(out, gameState);
-		
+		// Trigger Deathwatch for all surviving units on both sides.
+		// Snapshot the lists first to avoid ConcurrentModificationException
+		// (e.g. BloodmoonPriestess.deathwatch() adds a Wraithling to the unitList).
+		if (gameState != null) {
+			List<Unit> p1Units = new ArrayList<>(gameState.getPlayer1().getUnitList().values());
+			List<Unit> p2Units = new ArrayList<>(gameState.getPlayer2().getUnitList().values());
+			for (Unit unit : p1Units) unit.deathwatch(out, gameState);
+			for (Unit unit : p2Units) unit.deathwatch(out, gameState);
+		}
 	}
 
 	// ////////// BASIC METHODS ////////////
