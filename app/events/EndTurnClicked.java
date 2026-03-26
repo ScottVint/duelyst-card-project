@@ -26,7 +26,11 @@ public class EndTurnClicked implements EventProcessor {
 
 	@Override
 	public void processEvent(ActorRef out, GameState gameState, JsonNode message) {
-		if (gameState.gameOver || !gameState.player1Turn || gameState.unitMoving)
+		if (gameState.gameOver) {
+			BasicCommands.addPlayer1Notification(out, "The game is over.", 2);
+			return;
+		}
+		if (!gameState.player1Turn || gameState.unitMoving)
 			return;
 
 		// Clear any active unit/card selection

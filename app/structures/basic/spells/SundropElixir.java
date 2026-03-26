@@ -26,6 +26,11 @@ public class SundropElixir extends Spell {
                     ally.getPosition().getTiley());
             targets.add(tile);
         }
+        // Avatar can also be healed
+        if (player.getAvatar() != null) {
+            Unit avatar = player.getAvatar();
+            targets.add(board.getTile(avatar.getPosition().getTilex(), avatar.getPosition().getTiley()));
+        }
         return targets;
     }
 
@@ -36,7 +41,7 @@ public class SundropElixir extends Spell {
             BasicCommands.addPlayer1Notification(out, "No valid tiles!", 2);
         }
         for (Tile tile : validTargets) {
-            BasicCommands.drawTile(out, tile, 1);
+            BasicCommands.drawTile(out, tile, 2);
             BoardLogic.blink();
         }
     }

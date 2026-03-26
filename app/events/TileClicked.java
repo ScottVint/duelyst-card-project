@@ -37,7 +37,11 @@ public class TileClicked implements EventProcessor {
     public void processEvent(ActorRef out, GameState gameState, JsonNode message) {
         // Give nothing if clicked outside of turn
         // or if a unit is moving
-        if (gameState.gameOver || !gameState.player1Turn || gameState.unitMoving)
+        if (gameState.gameOver) {
+            BasicCommands.addPlayer1Notification(out, "The game is over.", 2);
+            return;
+        }
+        if (!gameState.player1Turn || gameState.unitMoving)
             return;
 
         int tilex = message.get("tilex").asInt();

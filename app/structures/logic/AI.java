@@ -175,10 +175,10 @@ public class AI {
             // AI requires a live WebSocket connection; skip during unit tests
             if (out == null) return;
 
-            summonUnits(out, gs);
-            castSpells(out, gs);
             moveUnit(out, gs);
             attack(out, gs);
+            summonUnits(out, gs);
+            castSpells(out, gs);
             try { Thread.sleep(500); } catch (InterruptedException e) { Thread.currentThread().interrupt(); }
             gs.endTurn(out, p2, p1);
         }
