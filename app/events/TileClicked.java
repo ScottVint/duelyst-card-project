@@ -52,9 +52,9 @@ public class TileClicked implements EventProcessor {
         // Clear board selection
         BoardLogic.clearSelection(out, board);
 
-// Ensure highlighted tile cache exists.
-// Do NOT clear it here, because card targeting relies on the previously
-// highlighted valid targets from cardClicked / unit selection.
+        // Ensure highlighted tile cache exists.
+        // Do NOT clear it here, because card targeting relies on the previously
+        // highlighted valid targets from cardClicked / unit selection.
         if (gameState.highlightedTiles == null) { //TODO just set it as an emtpy hashset on initialisation
             gameState.highlightedTiles = new HashSet<>();
         }
@@ -70,7 +70,6 @@ public class TileClicked implements EventProcessor {
         if (selectedCard != null) {
             if (gameState.highlightedTiles.contains(clickedTile)) {
                 if (gameState.player1.enoughMana(out, selectedCard.getManacost())) {
-                    BasicCommands.deleteCard(out, gameState.selectedHandPosition);
                     gameState.getPlayer1().useCard(out, gameState,
                             cardIndex, clickedTile, selectedCard.getManacost());
                 }
@@ -79,6 +78,7 @@ public class TileClicked implements EventProcessor {
             // Do not fall through into unit logic after a card click attempt
             gameState.selectedHandPosition = null;
             gameState.highlightedTiles.clear();
+            gameState.player1.destroyHand(out);
             gameState.player1.drawHand(out);
             return;
         }
